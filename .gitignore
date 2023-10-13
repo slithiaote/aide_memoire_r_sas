@@ -5,5 +5,5 @@
 *.xls
 *.Rhistory
 *.log
-*.png
 .Rproj.user
+
