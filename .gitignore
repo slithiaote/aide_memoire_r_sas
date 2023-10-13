@@ -1,0 +1,8 @@
+*.xlsx
+*.RData
+*.sas7bdat
+*.docx
+*.xls
+*.Rhistory
+*.log
+*.png
