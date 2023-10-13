@@ -6,3 +6,4 @@
 *.Rhistory
 *.log
 *.png
+.Rproj.user
