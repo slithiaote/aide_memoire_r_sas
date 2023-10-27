@@ -1,5 +1,8 @@
 ---
-title: "Aide-mémoire SAS"
+title: "Aide-mémoire SAS - `R`"
+author:  
+  - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr] 
+  - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr] 
 format: html
 editor: visual
 
@@ -8,67 +11,108 @@ description: |
   Un aide-mémoire pour les statisticiens qui connaissent SAS et souhaitent travailler avec `R`.
 
 # Date published
-date: 2023-10-27
-
-authors:
-  - Nassab Abdallah
-  - Damien Euzénat
-
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: tango
+    number_sections: true
+    
 categories:
   - SAS
   - R
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## Nombre de lignes et de colonnes dans la table
 
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 
-```{r}
-#| eval: false
-1 * 1
+```
+proc sql;
+  select count(*) as Nb_Lignes from Donnees_sas;
+quit;
+
 ```
 
 ## `R base` {.unnumbered .unlisted}
 
 ```{r}
 #| eval: false
-2 * 2
+# Nombre de lignes et de colonnes dans la base
+sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
 ```
 ## `tidyverse` {.unnumbered .unlisted} 
 
 ```{r}
 #| eval: false
-3 * 3
+# Nombre de lignes
+donnees_dplyr |> nrow()
+
+# Nombre de colonnes
+donnees_dplyr |>  ncol()
 ```
 
 ## `data.table` {.unnumbered .unlisted} 
 
 ```{r}
 #| eval: false
-# A écrire
+# Nombre de lignes
+donnees_dt[, .N]
+
+# Nombre de colonnes
+print(dim(donnees_dt)[2])
 ```
 
 ## `arrow` {.unnumbered .unlisted} 
 
 ```{r}
 #| eval: false
-# A écrire
+# Nombre de lignes
+donnees_arrow |> nrow()
+
+# Nombre de colonnes
+donnees_arrow |>  ncol()
 ```
 :::
 
-You can add options to executable code like this
+
+## Afficher les noms des variables de la table
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+
+```
+proc contents data = donnees_sas; run;
+```
+
+## `R base` {.unnumbered .unlisted}
 
 ```{r}
 #| eval: false
-2 * 2
+names(donnees_rbase)
+```
+## `tidyverse` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+colnames(donnees_dplyr)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## `data.table` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+names(donnees_dt)
+```
+
+## `arrow` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+donnees_arrow |> colnames()
+```
+:::
