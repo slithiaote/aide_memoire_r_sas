@@ -1,0 +1,74 @@
+---
+title: "Aide-mémoire SAS"
+format: html
+editor: visual
+
+# Summary for listings and search engines
+description: |
+  Un aide-mémoire pour les statisticiens qui connaissent SAS et souhaitent travailler avec `R`.
+
+# Date published
+date: 2023-10-27
+
+authors:
+  - Nassab Abdallah
+  - Damien Euzénat
+
+categories:
+  - SAS
+  - R
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+
+```{r}
+#| eval: false
+1 * 1
+```
+
+## `R base` {.unnumbered .unlisted}
+
+```{r}
+#| eval: false
+2 * 2
+```
+## `tidyverse` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+3 * 3
+```
+
+## `data.table` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+# A écrire
+```
+
+## `arrow` {.unnumbered .unlisted} 
+
+```{r}
+#| eval: false
+# A écrire
+```
+:::
+
+You can add options to executable code like this
+
+```{r}
+#| eval: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
