@@ -16,7 +16,7 @@ output:
   rmdformats::robobook:
     highlight: tango
     number_sections: true
-    
+  
 categories:
   - SAS
   - R
@@ -42,7 +42,11 @@ quit;
 ```{r}
 #| eval: false
 # Nombre de lignes et de colonnes dans la base
-sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
+sprintf(
+  "Nombre de lignes : %d | Nombre de colonnes : %d",
+  dim(donnees_rbase)[1], 
+  dim(donnees_rbase)[2]
+)
 ```
 ## `tidyverse` {.unnumbered .unlisted} 
 
