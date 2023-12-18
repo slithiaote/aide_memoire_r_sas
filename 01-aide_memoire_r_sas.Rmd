@@ -111,6 +111,8 @@ if (annee >= 2023) {
 
 ## SAS {.tabset .tabset-fade .tabset-pills}
 
+
+
 ```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
 /* Création d'une base de données SAS d'donnees */
 /* Données fictives sur des formations */
@@ -443,6 +445,7 @@ ls(donnees_rbase)
 ```{r, warning=FALSE, message=FALSE, class.source='klippy'}
 donnees_dplyr %>% colnames()
 ```
+
 ## Création de colonnes et de lignes {.tabset .tabset-fade .tabset-pills}
 
 1. Création de la colonne note2
@@ -580,7 +583,7 @@ run;
 ### R base {.tabset .tabset-fade .tabset-pills}
 
 ```{r, warning=FALSE, message=FALSE, class.source='klippy'}
-donnees_rbase_rbase$agef[donnees_rbase$age < 26]                     <- "1. De 15 à 25 ans"
+donnees_rbase$agef[donnees_rbase$age < 26]                     <- "1. De 15 à 25 ans"
 # 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
 donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
 donnees_rbase$agef[donnees_rbase$age >= 50]                    <- "3. 50 ans ou plus"
@@ -683,7 +686,6 @@ donnees_femme_dplyr <- donnees_dplyr %>%
   drop Mois;
   rename Mois_a = Mois;
 run;*/
-
 ```
 
 ### R base {.tabset .tabset-fade .tabset-pills}
@@ -698,7 +700,6 @@ donnees_rbase$mois <- sprintf("%02d", donnees_rbase$mois)
 
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
-
 ```{r, warning=FALSE, message=FALSE, class.source='klippy'}
 donnees_dplyr <- donnees_dplyr %>% 
   mutate(mois=lubridate::month(date_entree),
@@ -706,6 +707,7 @@ donnees_dplyr <- donnees_dplyr %>%
 ```
 
 ## Réexprimer en masse des valeurs {.tabset .tabset-fade .tabset-pills}
+
 ### SAS {.tabset .tabset-fade .tabset-pills}
 
 ```{sashtml, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
@@ -952,59 +954,288 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 ### R base {.tabset .tabset-fade .tabset-pills}
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+
 # Manipuler des chaînes de caractères 
 
 ## Majuscule, minuscule {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
+
+Première lettre en majuscule 
+
+```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+/*data Donnees_sas;
+set Donnees_sas;
+Niveau = propcase(Niveau);
+run;*/
+```
+
+Majuscule 
+
+```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+/*data Donnees_sas;
+set Donnees_sas;
+CSP_majuscule = upcase(CSPF);
+run;*/
+```
+
+Minuscule 
+
+```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+/*data Donnees_sas;
+set Donnees_sas;
+CSP_minuscule = lowcase(CSPF);
+run;*/
+```
+
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+Première lettre en majuscule 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
+```
+
+Majuscule
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
+```
+
+Minuscule 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase$csp_maj <- tolower(donnees_rbase$cspf)
+```
+
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+Première lettre en majuscule 
+
+```{r}
+donnees_dplyr <- donnees_dplyr %>%  
+  mutate(niveau=str_to_title(niveau))
+```
+
+Majuscule
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_dplyr <- donnees_dplyr %>% 
+  mutate(csp_maj=toupper(cspf))
+```
+
+Minuscule 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_dplyr <- donnees_dplyr %>% 
+  mutate(csp_maj=tolower(cspf))
+```
+
+```{r}
+
+```
+
+
 ## Remplacer une chaîne de catactère par une autre {.tabset .tabset-fade .tabset-pills}
+
 ### SAS {.tabset .tabset-fade .tabset-pills}
+
+```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+/*data Donnees_sas;
+set Donnees_sas;
+Niveau = tranwrd(Niveau, "Qualifie", "Qualifié");
+run; */
+```
+
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
 ## Supprimer des blancs {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+texte_rbsase <- "              Ce   Texte   mériterait   d être   corrigé                  "
+texte_rbase_1 <- "Je m'appelle"
+texte_rbase_2 <- "R"
+
+# trimws enlève les espaces au début et à la fin d'une chaîne de caractère
+texte_rbase <- gsub("\\s+", " ", trimws(texte_rbsase))
+```
+
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+texte_dplyr <- "              Ce   Texte   mériterait   d être   corrigé                  "
+texte_dplyr_1 <- "Je m'appelle"
+texte_dplyr_2 <- "R"
+
+# str_squish() supprime les espaces blancs au début et à la fin, et remplace tous les espaces blancs internes par un seul espace
+texte_dplyr <- str_squish(texte_dplyr)
+```
+
 
 ## Concaténer des chaînes de caractères {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
-### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Concaténer des chaînes de caractères
+paste(texte_rbase_1, texte_rbase_2, sep = " ")
+```
 ## Nombre de caractères dans une chaîne de caractères {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
-### R base {.tabset .tabset-fade .tabset-pills}
+### R base {.tabset .tabset-fade .tabset-pills
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Nombre de caractères dans une chaîne de caractères
+donnees_rbase$taille_id <- nchar(donnees_rbase$identifiant)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Nombre de caractères dans une chaîne de caractères
+donnees_dplyr <- donnees_dplyr %>% 
+   mutate(taille_id = str_split(identifiant, '') %>% 
+              lengths)
+```
 
 ## Transformer plusieurs caractères différents {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Transformer plusieurs caractères différents
+chaine <- "éèêëàâçîô"
+chartr("éèêëàâçîô", "eeeeaacio", chaine)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
 
 # Gestion ligne par ligne 
 
 ## Numéro de l'observation {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Numéro de l'observation : 2 manières différentes
+donnees_rbase$num_observation <- row.names(donnees_rbase)
+donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_dplyr <- donnees_dplyr %>% 
+  mutate(num_observation= row_number())
+```
 
 ## Trier des colonnes {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Numéro du contrat de chaque individu, contrat trié par date de survenue
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase$a <- 1
+donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
+
+# Pour trier les colonnes
+tri <- c("identifiant", "date_entree", "numero_contrat", "num_observation")
+donnees_rbase_tri <- donnees_rbase[, c(tri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% tri])]
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Numéro du contrat de chaque individu, contrat trié par date de survenue 
+
+donnees_dplyr <- donnees_dplyr %>% 
+  group_by(identifiant) %>% 
+  arrange(identifiant, date_entree) %>% 
+  mutate(numero_contrat=row_number())
+
+# arrange() va permettre de trier les observations par identifiant et date d'entrée 
+
+# Pour trier les colonnes
+
+donnees_dplyr_tri <- donnees_dplyr %>% 
+  select(identifiant, date_entree, numero_contrat, num_observation, everything())
+```
+
 ## Identifier le 1er, le 2e, le dernier contrat d’un individu {.tabset .tabset-fade .tabset-pills}
+
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Filtre sur le deuxième contrat 
+
+deuxieme_contrat_rbase <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Créer une base avec les seuls premiers contrats, et une base avec les seuls derniers contrats
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+premier_contrat_rbase <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = FALSE), ]
+dernier_contrat_rbase <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = TRUE), ]
+ni_prem_ni_der_rbase  <- donnees_rbase[! (!duplicated(donnees_rbase$identifiant, fromLast = FALSE) | !duplicated(donnees_rbase$identifiant, fromLast = TRUE)), ]
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Filtre sur le deuxième contrat 
+
+deuxieme_contrat_dplyr <- donnees_dplyr %>% 
+  filter(numero_contrat == 2)
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Créer une base avec les seuls premiers contrats, et une base avec les seuls derniers contrats
+
+premier_contrat_dplyr <- donnees_dplyr %>% 
+  filter(numero_contrat==1)
+
+dernier_contrat_dplyr <- donnees_dplyr %>% 
+  group_by(identifiant) %>% 
+  filter(numero_contrat==max(numero_contrat)) %>% 
+  ungroup()
+
+ni_prem_ni_der_dplyr  <- donnees_dplyr %>% 
+  group_by(identifiant) %>% 
+  filter(numero_contrat!=1 & numero_contrat != max(numero_contrat)) %>% 
+  ungroup()
+```
+
 
 ## Date de fin du contrat précédent {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+# La date de fin du contrat précédent
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Il faut soit utiliser un package, soit utiliser cette astuce car il n'existe pas de fonction lag dans le R de base (à notre connaissance)
+donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(length(donnees_rbase$date_sortie) - 1)])
+donnees_rbase$date_sortie_1[!duplicated(donnees_rbase$identifiant, fromLast = FALSE)] <- as.Date(NA)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+
+```
 
 ## Valeur retardée (lag) {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
@@ -1026,51 +1257,239 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 ## Repérer les valeurs manquantes{.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase$missing <- ifelse(is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), 1, 0)
+ageManquant_rbase_faux <- donnees_rbase[donnees_rbase$age == NA,  ] # Faux : crée une basse de données avec que des NA
+ageManquant_rbase_correct <- donnees_rbase[is.na(donnees_rbase$age), ] # Correct
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_dplyr <- donnees_dplyr %>% 
+  mutate(missing = ifelse(is.na(age) | is.na(niveau), 1, 0))
+
+ageManquant_dplyr <- donnees_dplyr %>% 
+  filter(is.na(age))
+```
+
 ## Incidence des valeurs manquantes, différent entre SAS et R {.tabset .tabset-fade .tabset-pills}
+
+Incidence des valeurs manquantes : 
+
+1. Dans des opérations (*exemple de la moyenne*)
+2. Dans les tris 
+
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
-### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+#### Opérations 
+
+Il suffit de rajouter l'argument *na.rm=TRUE*  
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+mean(donnees_rbase$note_formateur) # s'il existe un seul NA et que l'on ne précise rien, la fonction retournera NA
+```
+
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Il faut donc rajouter l'argument na.rm=TRUE (remove NA) afin de calculer la moyenne sans prendre en compte les NA
+
+mean(donnees_rbase$note_formateur, na.rm = TRUE)
+```
+
+#### Tris 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Trier la base par ligne (individu et date de début de la formation) par ordre croissant
+
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
+
+# soit croissant ou décroissant
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+
+# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+# donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$date_entree, na.last = FALSE), ] #ne marche pas pour les dates à refaire
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Trier la base par colonne (noms de variables)
+# On met identifiant date_entree et date_sortie au début
+# colTri <- c("identifiant", "date_entree", "date_sortie")
+# donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Pour mimer le tri SAS, il faut écrire :
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+```
 
 # Les doublons 
 
 ## Repérage des doublons {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Repérage
+doublons_rbase <- donnees_rbase[duplicated(donnees_rbase), ]
+
+#doublons ici : toute la ligne est identique avec une autre ligne 
+#avec cette commande, s'il y existe des doublons i.e. deux observations qui ont les mêmes observations pour toutes les variables, la base doublons_rbase stockera uniquement un des doublons mais pas toutes les lignes qui sont identiques 
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Repérage
+doublons_dplyr <- donnees_dplyr %>%  
+  group_by(identifiant, sexe) %>% 
+  filter(n()>1)
+
+#doublons ici : les observations qui ont le même identifiant et le même sexe 
+#avec cette commande, la base doublons_dplyr va stocker toutes les observations qui sont en doubles i.e. qui ont le même identifiant et le même sexe 
+```
 
 ## Suppression des doublons {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_rbase <- donnees_rbase[! duplicated(donnees_rbase), ]
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Autre solution (solution first. de SAS)
+donnees_rbase <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+donnees_dplyr <- donnees_dplyr %>% 
+  distinct()
+```
 
 
 # Les jointures de base 
 
+
+
 ## Inner Join : identifiants communs aux bases {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
+
+
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r}
+# On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
+diplome_rbase <- data.frame(identifiant_i = c("173", "168", "112", "087", "689", "765", "112", "999", "554"),
+diplome= c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"),
+age_dip = c(22, 27, 18, 23, 21, 15, 21, 18, 20)
+)
+```
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 1. Inner join : les seuls identifiants communs aux deux bases
+jointure_rbase <- donnees_rbase[, c("identifiant", "sexe", "age")]
+innerJoin_rbase <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant_i")
+dim(innerJoin_rbase)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r}
+# On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
+diplome_dplyr <- data.frame(identifiant= c("173", "168", "112", "087", "689", "765", "112", "999", "554"),
+diplome= c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"),
+age_dip = c(22, 27, 18, 23, 21, 15, 21, 18, 20)
+)
+```
+
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 1. Inner join : les seuls identifiants communs aux deux bases
+jointure_dplyr<- donnees_dplyr %>% 
+  select(identifiant, sexe, age)
+
+innerJoin_dplyr <- jointure_dplyr %>% 
+  inner_join(diplome_dplyr, by="identifiant")
+```
 
 ## Left et Right Join : identifiants de l’une des bases {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 2. Left join : les identifiants de la base de gauche
+leftJoin_rbase <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant_i", all.x = TRUE)
+dim(leftJoin_rbase)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 2. Left join : les identifiants de la base de gauche
+leftJoin_dplyr <- jointure_dplyr %>% 
+  left_join(diplome_dplyr, by="identifiant")
+```
+
 
 ## Full Join : identifiants de l’une ou l’autre des bases {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 3. Full join : les identifiants des deux bases
+fullJoin_rbase <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant_i", all = TRUE)
+dim(fullJoin_rbase)
+```
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 3. Full join : les identifiants des deux bases
+fullJoin_dplyr <- jointure_dplyr %>% 
+  full_join(diplome_dplyr)
+```
 
 ## Cross Join : toutes les combinaisons possibles {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 4. Cross join : toutes les combinaisons possibles de CSP, sexe et Diplome
+crossJoin_rbase <- unique(expand.grid(donnees_rbase$cspf, donnees_rbase$sexef, diplome_rbase$diplome))
+colnames(crossJoin_rbase) <- c("cspf", "sexef", "diplome")
+crossJoin_rbase
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# 4. Cross join 
+crossJoin_dplyr <- cross_join(jointure_dplyr, diplome_dplyr) #à refaire
+```
+
 ## Empiler les bases {.tabset .tabset-fade .tabset-pills}
+
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Lorsque les variables ne correspondent pas, on les crée avec des valeurs manquantes, via setdiff
+empilement <- rbind(
+data.frame(c(donnees_rbase, sapply(setdiff(names(diplome_rbase), names(donnees_rbase)), function(x) NA))),
+data.frame(c(diplome_rbase, sapply(setdiff(names(donnees_rbase), names(diplome_rbase)), function(x) NA)))
+)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
 
 
@@ -1079,17 +1498,111 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 ##  Somme, moyenne, médiane, minimum, maximum, nombre de valeurs {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+ 
+* Moyenne 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Moyenne de chaque note
+notes_rbase <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+lapply(donnees_rbase[, notes_rbase], mean, na.rm = TRUE)
+```
+
+* Moyenne, médiane, maximum, minimum 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+sapply(donnees_rbase[, notes], function(x) c("Somme" = sum(x, na.rm = TRUE), "Moyenne" = mean(x, na.rm = TRUE),
+"Médiane" = median(x, na.rm = TRUE), "Max" = max(x, na.rm = TRUE),
+"Min" = min(x, na.rm = TRUE)))
+```
+
+* Moyenne avec pondération 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Avec la pondération
+with(donnees_rbase, sapply(donnees_rbase[, notes], function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)))
+```
+
+* Résumé statistique
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+summary(donnees_rbase[, notes])
+```
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+* Moyenne par identifiant 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+notes_dplyr <- donnees_dplyr %>%  
+  select(starts_with("Note")) %>% 
+  summarise_all(.funs = c(mean="mean"))
+```
+
+* Moyenne par identifiant par pondération 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+notes_dplyr <- donnees_dplyr %>%  
+  select(starts_with("Note"), poids_sondage) %>% 
+  summarise(across(note_contenu:note_materiel, ~weighted.mean(., w = poids_sondage)))
+```
+
 
 ## Quantiles {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
-### R base {.tabset .tabset-fade .tabset-pills}
+### R base 
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+# Déciles et quartiles de la note moyenne
+quantile(donnees_rbase$note_moyens, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r}
+donnees_dplyr %>% 
+  group_by(identifiant) %>%  
+  summarise(quantile = scales::percent(c(0.25, 0.5, 0.75)),
+            note_moyens = quantile(note_moyens, c(0.25, 0.5, 0.75), na.rm = TRUE))
+```
+
 
 ## Tableaux de fréquence / contingence : proc freq {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
+
+L'équivalent de *proc freq* sur SAS :
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+table(donnees_rbase$sexef, useNA = "always")
+```
+
 ### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+tableau_contingence <- donnees_dplyr %>% 
+  group_by(sexef) %>% 
+  summarise(n=n())
+
+tableau_contingence
+```
+
+## Proportion {.tabset .tabset-fade .tabset-pills}
+### SAS {.tabset .tabset-fade .tabset-pills}
+### R base {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+prop.table(table(donnees_rbase$sexef, useNA = "always")) * 100
+```
+
+### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+proportion <- donnees_dplyr %>% 
+  group_by(sexef) %>% 
+  summarise(n=n(),
+            pourcentage=round(n/length(donnees_dplyr$sexef)*100,2))
+
+proportion
+```
 
 # Fonction, macros SAS 
 
@@ -1109,7 +1622,10 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 ## Supprimer toutes les bases de la mémoire vive (work RAM) {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 ### R base {.tabset .tabset-fade .tabset-pills}
-### Dplyr {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE, class.source='klippy'}
+rm(list = ls())
+```
 
 # Points de vigilance en SAS 
 
