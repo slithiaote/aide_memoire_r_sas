@@ -56,7 +56,7 @@ library(magrittr)
 ## Chemin vers le bureau et affichage de la date et de l'année {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills}
 
-```{saslog, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy'} 
+```
 /* Chemin du bureau de l'utilisateur */
 /* On vide la log */
 dm "log; clear; ";
@@ -110,7 +110,6 @@ if (annee >= 2023) {
 # Création d'une base de données {.tabset .tabset-fade .tabset-pills}
 
 ## SAS {.tabset .tabset-fade .tabset-pills}
-
 
 
 ```{sas, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
@@ -290,8 +289,8 @@ Convertir certaines variables en format 'date', 'integer' et 'numeric'
 ## SAS {.tabset .tabset-fade .tabset-pills} 
 
 
-```{sashtml, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
-/*data Donnees_sas;
+```
+data Donnees_sas;
   set Donnees_sas;
   duree_int = input(duree, 1.);
   note_contenu_int = input(note_contenu, 1.);
@@ -301,7 +300,7 @@ Convertir certaines variables en format 'date', 'integer' et 'numeric'
   note_materiel_int = input(note_materiel, 1.);
   date_naissance_date = input(date_naissance, DDMMYY10.);
   date_entree = input(date_entree, DDMMYY10.);
-run;*/
+run;
 ```
 
 ## R base {.tabset .tabset-fade .tabset-pills} 
@@ -340,13 +339,16 @@ donnees_dplyr <- donnees_dplyr %>%
 
 ### SAS {.tabset .tabset-fade .tabset-pills}
 
-```{sashtml, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+```
 /* Extraire les x premières lignes de la base (10 par défaut) */
 /*
 %let x = 10;
 proc print data = Donnees_sas (firstobs = 1 obs = &x.);run;*/
 /* Ou alors */
-/*data Lignes&x.;set Donnees_sas (firstobs = 1 obs = &x.);proc print;run;*/
+data Lignes&x.;
+set Donnees_sas (firstobs = 1 obs = &x.);
+proc print;
+run;
 ```
 
 ### R base {.tabset .tabset-fade .tabset-pills}
@@ -369,11 +371,11 @@ donnees_dplyr %>%
 ## Renommer les variables {.tabset .tabset-fade .tabset-pills}
 ### SAS {.tabset .tabset-fade .tabset-pills} 
 
-```{sashtml, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+```
 /* On renomme la variable sexe_red en sexe */
-/*data Donnees_sas;
+data Donnees_sas;
   set Donnees_sas (rename = (sexe_red = sexe));
-run;*/
+run;
 ```
 
 ### R base {.tabset .tabset-fade .tabset-pills} 
@@ -401,12 +403,16 @@ donnees_dplyr <- donnees_dplyr %>%
 
 ### SAS {.tabset .tabset-fade .tabset-pills} 
 
-```{sashtml, engine.path = 'C:\\Logiciel\\SASHome\\SASFoundation\\9.4\\sas.exe', encoding="UTF-8", class.source='klippy', collectcode=TRUE}
+```
 /* Nombre de lignes */
-/*proc sql;select count(*) as Nb_Lignes from Donnees_sas;quit;*/
+proc sql;
+  select count(*) as Nb_Lignes from Donnees_sas;
+quit;
 
 /* Nombre de colonnes */
-/*proc sql;select count(*) as Nb_Colonnes from Var;quit;*/
+proc sql;
+  select count(*) as Nb_Colonnes from Var;
+quit;
 ```
 
 ### R base {.tabset .tabset-fade .tabset-pills} 
