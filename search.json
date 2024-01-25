@@ -105,34 +105,6 @@
     "text": "Notes de bas de page\n\n\nDares/SCS, nassab.abdallah@travail.gouv.fr↩︎\nDares/DIP, damien.euzenat@travail.gouv.fr↩︎"
   },
   {
-    "objectID": "qmd_minimal.html",
-    "href": "qmd_minimal.html",
-    "title": "Aide-mémoire SAS - R",
-    "section": "",
-    "text": "SASR basetidyversedata.tablearrow\n\n\nproc sql;\n  select count(*) as Nb_Lignes from Donnees_sas;\nquit;\n\n\n\n\n# Nombre de lignes et de colonnes dans la base\nsprintf(\n  \"Nombre de lignes : %d | Nombre de colonnes : %d\",\n  dim(donnees_rbase)[1], \n  dim(donnees_rbase)[2]\n)\n\n\n\n\n# Nombre de lignes\ndonnees_dplyr |&gt; nrow()\n\n# Nombre de colonnes\ndonnees_dplyr |&gt;  ncol()\n\n\n\n\n# Nombre de lignes\ndonnees_dt[, .N]\n\n# Nombre de colonnes\nprint(dim(donnees_dt)[2])\n\n\n\n\n# Nombre de lignes\ndonnees_arrow |&gt; nrow()\n\n# Nombre de colonnes\ndonnees_arrow |&gt;  ncol()"
-  },
-  {
-    "objectID": "qmd_minimal.html#nombre-de-lignes-et-de-colonnes-dans-la-table",
-    "href": "qmd_minimal.html#nombre-de-lignes-et-de-colonnes-dans-la-table",
-    "title": "Aide-mémoire SAS - R",
-    "section": "",
-    "text": "SASR basetidyversedata.tablearrow\n\n\nproc sql;\n  select count(*) as Nb_Lignes from Donnees_sas;\nquit;\n\n\n\n\n# Nombre de lignes et de colonnes dans la base\nsprintf(\n  \"Nombre de lignes : %d | Nombre de colonnes : %d\",\n  dim(donnees_rbase)[1], \n  dim(donnees_rbase)[2]\n)\n\n\n\n\n# Nombre de lignes\ndonnees_dplyr |&gt; nrow()\n\n# Nombre de colonnes\ndonnees_dplyr |&gt;  ncol()\n\n\n\n\n# Nombre de lignes\ndonnees_dt[, .N]\n\n# Nombre de colonnes\nprint(dim(donnees_dt)[2])\n\n\n\n\n# Nombre de lignes\ndonnees_arrow |&gt; nrow()\n\n# Nombre de colonnes\ndonnees_arrow |&gt;  ncol()"
-  },
-  {
-    "objectID": "qmd_minimal.html#afficher-les-noms-des-variables-de-la-table",
-    "href": "qmd_minimal.html#afficher-les-noms-des-variables-de-la-table",
-    "title": "Aide-mémoire SAS - R",
-    "section": "Afficher les noms des variables de la table",
-    "text": "Afficher les noms des variables de la table\n\nSASR basetidyversedata.tablearrow\n\n\nproc contents data = donnees_sas; run;\n\n\n\nnames(donnees_rbase)\n\n\n\n\ncolnames(donnees_dplyr)\n\n\n\n\nnames(donnees_dt)\n\n\n\n\ndonnees_arrow |&gt; colnames()"
-  },
-  {
-    "objectID": "qmd_minimal.html#footnotes",
-    "href": "qmd_minimal.html#footnotes",
-    "title": "Aide-mémoire SAS - R",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nDares/DIP, damien.euzenat@travail.gouv.fr↩︎\nDares/SCS, nassab.abdallah@travail.gouv.fr↩︎\nDares/DIP, damien.euzenat@travail.gouv.fr↩︎\nDares/SCS, nassab.abdallah@travail.gouv.fr↩︎\nDares/DIP, damien.euzenat@travail.gouv.fr↩︎\nDares/SCS, nassab.abdallah@travail.gouv.fr↩︎"
-  },
-  {
     "objectID": "01-aide_memoire_r_sas.html",
     "href": "01-aide_memoire_r_sas.html",
     "title": "Aide-mémoire SAS - R",
