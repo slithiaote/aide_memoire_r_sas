@@ -108,8 +108,7 @@ paste0("Année passée: ", annee_1)
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 if (annee >= 2023) {
   print("Nous sommes en 2023 ou après")
-}
-else {
+}else {
   print("Nous sommes en 2022 ou avant")
 }
 # Construction correcte ! Le else doit être sur la même ligne que le {
