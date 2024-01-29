@@ -4,6 +4,7 @@ lang : fr
 author:
   - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr]
   - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr]
+  - Sébastien LI-THIAO-TE^[Dares/DFA, sebastien.li-thiao-te@travail.gouv.fr]
 format:
   html:
     toc: true
@@ -248,6 +249,33 @@ donnees_tidyverse <- donnees_tidyverse %>% janitor::row_to_names(row_number = 1)
 #la base de données 
 donnees_tidyverse <- donnees_tidyverse %>% mutate_all(na_if,"")
 ```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+Duckdb fonctionne comme un serveur SQL. Il faut transférer les données vers le serveur SQL.
+
+```{r, warning=FALSE, message=FALSE}
+# Ouvrir une connexion au serveur duckdb
+con <- DBI::dbConnect(duckdb::duckdb()); 
+
+# On "copie" les données dans une table du nom table_duckdb
+con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
+
+con %>% tbl("table_duckdb")
+
+# Fermer la connexion au serveur duckdb
+DBI::dbDisconnect(con, shutdown = TRUE)
+```
+
+Pour la suite, on suppose que la connexion est ouverte sous le nom `con`, et que les données sont accessibles par la requête `requete_duckdb`. Le code modifiera la requete, mais pas la table dans le serveur SQL.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb()); 
+con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
+requete_duckdb <- con %>% tbl("table_duckdb")
+```
+
+N.B. Duckdb est envisagé pour des traitements sans charger des données en mémoire, par exemple en lisant directement un fichier `.parquet` sur le disque dur. Dans ce cas, les opérations sont effectuées à la volée, mais n'affectent pas les fichiers source.
 :::
 
 ## Manipuler les colonnes de la base de données
@@ -274,6 +302,17 @@ colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% colnames()
+```
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% rename_with(tolower) 
+requete_duckdb %>% colnames()
 ```
 :::
 
@@ -322,6 +361,21 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(poids_sondage=as.numeric(poids_sondage)) %>% 
   mutate_at(enDate, lubridate::dmy)
 ```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+enDate <- c('date_naissance', 'date_entree')
+```
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>%  
+  mutate_at(enNumerique, as.integer) %>% 
+  mutate(poids_sondage=as.numeric(poids_sondage)) %>%
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) # strptime est une fonction duckdb
+requete_duckdb %>% select(enDate, duree, note_contenu)
+```
 :::
 
 ## Information sur la base de données
@@ -355,6 +409,14 @@ donnees_tidyverse %>%
   slice(1:10) %>% 
   head()
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+En duckdb, les dix premières lignes sont affichées par défaut. Si on veut les récupérer, par exemple dans une autre variable, il faut faire `collect()`. Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% head(10) %>% collect()
+```
 :::
 
 ### Renommer les variables
@@ -387,6 +449,15 @@ donnees_rbase <- donnees_rbase[, -which(names(donnees_rbase) %in% c("sexe_red"))
 donnees_tidyverse <- donnees_tidyverse %>% 
   rename(sexe=sexe_red)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# On renomme la variable sexe_red en sexe
+# La fonction rename() va écraser l'ancien nom de la variable contrairement au code utilisé dans la section R base
+requete_duckdb <- requete_duckdb %>% 
+  rename(sexe=sexe_red)
+```
 :::
 
 ### Nombre de lignes et de colonnes dans la base
@@ -417,6 +488,19 @@ donnees_tidyverse %>% nrow()
 
 #Nombre de colonnes
 donnees_tidyverse %>%  ncol()
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+Duckdb/SQL ne connaît pas le nombre de lignes sans un calcul. Il faut faire `count()`.
+
+```{r, warning=FALSE, message=FALSE}
+#Nombre de lignes
+requete_duckdb %>% nrow() # retourne NA
+requete_duckdb %>% count() # retourne 27
+
+#Nombre de colonnes
+requete_duckdb %>%  ncol()
 ```
 :::
 
@@ -1957,6 +2041,12 @@ proportion
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 rm(list = ls())
+```
+
+### `Duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+DBI::dbDisconnect(con, shutdown = TRUE)
 ```
 :::
 
