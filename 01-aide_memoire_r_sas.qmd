@@ -522,6 +522,13 @@ ls(donnees_rbase)
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% colnames()
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% colnames()
+```
+
 :::
 
 ### Création de colonnes et de lignes
@@ -564,6 +571,21 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_tidyverse <- donnees_tidyverse %>% 
    mutate(age=as.period(interval(start = date_naissance, end = date_entree))$year)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne note2
+requete_duckdb <- requete_duckdb %>% 
+  mutate(note2= note_contenu / 20 * 5)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne age 
+requete_duckdb <- requete_duckdb %>% mutate(age= year(age(date_entree,date_naissance))) 
+requete_duckdb %>% select(note2, age)
+```
+
 :::
 
 ### Supression de colonnes et de lignes
@@ -586,6 +608,12 @@ donnees_rbase$note2 <- NULL
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
+  select(-note2)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+requete_duckdb <- requete_duckdb %>% 
   select(-note2)
 ```
 :::
@@ -639,6 +667,25 @@ donnees_tidyverse <- donnees_tidyverse %>%
     csp=="5" ~ "Retraité",
     TRUE ~ csp))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+Préférer `case_match` quand il s'agit de valeurs déterminées.
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% 
+  mutate(sexef = case_when(
+    sexe=="1" ~ "Homme",
+    sexe=="2" ~ "Femme",
+    .default = sexe),
+         cspf = case_match(csp,
+    "1" ~ "Cadre",
+    "2" ~ "Profession intermédiaire",
+    "3" ~ "Employé",
+    "4" ~ "Ouvrier",
+    "5" ~ "Retraité",
+    .default = csp))
+```
+
 :::
 
 ### Valeur continue
@@ -677,6 +724,17 @@ donnees_tidyverse <- donnees_tidyverse %>%
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
     age >= 50 ~ "3. 50 ans ou plus"))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+requete_duckdb <- requete_duckdb %>%
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus"))
+```
+
 :::
 
 ## Manipuler des lignes et des colonnes
@@ -706,6 +764,12 @@ donnees_col_select_rbase <- donnees_rbase[, c("identifiant", "csp", "niveau")]
 donnees_col_select_tidyverse <- donnees_tidyverse %>% 
   select(identifiant, csp, niveau)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(identifiant, csp, niveau)
+```
+
 :::
 
 ### Selection de lignes
@@ -733,7 +797,14 @@ donnees_femme_rbase <- donnees_rbase[donnees_rbase$sexef=="Femme", ]
 donnees_femme_tidyverse <- donnees_tidyverse %>% 
   filter(sexef=="Femme")
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% filter(sexef=="Femme")
+```
+
 :::
+
 
 ## Manipuler des lignes et des colonnes
 
@@ -773,6 +844,15 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(mois=lubridate::month(date_entree),
          mois=ifelse(str_length(mois)<2, paste0("0", mois), mois))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% 
+  mutate(mois=lubridate::month(date_entree),
+         mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) 
+requete_duckdb %>% select(mois)
+```
+
 :::
 
 ### Réexprimer en masse des valeurs
@@ -843,6 +923,15 @@ notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(across(notes, ~ .x/20*100))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+
+requete_duckdb <- requete_duckdb %>% 
+  mutate(across(notes, ~ .x/20*100))
+```
+
 :::
 
 ### Passer une variable de numérique à caractère et vice-versa
