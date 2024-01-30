@@ -4,6 +4,7 @@ lang : fr
 author:
   - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr]
   - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr]
+  - Sébastien LI-THIAO-TE^[Dares/DFA, sebastien.li-thiao-te@travail.gouv.fr]
 format:
   html:
     toc: true
@@ -248,6 +249,33 @@ donnees_tidyverse <- donnees_tidyverse %>% janitor::row_to_names(row_number = 1)
 #la base de données 
 donnees_tidyverse <- donnees_tidyverse %>% mutate_all(na_if,"")
 ```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+Duckdb fonctionne comme un serveur SQL. Il faut transférer les données vers le serveur SQL.
+
+```{r, warning=FALSE, message=FALSE}
+# Ouvrir une connexion au serveur duckdb
+con <- DBI::dbConnect(duckdb::duckdb()); 
+
+# On "copie" les données dans une table du nom table_duckdb
+con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
+
+con %>% tbl("table_duckdb")
+
+# Fermer la connexion au serveur duckdb
+DBI::dbDisconnect(con, shutdown = TRUE)
+```
+
+Pour la suite, on suppose que la connexion est ouverte sous le nom `con`, et que les données sont accessibles par la requête `requete_duckdb`. Le code modifiera la requete, mais pas la table dans le serveur SQL.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb()); 
+con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
+requete_duckdb <- con %>% tbl("table_duckdb")
+```
+
+N.B. Duckdb est envisagé pour des traitements sans charger des données en mémoire, par exemple en lisant directement un fichier `.parquet` sur le disque dur. Dans ce cas, les opérations sont effectuées à la volée, mais n'affectent pas les fichiers source.
 :::
 
 ## Manipuler les colonnes de la base de données
@@ -274,6 +302,17 @@ colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% colnames()
+```
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% rename_with(tolower) 
+requete_duckdb %>% colnames()
 ```
 :::
 
@@ -322,6 +361,21 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(poids_sondage=as.numeric(poids_sondage)) %>% 
   mutate_at(enDate, lubridate::dmy)
 ```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+enDate <- c('date_naissance', 'date_entree')
+```
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>%  
+  mutate_at(enNumerique, as.integer) %>% 
+  mutate(poids_sondage=as.numeric(poids_sondage)) %>%
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) # strptime est une fonction duckdb
+requete_duckdb %>% select(enDate, duree, note_contenu)
+```
 :::
 
 ## Information sur la base de données
@@ -355,6 +409,14 @@ donnees_tidyverse %>%
   slice(1:10) %>% 
   head()
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+En duckdb, les dix premières lignes sont affichées par défaut. Si on veut les récupérer, par exemple dans une autre variable, il faut faire `collect()`. Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% head(10) %>% collect()
+```
 :::
 
 ### Renommer les variables
@@ -385,6 +447,15 @@ donnees_rbase <- donnees_rbase[, -which(names(donnees_rbase) %in% c("sexe_red"))
 # On renomme la variable sexe_red en sexe
 # La fonction rename() va écraser l'ancien nom de la variable contrairement au code utilisé dans la section R base
 donnees_tidyverse <- donnees_tidyverse %>% 
+  rename(sexe=sexe_red)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# On renomme la variable sexe_red en sexe
+# La fonction rename() va écraser l'ancien nom de la variable contrairement au code utilisé dans la section R base
+requete_duckdb <- requete_duckdb %>% 
   rename(sexe=sexe_red)
 ```
 :::
@@ -418,6 +489,19 @@ donnees_tidyverse %>% nrow()
 #Nombre de colonnes
 donnees_tidyverse %>%  ncol()
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+Duckdb/SQL ne connaît pas le nombre de lignes sans un calcul. Il faut faire `count()`.
+
+```{r, warning=FALSE, message=FALSE}
+#Nombre de lignes
+requete_duckdb %>% nrow() # retourne NA
+requete_duckdb %>% count() # retourne 27
+
+#Nombre de colonnes
+requete_duckdb %>%  ncol()
+```
 :::
 
 ### Afficher les noms des variables de la base
@@ -438,6 +522,13 @@ ls(donnees_rbase)
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% colnames()
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% colnames()
+```
+
 :::
 
 ### Création de colonnes et de lignes
@@ -480,6 +571,21 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_tidyverse <- donnees_tidyverse %>% 
    mutate(age=as.period(interval(start = date_naissance, end = date_entree))$year)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne note2
+requete_duckdb <- requete_duckdb %>% 
+  mutate(note2= note_contenu / 20 * 5)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne age 
+requete_duckdb <- requete_duckdb %>% mutate(age= year(age(date_entree,date_naissance))) 
+requete_duckdb %>% select(note2, age)
+```
+
 :::
 
 ### Supression de colonnes et de lignes
@@ -502,6 +608,12 @@ donnees_rbase$note2 <- NULL
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
+  select(-note2)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+requete_duckdb <- requete_duckdb %>% 
   select(-note2)
 ```
 :::
@@ -555,6 +667,25 @@ donnees_tidyverse <- donnees_tidyverse %>%
     csp=="5" ~ "Retraité",
     TRUE ~ csp))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+Préférer `case_match` quand il s'agit de valeurs déterminées.
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% 
+  mutate(sexef = case_when(
+    sexe=="1" ~ "Homme",
+    sexe=="2" ~ "Femme",
+    .default = sexe),
+         cspf = case_match(csp,
+    "1" ~ "Cadre",
+    "2" ~ "Profession intermédiaire",
+    "3" ~ "Employé",
+    "4" ~ "Ouvrier",
+    "5" ~ "Retraité",
+    .default = csp))
+```
+
 :::
 
 ### Valeur continue
@@ -593,6 +724,17 @@ donnees_tidyverse <- donnees_tidyverse %>%
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
     age >= 50 ~ "3. 50 ans ou plus"))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+requete_duckdb <- requete_duckdb %>%
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus"))
+```
+
 :::
 
 ## Manipuler des lignes et des colonnes
@@ -622,6 +764,12 @@ donnees_col_select_rbase <- donnees_rbase[, c("identifiant", "csp", "niveau")]
 donnees_col_select_tidyverse <- donnees_tidyverse %>% 
   select(identifiant, csp, niveau)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(identifiant, csp, niveau)
+```
+
 :::
 
 ### Selection de lignes
@@ -649,7 +797,14 @@ donnees_femme_rbase <- donnees_rbase[donnees_rbase$sexef=="Femme", ]
 donnees_femme_tidyverse <- donnees_tidyverse %>% 
   filter(sexef=="Femme")
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% filter(sexef=="Femme")
+```
+
 :::
+
 
 ## Manipuler des lignes et des colonnes
 
@@ -689,6 +844,15 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(mois=lubridate::month(date_entree),
          mois=ifelse(str_length(mois)<2, paste0("0", mois), mois))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb <- requete_duckdb %>% 
+  mutate(mois=lubridate::month(date_entree),
+         mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) 
+requete_duckdb %>% select(mois)
+```
+
 :::
 
 ### Réexprimer en masse des valeurs
@@ -759,6 +923,15 @@ notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(across(notes, ~ .x/20*100))
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+
+requete_duckdb <- requete_duckdb %>% 
+  mutate(across(notes, ~ .x/20*100))
+```
+
 :::
 
 ### Passer une variable de numérique à caractère et vice-versa
@@ -1957,6 +2130,12 @@ proportion
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 rm(list = ls())
+```
+
+### `Duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+DBI::dbDisconnect(con, shutdown = TRUE)
 ```
 :::
 
