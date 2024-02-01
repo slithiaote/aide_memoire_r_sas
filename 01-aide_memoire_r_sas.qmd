@@ -42,7 +42,7 @@ L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la
 
 -   arrow/duckdb
 
--   data.table *(en cours)* 
+-   data.table *(en cours)*
 
 Les éléments utilisés sont des codes typiques qui sont appliqués dans la production statistique ou dans la réalisation d'études descriptives.
 
@@ -2107,7 +2107,7 @@ proportion
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-rm(list = ls())
+#rm(list = ls()) #conflit avec cellule d'après sinon 
 ```
 
 ### `Duckdb` {.unnumbered .unlisted}
