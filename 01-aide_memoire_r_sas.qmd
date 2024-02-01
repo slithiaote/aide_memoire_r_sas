@@ -36,11 +36,13 @@ categories:
 
 L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la traduction en R de trois manières possibles :
 
--   en utilisant la base R
+-   la base R
 
--   en utilisant dplyr
+-   dplyr
 
--   en utilisant data.table *(en cours)*
+-   arrow/duckdb
+
+-   data.table *(en cours)* 
 
 Les éléments utilisés sont des codes typiques qui sont appliqués dans la production statistique ou dans la réalisation d'études descriptives.
 
@@ -158,46 +160,25 @@ if (annee >= 2023) {
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Création de la base R
-a <- "Identifiant|Sexe_red|CSP|Niveau|Date_naissance|Date_entree|Duree|Note_Contenu|Note_Formateur|Note_Moyens|Note_Accompagnement|Note_Materiel|poids_sondage
-173|2|1|Qualifie|17/06/1998|01/01/2021|308|12|6|17|4|19|117.1
-173|2|1|qualifie|17/06/1998|01/01/2022|365|6||12|7|14|98.3
-173|2|1|qualifie|17/06/1998|06/01/2022|185|8|10|11|1|9|214.6
-173|2|1|Qualifie|17/06/1998|02/01/2023|365|14|15|15|10|8|84.7
-174|1|1|qualifie|08/12/1984|17/08/2021|183|17|18|20|15|12|65.9
-175|1|1|qualifie|16/09/1989|21/12/2022|730|5|5|8|4|9|148.2
-198|2|4|Non qualifie|17/03/1987|28/07/2022|30|10|10|10|16|8|89.6
-198|2|4|Qualifie|17/03/1987|17/11/2022|164|11|7|6|14|13|100.3
-198|2|4|Qualifie|17/03/1987|21/02/2023|365|9|20|3|4|17|49.3
-168|1|2|Qualifie|30/07/2002|04/09/2019|365|18|11|20|13|15|148.2
-211|2|3|Non qualifie||17/12/2021|135|16|16|15|12|9|86.4
-278|1|5|Qualifie|10/08/1948|07/06/2018|365|14|10|6|8|12|99.2
-347|2|5|Qualifie|13/09/1955||180|12|5|7|11|12|105.6
-112|1|3|Non qualifie|13/09/2001|02/03/2022|212|3|10|11|9|8|123.1
-112|1|3|Non qualifie|13/09/2001|01/03/2021|365|7|13|8|19|2|137.4
-112|1|3|Non qualifie|13/09/2001|01/12/2023|365||||||187.6
-087|1|3|Non qualifie|||365||||||87.3
-087|1|3|Non qualifie||31/10/2020|365||||||87.3
-099|1|3|qualifie|06/06/1998|01/03/2021|364|12|11|10|12|13|169.3
-099|1|3|qualifie|06/06/1998|01/03/2022|364|12|11|10|12|13|169.3
-099|1|3|qualifie|06/06/1998|01/03/2023|364|12|11|10|12|13|169.3
-187|2|2|qualifie|05/12/1986|01/01/2022|364|10|10|10|10|10|169.3
-187|2|2|qualifie|05/12/1986|01/01/2023|364|10|10|10|10|10|234.1
-689|1|1||01/12/2000|06/11/2017|123|9|7|8|13|16|189.3
-765|1|4|Non qualifie|26/12/1995|17/04/2020|160|13|10|12|18|10|45.9
-765|1|4|Non qualifie|26/12/1995|17/04/2020|160|13|10|12|18|10|45.9
-765|1|4|Non qualifie|26/12/1995|17/04/2020|160|13|10|12|18|10|45.9"
-```
+donnees_rbase <- data.frame(
+  Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
+  Sexe_red = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
+  CSP = c("1", "1", "1", "1", "1", "1", "4", "4", "4", "2", "3", "5", "5", "3", "3", "3", "3", "3", "3", "3", "3", "2", "2", "1", "4", "4", "4"),
+  Niveau = c("Qualifie", "qualifie", "qualifie", "Non Qualifie", "qualifie", "qualifie", "Non qualifie", "Qualifie", "Qualifie", "Qualifie", "Non qualifie", "Qualifie", "Qualifie", "Non qualifie", 
+             "Non qualifie", "qualifie", "Non qualifie", "Non qualifie", "qualifie", "qualifie", "qualifie", "qualifie", "qualifie", NA, "Non qualifie", "Non qualifie", "Non qualifie"),
+  Date_naissance = c("17/06/1998", "17/06/1998", "17/06/1998", "17/06/1998", "08/12/1984", "16/09/1989", "17/03/1987", "17/03/1987", "17/03/1987", "30/07/2002", NA, "10/08/1948", 
+                     "13/09/1955", "13/09/2001", "13/09/2001", "13/09/2001", NA, NA, "06/06/1998", "06/06/1998", "06/06/1998", "05/12/1986", "05/12/1986", "01/12/2000", "26/12/1995", "26/12/1995", "26/12/1995"),
+  Date_entree = c("01/01/2021", "01/01/2022", "06/01/2022", "02/01/2023", "17/08/2021", "21/12/2022", "28/07/2022", "17/11/2022", "21/02/2023", "04/09/2019", "17/12/2021", "07/06/2018", NA, "02/03/2022", "01/03/2021", "01/12/2023", NA, 
+                  "31/10/2020", "01/03/2021", "01/03/2022", "01/03/2023", "01/01/2022", "01/01/2023", "06/11/2017", "17/04/2020", "17/04/2020", "17/04/2020"),
+  Duree = c("308", "365", "185", "365", "183", "730", "30", "164", "365", "365", "135", "365", "180", "212", "365", "365", "365", "365", "364", "364", "364", "364", "364", "123", "160", "160", "160"),
+  Note_Contenu = c("12", "6", "8", "14", "17", "5", "10", "11", "9", "18", "16", "14", "12", "3", "7", NA, NA, NA, "12", "12", "12", "10", "10", "9", "13", "13", "13"),
+  Note_Formateur = c("6", NA, "10", "15", "18", "5", "10", "7", "20", "11", "16", "10", "5", "10", "13", NA, NA, NA, "11", "11", "11", "10", "10", "7", "10", "10", "10"),
+  Note_Moyens = c("17", "12", "11", "15", "20", "8", "10", "6", "3", "20", "15", "6", "7", "11", "8", NA, NA, NA, "10", "10", "10", "10", "10", "8", "12", "12", "12"),
+  Note_Accompagnement = c("4", "7", "1", "10", "15", "4", "16", "14", "4", "13", "12", "8", "11", "9", "19", NA, NA, NA, "12", "12", "12", "10", "10", "13", "18", "18", "18"),
+  Note_Materiel = c("19", "14", "9", "8", "12", "9", "8", "13", "17", "15", "9", "12", "12", "8", "2", NA, NA, NA, "13", "13", "13", "10", "10", "16", "10", "10", "10"),
+  poids_sondage = c("117.1", "98.3", "214.6", "84.7", "65.9", "148.2", "89.6", "100.3", "49.3", "148.2", "86.4", "99.2", "105.6", "123.1", "137.4", "187.6", "87.3", "87.3", "169.3", "169.3", "169.3", "169.3", "234.1", "189.3", "45.9", "45.9", "45.9")
+)
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-fichier <- file.path(chemin, "Passage SAS à R.csv")
-# On copie ce fichier texte sur le bureau de l'utilisateur
-writeLines(a, con = fichier)
-
-# On va importer ce fichier texte en base R (dataframe)
-# On importe la base de données dans R
-# on importe par défaut les colonnes en texte
-
-donnees_rbase <- read.csv(file.path(chemin, "Passage SAS à R.csv"), sep = "|", header = TRUE, na.strings = "",colClasses = rep("character",length(data)))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -528,7 +509,6 @@ donnees_tidyverse %>% colnames()
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% colnames()
 ```
-
 :::
 
 ### Création de colonnes et de lignes
@@ -585,7 +565,6 @@ requete_duckdb <- requete_duckdb %>%
 requete_duckdb <- requete_duckdb %>% mutate(age= year(age(date_entree,date_naissance))) 
 requete_duckdb %>% select(note2, age)
 ```
-
 :::
 
 ### Supression de colonnes et de lignes
@@ -612,6 +591,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 requete_duckdb <- requete_duckdb %>% 
   select(-note2)
@@ -671,6 +651,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 Préférer `case_match` quand il s'agit de valeurs déterminées.
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb <- requete_duckdb %>% 
   mutate(sexef = case_when(
@@ -685,7 +666,6 @@ requete_duckdb <- requete_duckdb %>%
     "5" ~ "Retraité",
     .default = csp))
 ```
-
 :::
 
 ### Valeur continue
@@ -734,7 +714,6 @@ requete_duckdb <- requete_duckdb %>%
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
     age >= 50 ~ "3. 50 ans ou plus"))
 ```
-
 :::
 
 ## Manipuler des lignes et des colonnes
@@ -766,10 +745,10 @@ donnees_col_select_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(identifiant, csp, niveau)
 ```
-
 :::
 
 ### Selection de lignes
@@ -799,12 +778,11 @@ donnees_femme_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% filter(sexef=="Femme")
 ```
-
 :::
-
 
 ## Manipuler des lignes et des colonnes
 
@@ -846,13 +824,13 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb <- requete_duckdb %>% 
   mutate(mois=lubridate::month(date_entree),
          mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) 
 requete_duckdb %>% select(mois)
 ```
-
 :::
 
 ### Réexprimer en masse des valeurs
@@ -925,13 +903,13 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 
 requete_duckdb <- requete_duckdb %>% 
   mutate(across(notes, ~ .x/20*100))
 ```
-
 :::
 
 ### Passer une variable de numérique à caractère et vice-versa
