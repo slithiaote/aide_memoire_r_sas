@@ -184,7 +184,7 @@ donnees_rbase <- data.frame(
 ## `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Création de la base R
+# Création de la base R 
 a <- "Identifiant|Sexe_red|CSP|Niveau|Date_naissance|Date_entree|Duree|Note_Contenu|Note_Formateur|Note_Moyens|Note_Accompagnement|Note_Materiel|poids_sondage
 173|2|1|Qualifie|17/06/1998|01/01/2021|308|12|6|17|4|19|117.1
 173|2|1|qualifie|17/06/1998|01/01/2022|365|6||12|7|14|98.3
