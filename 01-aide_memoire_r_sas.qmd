@@ -292,8 +292,7 @@ requete_duckdb %>% colnames()
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb <- requete_duckdb %>% rename_with(tolower) 
-requete_duckdb %>% colnames()
+requete_duckdb %>% rename_with(tolower) %>% colnames()
 ```
 :::
 
@@ -320,7 +319,7 @@ Convertir certaines variables en format 'date', 'integer' et 'numeric'
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-enDate <-c('date_naissance', 'date_entree')
+enDate <- c('date_naissance', 'date_entree')
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -333,7 +332,7 @@ donnees_rbase$poids_sondage <- as.numeric(donnees_rbase$poids_sondage)
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-enDate <-c('date_naissance', 'date_entree')
+enDate <- c('date_naissance', 'date_entree')
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -346,17 +345,19 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-enDate <- c('date_naissance', 'date_entree')
+enNumerique <- c("Duree", "Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel")
+enDate <- c('Date_naissance', 'Date_entree')
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb <- requete_duckdb %>%  
+requete_duckdb %>%  
   mutate_at(enNumerique, as.integer) %>% 
   mutate(poids_sondage=as.numeric(poids_sondage)) %>%
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) # strptime est une fonction duckdb
-requete_duckdb %>% select(enDate, duree, note_contenu)
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(enDate, Duree, Note_Contenu)
 ```
+
+Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
 
 ## Information sur la base de données
@@ -436,8 +437,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE}
 # On renomme la variable sexe_red en sexe
 # La fonction rename() va écraser l'ancien nom de la variable contrairement au code utilisé dans la section R base
-requete_duckdb <- requete_duckdb %>% 
-  rename(sexe=sexe_red)
+requete_duckdb %>% rename(sexe=Sexe_red)
 ```
 :::
 
@@ -556,14 +556,17 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ```{r, warning=FALSE, message=FALSE}
 # Création de la colonne note2
-requete_duckdb <- requete_duckdb %>% 
-  mutate(note2= note_contenu / 20 * 5)
+requete_duckdb %>% 
+  mutate(note2 = as.integer(Note_Contenu) / 20 * 5) %>% 
+  select(note2)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Création de la colonne age 
-requete_duckdb <- requete_duckdb %>% mutate(age= year(age(date_entree,date_naissance))) 
-requete_duckdb %>% select(note2, age)
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  select(age)
 ```
 :::
 
@@ -592,9 +595,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-requete_duckdb <- requete_duckdb %>% 
-  select(-note2)
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(- CSP, -contains("Date"), -starts_with("Note"))
 ```
 :::
 
@@ -653,18 +655,19 @@ donnees_tidyverse <- donnees_tidyverse %>%
 Préférer `case_match` quand il s'agit de valeurs déterminées.
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb <- requete_duckdb %>% 
+requete_duckdb %>% 
   mutate(sexef = case_when(
-    sexe=="1" ~ "Homme",
-    sexe=="2" ~ "Femme",
-    .default = sexe),
-         cspf = case_match(csp,
+    Sexe_red=="1" ~ "Homme",
+    Sexe_red=="2" ~ "Femme",
+    .default = Sexe_red),
+         cspf = case_match(CSP,
     "1" ~ "Cadre",
     "2" ~ "Profession intermédiaire",
     "3" ~ "Employé",
     "4" ~ "Ouvrier",
     "5" ~ "Retraité",
-    .default = csp))
+    .default = CSP)) %>% 
+  select(Sexe_red, sexef, CSP, cspf)
 ```
 :::
 
@@ -707,12 +710,15 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-requete_duckdb <- requete_duckdb %>%
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>%
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
   mutate(agef = case_when(
     age < 26 ~ "1. De 15 à 25 ans",
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
-    age >= 50 ~ "3. 50 ans ou plus"))
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
 ```
 :::
 
@@ -747,7 +753,7 @@ donnees_col_select_tidyverse <- donnees_tidyverse %>%
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% select(identifiant, csp, niveau)
+requete_duckdb %>% select(Identifiant, CSP, starts_with("NI"))
 ```
 :::
 
@@ -780,7 +786,7 @@ donnees_femme_tidyverse <- donnees_tidyverse %>%
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% filter(sexef=="Femme")
+requete_duckdb %>% filter(Sexe_red==2)
 ```
 :::
 
@@ -826,10 +832,11 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb <- requete_duckdb %>% 
-  mutate(mois=lubridate::month(date_entree),
-         mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) 
-requete_duckdb %>% select(mois)
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(mois=lubridate::month(Date_entree),
+         mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) %>% 
+  select(mois, Date_entree)
 ```
 :::
 
@@ -905,10 +912,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-
-requete_duckdb <- requete_duckdb %>% 
-  mutate(across(notes, ~ .x/20*100))
+requete_duckdb %>% 
+  mutate(across(starts_with("Note"), ~ as.numeric(.x)/20*100)) %>% 
+  select(starts_with("Note"))
 ```
 :::
 
@@ -957,6 +963,20 @@ poids_inf <- floor(donnees_rbase$poids)
 # Arrondi à l'entier inférieur
 poids_inf <- ceiling(donnees_rbase$poids)
 ```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% 
+  mutate( # la fonction round de duckdb ne prend pas l'argument digits, mais la traduction fonctionne
+    poids_arrondi_0 = round(as.numeric(poids_sondage),0),
+    poids_arrondi_1 = round(as.numeric(poids_sondage),1),
+    poids_arrondi_2 = round(as.numeric(poids_sondage),-1),
+    poids_floor = floor(as.numeric(poids_sondage)),
+    poids_ceiling = ceiling(as.numeric(poids_sondage)),
+    ) %>% 
+  select(starts_with("poids"))
+```
 :::
 
 ## Les tris
@@ -992,9 +1012,23 @@ donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in%
 ### `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On met identifiant date_entree et date_sortie au début
+# On met identifiant date_entree au début
 donnees_tidyverse %>% 
   select(identifiant, date_entree, everything())
+donnees_tidyverse %>% 
+  relocate(identifiant, date_entree)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# On met identifiant date_entree au début
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(Identifiant, Date_entree, everything())
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  relocate(Identifiant, Date_entree)
 ```
 :::
 
@@ -1028,7 +1062,7 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 
 ### `tidyverse` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Trier la base par ligne (individu et date de début de la formation) par ordre croissant
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, date_entree)
@@ -1036,6 +1070,20 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Tri par ordre croissant de identifiant et décroissant de date_entree 
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, desc(date_entree))
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Trier la base par ligne (individu et date de début de la formation) par ordre croissant
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  arrange(Identifiant, Date_entree) %>% select(Identifiant, Date_entree, Note_Contenu)
+
+# Tri par ordre croissant de identifiant et décroissant de date_entree 
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  arrange(Identifiant, desc(Date_entree)) %>% select(Identifiant, Date_entree, Note_Contenu)
 ```
 :::
 
@@ -1061,12 +1109,23 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
 
 # Pour mimer le tri SAS, il faut écrire :
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
+  
+# Pour mimer le tri SAS, il faut écrire :
+# Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
+requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu) 
 ```
 :::
 
