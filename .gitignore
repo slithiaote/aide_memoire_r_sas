@@ -7,3 +7,7 @@
 *.log
 .Rproj.user
 
+
+/.quarto/
+/_freeze/
+/_site/
