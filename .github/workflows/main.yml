@@ -23,7 +23,7 @@ jobs:
           r-version: '4.2.0'
 
       - name: Install xmllint
-        run: sudo apt-get install -y curl libcurl
+        run: sudo apt-get install -y r-cran-curl
 
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
