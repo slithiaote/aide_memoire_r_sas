@@ -46,17 +46,16 @@ L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la
 
 Les éléments utilisés sont des codes typiques qui sont appliqués dans la production statistique ou dans la réalisation d'études descriptives.
 
-Ce code s'adresse aux utilisateurs de SAS qui veulent connaître la traduction du code SAS en R ainsi qu'aux utilisateurs de R qui ont besoin de comprendre le code SAS.
+Ce document s'adresse aux utilisateurs de SAS qui veulent connaître la traduction du code SAS en R ainsi qu'aux utilisateurs de R qui ont besoin de comprendre le code SAS.
 
 ## Importation des packages
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+library(janitor)
+library(magrittr)
 library(lubridate)
 library(dplyr)
 library(tidyverse)
-library(janitor)
-library(SASmarkdown)
-library(magrittr)
 ```
 
 ## Chemin vers le bureau et affichage de la date et de l'année
