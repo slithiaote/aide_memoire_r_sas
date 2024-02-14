@@ -401,17 +401,20 @@ Convertir certaines variables en format 'date', 'integer' et 'numeric'
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-      data Donnees_sas;
-      set Donnees_sas;
-      duree_int = input(duree, 1.);
-      note_contenu_int = input(note_contenu, 1.);
-      note_formateur_int = input(note_formateur, 1.);
-      note_moyens_int = input(note_moyens, 1.);
-      note_accompagnement_int = input(note_accompagnement, 1.);
-      note_materiel_int = input(note_materiel, 1.);
-      date_naissance_date = input(date_naissance, DDMMYY10.);
-      date_entree = input(date_entree, DDMMYY10.);
-    run;
+```{r}
+#| eval: false
+data Donnees_sas;
+  set Donnees_sas;
+  duree_int = input(duree, 1.);
+  note_contenu_int = input(note_contenu, 1.);
+  note_formateur_int = input(note_formateur, 1.);
+  note_moyens_int = input(note_moyens, 1.);
+  note_accompagnement_int = input(note_accompagnement, 1.);
+  note_materiel_int = input(note_materiel, 1.);
+  date_naissance_date = input(date_naissance, DDMMYY10.);
+  date_entree = input(date_entree, DDMMYY10.);
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -465,13 +468,15 @@ Note : `duckdb` fait des conversions de type implicitement, mais seulement les c
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Extraire les x premières lignes de la base (10 par défaut) */
+```{r}
+#| eval: false
+/* Extraire les x premières lignes de la base (10 par défaut) */
+%let x = 10;
+proc print data = Donnees_sas (firstobs = 1 obs = &x.);run;
 
-    %let x = 10;
-    proc print data = Donnees_sas (firstobs = 1 obs = &x.);run;
-
-    /* Ou alors */
-    data Lignes&x.;set Donnees_sas (firstobs = 1 obs = &x.);proc print;run;
+/* Ou alors */
+data Lignes&x.;set Donnees_sas (firstobs = 1 obs = &x.);proc print;run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -502,13 +507,16 @@ requete_duckdb %>% head(10) %>% collect()
 ### Renommer les variables
 
 ::: {.panel-tabset group="language"}
+
 ### `SAS` {.unnumbered .unlisted}
 
-    /* On renomme la variable sexe_red en sexe */
-      
-      data Donnees_sas;
-      set Donnees_sas (rename = (sexe_red = sexe));
-      run;
+```{r}
+#| eval: false
+/* On renomme la variable sexe_red en sexe */
+data Donnees_sas;
+  set Donnees_sas (rename = (sexe_red = sexe));
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -544,13 +552,14 @@ requete_duckdb %>% rename(sexe=Sexe_red)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Nombre de lignes */
-      
-      proc sql;select count(*) as Nb_Lignes from Donnees_sas;quit;
+```{r}
+#| eval: false
+/* Nombre de lignes */
+proc sql;select count(*) as Nb_Lignes from Donnees_sas;quit;
+/* Nombre de colonnes */
+proc sql;select count(*) as Nb_Colonnes from Var;quit;
+```
 
-    /* Nombre de colonnes */
-
-      proc sql;select count(*) as Nb_Colonnes from Var;quit;
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -588,7 +597,11 @@ requete_duckdb %>%  ncol()
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-      proc contents data=donnees_sas; run;
+```{r}
+#| eval: false
+proc contents data=donnees_sas; run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -618,11 +631,15 @@ requete_duckdb %>% colnames()
 
 ### `SAS` {.unnumbered .unlisted}
 
-    data Donnees_sas;
-      set Donnees_sas;
-      note2 = note_contenu / 20 * 5;
-      Age = intck('year', date_naissance, date_entree);
-      run;
+```{r}
+#| eval: false
+data Donnees_sas;
+  set Donnees_sas;
+  note2 = note_contenu / 20 * 5;
+  Age = intck('year', date_naissance, date_entree);
+run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -673,11 +690,15 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    data Donnees_sas;
-      set Donnees_sas;
-      drop note2;
-      run;
+```{r}
+#| eval: false
+data Donnees_sas;
+  set Donnees_sas;
+  drop note2;
+run;
+```
 
+    
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -705,18 +726,22 @@ requete_duckdb %>% select(- CSP, -contains("Date"), -starts_with("Note"))
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    proc format;
-      value sexef
-      1 = "Homme"
-      2 = "Femme";
+```{r}
+#| eval: false
+proc format;
+  value sexef
+  1 = "Homme"
+  2 = "Femme";
+  
+  value $ cspf
+  '1' = "Cadre"
+  '2' = "Profession intermédiaire"
+  '3' = "Employé"
+  '4' = "Ouvrier"
+  '5' = "Retraité";
+run;
+```
 
-      value $ cspf
-      '1' = "Cadre"
-      '2' = "Profession intermédiaire"
-      '3' = "Employé"
-      '4' = "Ouvrier"
-      '5' = "Retraité";
-    run;
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -774,12 +799,15 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    proc format;
-      value agef
-      low-<26 = "1. De 15 à 25 ans"
-      26<-<50 = "2. De 26 à 49 ans"
-      50-high = "3. 50 ans ou plus";
-    run;
+```{r}
+#| eval: false
+proc format;
+  value agef
+  low-<26 = "1. De 15 à 25 ans"
+  26<-<50 = "2. De 26 à 49 ans"
+  50-high = "3. 50 ans ou plus";
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -829,11 +857,15 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    proc sql;
-      create table work.donnees_col_select_sas as
-      select    identifiant, csp, niveau
-      from work.donnees_sas;
-    quit; 
+```{r}
+#| eval: false
+proc sql;
+  create table work.donnees_col_select_sas as
+  select    identifiant, csp, niveau
+  from work.donnees_sas;
+quit; 
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -862,11 +894,15 @@ Selectionner les lignes qui ont sexef="Femme"
 
 ### `SAS` {.unnumbered .unlisted}
 
-      data donnees_sas; 
-      set donnees_sas; 
-      where sexef="Femme";
-      run;
-      
+
+```{r}
+#| eval: false
+data donnees_sas; 
+  set donnees_sas; 
+  where sexef="Femme";
+ run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -898,16 +934,19 @@ requete_duckdb %>% filter(Sexe_red==2)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Mettre un 0 devant un nombre */
-      
-      data Zero_devant;set Donnees_sas (keep = date_entree);
-      /* Obtenir le mois et la date */
-       Mois = month(date_entree);
-      /* Mettre le mois sur 2 positions (avec un 0 devant si le mois <= 9) : format prédéfini z2. */
-      Mois_a = put(Mois, z2.);
-      drop Mois;
-      rename Mois_a = Mois;
-      run;
+```{r}
+#| eval: false
+/* Mettre un 0 devant un nombre */
+data Zero_devant;set Donnees_sas (keep = date_entree);
+  /* Obtenir le mois et la date */
+  Mois = month(date_entree);
+  /* Mettre le mois sur 2 positions (avec un 0 devant si le mois <= 9) : format prédéfini z2. */
+  Mois_a = put(Mois, z2.);
+  drop Mois;
+  rename Mois_a = Mois;
+run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -943,52 +982,60 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* On souhaite rééxprimer toutes les notes sur 100 et non sur 20 */
-      
-       %let notes = Note_Contenu   Note_Formateur Note_Moyens     Note_Accompagnement     Note_Materiel;
-    /* On supprime les doubles blancs entre les variables */
-       %let notes = %sysfunc(compbl(&notes.));
-    %put &notes;
-      
-    /* 1ère solution : avec les array */
-      
-      data Sur100_1;
-      set Donnees_sas;
-      array variables (*) &notes.;
-      do increment = 1 to dim(variables);
-        variables[increment] = variables[increment] / 20 * 100;
-      end; 
-      drop increment;
-    run; 
-      
-      
-    /* 2e solution : avec une macro */
+```{r}
+#| eval: false
+/* On souhaite rééxprimer toutes les notes sur 100 et non sur 20 */
+%let notes = Note_Contenu   Note_Formateur Note_Moyens     Note_Accompagnement     Note_Materiel;
+/* On supprime les doubles blancs entre les variables */
+%let notes = %sysfunc(compbl(&notes.));
+%put &notes;Mois_a = Mois;
+```
 
-      data Sur100_2;
-      set Donnees;
-      %macro Sur100;
-        %do i = 1 %to %sysfunc(countw(&notes.));
-          %let note = %scan(&notes., &i.);
-          &note. = &note. / 20 * 100;
-        %end;
-      %mend Sur100;
-      %Sur5;
-    run; 
-      
-      
-    /* 3e solution : l'équivalent des list-comprehension de Python en SAS */
+```{r}
+#| eval: false
+/* 1ère solution : avec les array */
+data Sur100_1;
+  set Donnees_sas;
+  array variables (*) &notes.;
+  do increment = 1 to dim(variables);
+    variables[increment] = variables[increment] / 20 * 100;
+  end; 
+  drop increment;
+run; 
+```
+    
+
+```{r}
+#| eval: false
+/* 2e solution : avec une macro */
+data Sur100_2;
+  set Donnees;
+  %macro Sur100;
+    %do i = 1 %to %sysfunc(countw(&notes.));
+      %let note = %scan(&notes., &i.);
+      &note. = &note. / 20 * 100;
+    %end;
+  %mend Sur100;
+  %Sur5;
+run;
+```
 
 
-      data Sur100_3;
-      set Donnees_sas;
-      %macro List_comprehension;
-        %do i = 1 %to %sysfunc(countw(&notes.));
-          %let j = %scan(&notes., &i.);
-            &j. = &j. / 20 * 100
-        %end;);;
-      %mend List_comprehension;
-      %List_comprehension;
-    run;
+```{r}
+#| eval: false
+/* 3e solution : l'équivalent des list-comprehension de Python en SAS */
+data Sur100_3;
+  set Donnees_sas;
+  %macro List_comprehension;
+     %do i = 1 %to %sysfunc(countw(&notes.));
+       %let j = %scan(&notes., &i.);
+       &j. = &j. / 20 * 100
+     %end;);;
+  %mend List_comprehension;
+  %List_comprehension;
+run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1033,19 +1080,24 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Arrondir une valeur numérique */
-     data Arrondis;set Donnees_sas (keep = Poids);
-    /* Arrondi à l'entier le plus proche */
-     poids_arrondi_0 = round(poids, 0.0);
-    /* Arrondi à 1 chiffre après la virgule */
-     poids_arrondi_1 = round(poids, 0.1);
-    /* Arrondi à 2 chiffre après la virgule */
-     poids_arrondi_2 = round(poids, 0.2);
-    /* Arrondi à l'entier inférieur */
-     poids_inf = floor(poids);
-    /* Arrondi à l'entier inférieur */
-     poids_inf = ceil(poids);  
-    run;
+
+```{r}
+#| eval: false
+/* Arrondir une valeur numérique */
+data Arrondis;set donnees_sas (keep = poids_sondage);
+  /* Arrondi à l'entier le plus proche */
+  poids_arrondi_0 = round(poids_sondage, 0.0);
+  /* Arrondi à 1 chiffre après la virgule */
+  poids_arrondi_1 = round(poids_sondage, 0.1);
+  /* Arrondi à 2 chiffre après la virgule */
+  poids_arrondi_2 = round(poids_sondage, 0.2);
+  /* Arrondi à l'entier inférieur */
+  poids_inf = floor(poids_sondage);
+  /* Arrondi à l'entier supérieur */
+  poids_inf = ceil(poids_sondage);  
+run;
+```
+
 
 ### R {.tabset .tabset-fade .tabset-pills}
 
@@ -1084,20 +1136,28 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* On met identifiant date_entree et date_sortie au début de la base */
-     %let colTri = identifiant date_entree;
-    data Donnees_sas;
-      retain &colTri.;
-      set Donnees_sas;
-    run;
-      
-    /* Autre solution */
-     proc sql;
-      create table Donnees_sas as 
-      /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
-      /* Dans la proc SQL, les variables doivent être séparées par des virgules */
-       select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from Donnees_sas;
-    quit;
+
+```{r}
+#| eval: false
+/* On met identifiant date_entree et date_sortie au début de la base */
+%let colTri = identifiant date_entree;
+data Donnees_sas;
+  retain &colTri.;
+  set Donnees_sas;
+run;
+```
+
+```{r}
+#| eval: false
+/* Autre solution */
+proc sql;
+  create table Donnees_sas as 
+  /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
+  /* Dans la proc SQL, les variables doivent être séparées par des virgules */
+  select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from Donnees_sas;
+quit;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1135,15 +1195,20 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Trier la base par ligne (individu et date de début de la formation) par ordre décroissant : 2 possibilités */
+```{r}
+#| eval: false
+/* Trier la base par ligne (individu et date de début de la formation) par ordre décroissant : 2 possibilités */
+proc sort data = Donnees_sas;by Identifiant Date_entree;run;
+proc sql;create table Donnes as select * from Donnees_sas order by Identifiant, Date_entree;quit;
+```
 
-    proc sort data = Donnees_sas;by Identifiant Date_entree;run;
-    proc sql;create table Donnes as select * from Donnees_sas order by Identifiant, Date_entree;quit;
-      
-    /* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée*/
+```{r}
+#| eval: false
+/* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée*/
+proc sort data = Donnees_sas;by Identifiant Date_entree descending;run;
+proc sql;create table Donnes as select * from Donnees_sas order by Identifiant, desc Date_entree;quit;
+```
 
-    proc sort data = Donnees_sas;by Identifiant Date_entree descending;run;
-    proc sql;create table Donnes as select * from Donnees_sas order by Identifiant, desc Date_entree;quit;
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1190,20 +1255,21 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    proc sort data = Donnees_sas;
-    by identifiant date_entree;run;
-    proc print
-    ;run;
+```{r}
+#| eval: false
+proc sort data = Donnees_sas;by identifiant date_entree;run;
+proc print;run;
+```
 
-    /* ... et en dernier selon un tri par ordre décroissant */
+```{r}
+/* ... et en dernier selon un tri par ordre décroissant */
+proc sort data = Donnees_sas;
+  by identifiant descending date_entree;
+run;
+proc print;run;
+```
+En effet, les valeurs manquantes sont considérées comme des valeurs négatives
 
-    proc sort data = Donnees_sas;
-    by identifiant descending date_entree;
-    run;
-    proc print;
-    run;
-
-    /* En effet, les valeurs manquantes sont considérées comme des valeurs négatives */
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1234,12 +1300,16 @@ requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! 
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    data Donnees;
-    set Donnees;
-    /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
-    format date_sortie ddmmyy10.;
-    date_sortie = intnx('day', date_entree, duree);
-    run;
+```{r}
+data Donnees;
+  set Donnees;
+  /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
+  format date_sortie ddmmyy10.;
+  date_sortie = intnx('day', date_entree, duree);
+run;
+```
+
+    
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1284,27 +1354,33 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /*Première lettre en majuscule*/
+```{r}
+/*Première lettre en majuscule*/
+data Donnees_sas;
+  set Donnees_sas;
+  Niveau = propcase(Niveau);
+run;
+```
 
-      data Donnees_sas;
-      set Donnees_sas;
-      Niveau = propcase(Niveau);
-      run;
+
+```{r}
+/*Majuscule*/
+data Donnees_sas;
+  set Donnees_sas;
+  CSP_majuscule = upcase(CSPF);
+run;
+```
 
 
-    /*Majuscule*/
+```{r}
+/*Minuscule*/
+data Donnees_sas;
+  set Donnees_sas;
+  CSP_minuscule = lowcase(CSPF);
+run;
+```
+    
 
-      data Donnees_sas;
-      set Donnees_sas;
-      CSP_majuscule = upcase(CSPF);
-      run;
-
-    /*Minuscule*/
-
-      data Donnees_sas;
-      set Donnees_sas;
-      CSP_minuscule = lowcase(CSPF);
-      run;
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1355,10 +1431,14 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    data Donnees_sas;
-    set Donnees_sas;
-    Niveau = tranwrd(Niveau, "Qualifie", "Qualifié");
-    run;
+```{r}
+/*Minuscule*/
+data Donnees_sas;
+  set Donnees_sas;
+  Niveau = tranwrd(Niveau, "Qualifie", "Qualifié");
+run;
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
