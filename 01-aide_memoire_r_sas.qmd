@@ -335,7 +335,9 @@ requete_duckdb <- con %>% tbl("table_duckdb")
 N.B. Duckdb est envisagé pour des traitements sans charger des données en mémoire, par exemple en lisant directement un fichier `.parquet` sur le disque dur. Dans ce cas, les opérations sont effectuées à la volée, mais n'affectent pas les fichiers source.
 :::
 
-## Manipuler les colonnes de la base de données
+## Préparer les données importées
+
+### Casse des noms des variables
 
 [**R étant sensible à la casse, ce qui n'est pas le cas de SAS, cette section est donc pertinente pour les codes sous R.**]{style="color:red"}
 
@@ -343,25 +345,42 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 2.  Mettre le nom de la colonne en minuscules
 
 ::: {.panel-tabset group="language"}
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
-nomCol <- tolower(colnames(donnees_rbase))
+```{r, warning=FALSE, message=FALSE'}
+# On vérifie déjà que la base importée est bien un data.frame
+is.data.frame(donnees_rbase)
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+On convertit les colonnes en minuscule
+```{r, warning=FALSE, message=FALSE}
+# Renommer les colonnes de la base
 colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
+# Autre possibilité
+setNames(donnees_rbase, tolower(names(donnees_rbase)))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+
+### `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# On convertit la base en format data.table
+# Expliquer les différences
+donnees_datatable <- as.data.table(donnees_datatable)
+setDT(donnees_datatable)
+
+# On vérifie que la base est bien un data.table
+is.data.table(donnees_datatable)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% colnames()
@@ -370,14 +389,17 @@ requete_duckdb %>% colnames()
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% rename_with(tolower) %>% colnames()
 ```
+
 :::
 
-## Harmoniser le format des variables
+
+
+### Harmoniser le format des variables
 
 Convertir certaines variables en format 'date', 'integer' et 'numeric'
 
 ::: {.panel-tabset group="language"}
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 
       data Donnees_sas;
       set Donnees_sas;
@@ -391,7 +413,7 @@ Convertir certaines variables en format 'date', 'integer' et 'numeric'
       date_entree = input(date_entree, DDMMYY10.);
     run;
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -404,7 +426,7 @@ donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
 donnees_rbase$poids_sondage <- as.numeric(donnees_rbase$poids_sondage)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -418,7 +440,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate_at(enDate, lubridate::dmy)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("Duree", "Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel")
