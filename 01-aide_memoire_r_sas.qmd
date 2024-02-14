@@ -40,7 +40,7 @@ L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la
 
 -   tidyverse
 
--   data.table *(en cours)*
+-   data.table
 
 -   arrow/duckdb
 
@@ -51,13 +51,61 @@ Ce document s'adresse aux utilisateurs de SAS qui veulent connaître la traducti
 
 ## Importation des packages
 
+À FAIRE : on est d'accord qu'il faut adapter les importations selon les types d'environnement ?
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+Etape inutile.
+
+## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+library(lubridate)
+```
+
+## `Tidyverse` {.unnumbered .unlisted}
+À FAIRE : library(janitor) et library(tidyverse) suffisent non ? Puisque Tidyverse a déjà les autres packages ?
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(lubridate)
 library(janitor)
 library(magrittr)
 library(lubridate)
 library(dplyr)
 library(tidyverse)
 ```
+
+## `data.table` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(data.table)
+```
+
+## `data.table` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(data.table)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+À FAIRE : à ajouter pour DuckDb ??
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#library(duckdb)
+#library(arrow)
+```
+
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(janitor)
+library(magrittr)
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(data.table)
+```
+:::
 
 ## Chemin vers le bureau et affichage de la date et de l'année
 
