@@ -417,7 +417,7 @@ run;
 ```
 
 ### `R base` {.unnumbered .unlisted}
-
+On a importé toutes les variables en caractère. On convertit certaines variables en format 'numeric' et 'date'
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 enDate <- c('date_naissance', 'date_entree')
@@ -427,6 +427,16 @@ enDate <- c('date_naissance', 'date_entree')
 donnees_rbase[, enNumerique] <- lapply(donnees_rbase[, enNumerique], as.integer)
 donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
 donnees_rbase$poids_sondage <- as.numeric(donnees_rbase$poids_sondage)
+```
+
+On convertit les dates.
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On récupère les variables dont le nom débute par le mot "date"
+varDates <- names(donnees_rbase)[grepl("date", tolower(names(donnees_rbase)))]
+# On remplace / par - dans les dates
+donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], function(x) gsub("/", "-", x))
+# On exprime les dates en format Date
+donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], lubridate::dmy)
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -442,6 +452,33 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(poids_sondage=as.numeric(poids_sondage)) %>% 
   mutate_at(enDate, lubridate::dmy)
 ```
+
+### `data.table` {.unnumbered .unlisted}
+On a importé toutes les variables en caractère. On convertit certaines variables en format 'numeric' et 'date'
+```{r, warning=FALSE, message=FALSE, results='hide'}
+enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+enDate <- c('date_naissance', 'date_entree')
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, lapply(.SD, as.integer), .SDcols = enNumerique]
+# Autre solution
+for (j in enNumerique) {
+  set(donnees_datatable, j = j, value = as.numeric(donnees_datatable[[j]]))
+}
+donnees_datatable[, poids_sondage := as.numeric(poids_sondage)]
+```
+
+On convertit les dates.
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On récupère les variables dont le nom débute par le mot "date"
+varDates <- names(donnees_datatable)[grepl("date", tolower(names(donnees_datatable)))]
+# On remplace / par - dans les dates
+donnees_datatable[, (varDates) := lapply(.SD, function(x) gsub("/", "-", x)), .SDcols = varDates]
+# On exprime les dates en format Date
+donnees_datatable[, (varDates) := lapply(.SD, lubridate::dmy), .SDcols = varDates]
+```
+
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -460,6 +497,38 @@ requete_duckdb %>%
 
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
+
+
+
+::: {.panel-tabset group="language"}
+### `SAS` {.unnumbered .unlisted}
+:::
+
+# Format des variables
+donnees_datatable[, lapply(.SD, class)]
+
+# On sélectionne les données de date
+# FAIRE PLUS TARD ???
+
+
+
+# Ne sélectionner que les variables numériques de la base
+donnees_datatable[ , .SD, .SDcols = is.numeric]
+
+
+Quel est le forma
+
+# Format des colonnes
+sapply(donnees_rbase, class)
+
+# Ne sélectionner que les variables numériques de la base
+varNumeriques <- donnees_rbase[, sapply(donnees_rbase, is.numeric), drop = FALSE]
+
+
+
+
+
+
 
 ## Information sur la base de données
 
