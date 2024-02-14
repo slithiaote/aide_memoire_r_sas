@@ -38,22 +38,29 @@ Voici quelques trucs et astuces utiles à connaître sur R, des livres [The R In
 
 # Trucs et astuces en R
 
+
+## Effets des calculs en virgule flottante
+
+```{r, warning=FALSE, message=FALSE}
+.1 == .3 / 3
+seq(0, 1, by=.1) == .3
+unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
+```
+
 ## Les types d'objet
 
 ```{r, warning=FALSE, message=FALSE}
 # En savoir plus sur ses données
 data("cars")
-x <- cars
-typeof(x)
-class(x)
-mode(x)
-str(x)
-dim(x)
-is.data.frame(x)
-is.list(x)
-is.vector(x)
-is.array(x)
-
+typeof(cars)
+class(cars)
+mode(cars)
+str(cars)
+dim(cars)
+is.data.frame(cars)
+is.list(cars)
+is.vector(cars)
+is.array(cars)
 ```
 
 ## Les affectations
@@ -125,7 +132,7 @@ for(i in seq(along=x)) print(i)
 ```{r, warning=FALSE, message=FALSE}
 # Equivalent des list-comprehensions de type Python en R
 # Somme des entiers de 1 à 1 000 multiples de 3 ou 5, en une ligne !
-# 3 manières de faire
+# 4 manières de faire
 sum({l <- 1:1000 ; l[l %% 3 == 0 | l %% 5 == 0]})
 sum({l <- 1:1000 ; l[seq_along(l) %% 3 == 0 | seq_along(l) %% 5 == 0]})
 sum(l<-(1:1000)[l %% 3 == 0 | l %% 5 == 0])
@@ -227,7 +234,7 @@ sapply(x, function(xi, mn, mx) {(xi - mn) / (mx - mn)}, mn = min(x), mx = max(x)
 
 ## Principe de coercion
 
-Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complexe et character, jusqu'à ce que la comaraison puisse se faire
+Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complex et character, jusqu'à ce que la comparaison puisse se faire
 
 ```{r, warning=FALSE, message=FALSE}
 # TRUE / FALSE est transformé en integer (1 / 0)
@@ -522,14 +529,6 @@ liste[-1]
 liste["nombres"] <- NULL
 liste
 
-```
-
-## Effets des calculs en virgule flottante
-
-```{r, warning=FALSE, message=FALSE}
-.1 == .3 / 3
-seq(0, 1, by=.1) == .3
-unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
 ```
 
 ## Trucs et astuces divers
