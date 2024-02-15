@@ -347,7 +347,7 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 ::: {.panel-tabset group="language"}
 ### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE'}
+```{r, warning=FALSE, message=FALSE}
 # On vérifie déjà que la base importée est bien un data.frame
 is.data.frame(donnees_rbase)
 ```
