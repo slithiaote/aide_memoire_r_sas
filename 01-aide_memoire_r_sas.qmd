@@ -370,7 +370,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ### `data.table` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # On convertit la base en format data.table
 # Expliquer les différences
 donnees_datatable <- as.data.table(donnees_datatable)
@@ -378,6 +378,14 @@ setDT(donnees_datatable)
 
 # On vérifie que la base est bien un data.table
 is.data.table(donnees_datatable)
+```
+
+On convertit les colonnes en minuscule
+```{r, warning=FALSE, message=FALSE}
+# Renommer les colonnes de la base
+colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
+# Autre possibilité
+setNames(donnees_datatable, tolower(names(donnees_datatable)))
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -497,37 +505,6 @@ requete_duckdb %>%
 
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
-
-
-
-::: {.panel-tabset group="language"}
-### `SAS` {.unnumbered .unlisted}
-:::
-
-# Format des variables
-donnees_datatable[, lapply(.SD, class)]
-
-# On sélectionne les données de date
-# FAIRE PLUS TARD ???
-
-
-
-# Ne sélectionner que les variables numériques de la base
-donnees_datatable[ , .SD, .SDcols = is.numeric]
-
-
-Quel est le forma
-
-# Format des colonnes
-sapply(donnees_rbase, class)
-
-# Ne sélectionner que les variables numériques de la base
-varNumeriques <- donnees_rbase[, sapply(donnees_rbase, is.numeric), drop = FALSE]
-
-
-
-
-
 
 
 ## Information sur la base de données
@@ -1331,7 +1308,8 @@ proc print;run;
 ```
 
 ```{r}
-/* ... et en dernier selon un tri par ordre décroissant */
+#| eval: false
+/* ... et en dernier selon un tri par ordre décroissant*/
 proc sort data = Donnees_sas;
   by identifiant descending date_entree;
 run;
@@ -1370,6 +1348,7 @@ requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! 
 ### `SAS` {.unnumbered .unlisted}
 
 ```{r}
+#| eval: false
 data Donnees;
   set Donnees;
   /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
@@ -1424,6 +1403,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ### `SAS` {.unnumbered .unlisted}
 
 ```{r}
+#| eval: false
 /*Première lettre en majuscule*/
 data Donnees_sas;
   set Donnees_sas;
@@ -1433,6 +1413,7 @@ run;
 
 
 ```{r}
+#| eval: false
 /*Majuscule*/
 data Donnees_sas;
   set Donnees_sas;
@@ -1442,6 +1423,7 @@ run;
 
 
 ```{r}
+#| eval: false
 /*Minuscule*/
 data Donnees_sas;
   set Donnees_sas;
@@ -1501,6 +1483,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ### `SAS` {.unnumbered .unlisted}
 
 ```{r}
+#| eval: false
 /*Minuscule*/
 data Donnees_sas;
   set Donnees_sas;
