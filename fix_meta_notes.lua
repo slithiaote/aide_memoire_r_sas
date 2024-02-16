@@ -4,7 +4,7 @@ return {
   {
     Note = function (el)
       notes = notes + 1
-      if notes >= 5 then
+      if notes >=  7 then
         return el
       else
         return ""
