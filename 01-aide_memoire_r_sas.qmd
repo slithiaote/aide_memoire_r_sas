@@ -34,7 +34,7 @@ categories:
   - SAS 
 ---
 
-L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la traduction en R de trois manières possibles :
+L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la traduction en R de différentes manières possibles :
 
 -   base R
 
@@ -44,41 +44,28 @@ L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la
 
 -   arrow/duckdb
 
-
 Les éléments utilisés sont des codes typiques qui sont appliqués dans la production statistique ou dans la réalisation d'études descriptives.
 
 Ce document s'adresse aux utilisateurs de SAS qui veulent connaître la traduction du code SAS en R ainsi qu'aux utilisateurs de R qui ont besoin de comprendre le code SAS.
 
 ## Importation des packages
 
-À FAIRE : on est d'accord qu'il faut adapter les importations selon les types d'environnement ?
+##  {.unnumbered .unlisted}
 
 ::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-Etape inutile.
-
 ## `R base` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(lubridate)
 ```
 
 ## `Tidyverse` {.unnumbered .unlisted}
-À FAIRE : library(janitor) et library(tidyverse) suffisent non ? Puisque Tidyverse a déjà les autres packages ?
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(lubridate)
 library(janitor)
 library(magrittr)
-library(lubridate)
-library(dplyr)
 library(tidyverse)
-```
-
-## `data.table` {.unnumbered .unlisted}
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(data.table)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -89,22 +76,11 @@ library(data.table)
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
-À FAIRE : à ajouter pour DuckDb ??
-
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 #library(duckdb)
 #library(arrow)
 ```
 
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(janitor)
-library(magrittr)
-library(lubridate)
-library(dplyr)
-library(tidyverse)
-library(data.table)
-```
 :::
 
 ## Chemin vers le bureau et affichage de la date et de l'année
@@ -162,16 +138,31 @@ if (annee >= 2023) {
   print("Nous sommes en 2022 ou avant")
 }
 ```
+
+Afficher le répertoire de travail et le définir si besoin 
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#Afficher 
+
+getwd()
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#Le définir si besoin 
+
+#setwd(dir="nom du répertoire")
+```
 :::
 
 ## Création d'une base de données
+
+Données fictives sur des formations
 
 ::: {.panel-tabset group="language"}
 ## `SAS` {.unnumbered .unlisted}
 
 ```{r}
 #| eval: false
-/* Données fictives sur des formations */
 data Donnees;
   infile cards dsd dlm='|';
   format Identifiant $3. Sexe_red 1. CSP $1. Niveau $30. Date_naissance ddmmyy10. Date_entree ddmmyy10. Duree Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel poids_sondage;
@@ -211,7 +202,6 @@ run;
 ## `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Création de la base R
 donnees_rbase <- data.frame(
   Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
   Sexe_red = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
@@ -236,7 +226,6 @@ donnees_rbase <- data.frame(
 ## `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Création de la base R 
 a <- "Identifiant|Sexe_red|CSP|Niveau|Date_naissance|Date_entree|Duree|Note_Contenu|Note_Formateur|Note_Moyens|Note_Accompagnement|Note_Materiel|poids_sondage
 173|2|1|Qualifie|17/06/1998|01/01/2021|308|12|6|17|4|19|117.1
 173|2|1|qualifie|17/06/1998|01/01/2022|365|6||12|7|14|98.3
@@ -284,8 +273,8 @@ donnees_tidyverse <- donnees_tidyverse %>% mutate_all(na_if,"")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
-# Création de la base R
 donnees_datatable <- data.frame(
   Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
   Sexe_red = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
@@ -305,7 +294,6 @@ donnees_datatable <- data.frame(
   poids_sondage = c("117.1", "98.3", "214.6", "84.7", "65.9", "148.2", "89.6", "100.3", "49.3", "148.2", "86.4", "99.2", "105.6", "123.1", "137.4", "187.6", "87.3", "87.3", "169.3", "169.3", "169.3", "169.3", "234.1", "189.3", "45.9", "45.9", "45.9")
 )
 ```
-
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -347,19 +335,19 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 ::: {.panel-tabset group="language"}
 ### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # On vérifie déjà que la base importée est bien un data.frame
 is.data.frame(donnees_rbase)
 ```
 
 On convertit les colonnes en minuscule
-```{r, warning=FALSE, message=FALSE}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Renommer les colonnes de la base
 colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
 # Autre possibilité
 setNames(donnees_rbase, tolower(names(donnees_rbase)))
 ```
-
 
 ### `tidyverse` {.unnumbered .unlisted}
 
@@ -381,6 +369,7 @@ is.data.table(donnees_datatable)
 ```
 
 On convertit les colonnes en minuscule
+
 ```{r, warning=FALSE, message=FALSE}
 # Renommer les colonnes de la base
 colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
@@ -397,10 +386,7 @@ requete_duckdb %>% colnames()
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% rename_with(tolower) %>% colnames()
 ```
-
 :::
-
-
 
 ### Harmoniser le format des variables
 
@@ -425,7 +411,9 @@ run;
 ```
 
 ### `R base` {.unnumbered .unlisted}
+
 On a importé toutes les variables en caractère. On convertit certaines variables en format 'numeric' et 'date'
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 enDate <- c('date_naissance', 'date_entree')
@@ -433,18 +421,33 @@ enDate <- c('date_naissance', 'date_entree')
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[, enNumerique] <- lapply(donnees_rbase[, enNumerique], as.integer)
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#Pour une seule variable 
+
 donnees_rbase$poids_sondage <- as.numeric(donnees_rbase$poids_sondage)
 ```
 
 On convertit les dates.
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère les variables dont le nom débute par le mot "date"
 varDates <- names(donnees_rbase)[grepl("date", tolower(names(donnees_rbase)))]
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # On remplace / par - dans les dates
-donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], function(x) gsub("/", "-", x))
+# donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], function(x) gsub("/", "-", x))
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # On exprime les dates en format Date
-donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], lubridate::dmy)
+# donnees_rbase[, varDates] <- lapply(donnees_rbase[, varDates], lubridate::dmy)
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -462,7 +465,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```
 
 ### `data.table` {.unnumbered .unlisted}
+
 On a importé toutes les variables en caractère. On convertit certaines variables en format 'numeric' et 'date'
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 enDate <- c('date_naissance', 'date_entree')
@@ -478,6 +483,7 @@ donnees_datatable[, poids_sondage := as.numeric(poids_sondage)]
 ```
 
 On convertit les dates.
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère les variables dont le nom débute par le mot "date"
 varDates <- names(donnees_datatable)[grepl("date", tolower(names(donnees_datatable)))]
@@ -486,7 +492,6 @@ donnees_datatable[, (varDates) := lapply(.SD, function(x) gsub("/", "-", x)), .S
 # On exprime les dates en format Date
 donnees_datatable[, (varDates) := lapply(.SD, lubridate::dmy), .SDcols = varDates]
 ```
-
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -505,7 +510,6 @@ requete_duckdb %>%
 
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
-
 
 ## Information sur la base de données
 
@@ -528,17 +532,14 @@ data Lignes&x.;set Donnees_sas (firstobs = 1 obs = &x.);proc print;run;
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 10 premières lignes de la base
-donnees_rbase <- data.frame(donnees_rbase)
-View(donnees_rbase[1:10, ])
-head(donnees_rbase)
+donnees_rbase[1:10, ]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
-  slice(1:10) %>% 
-  head()
+  slice(1:10)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -553,7 +554,6 @@ requete_duckdb %>% head(10) %>% collect()
 ### Renommer les variables
 
 ::: {.panel-tabset group="language"}
-
 ### `SAS` {.unnumbered .unlisted}
 
 ```{r}
@@ -572,6 +572,7 @@ donnees_rbase$sexe <- donnees_rbase$sexe_red
 
 #Attention, lorsqu'on utilise ce code pour renommer la variable, l'ancienne variable reste dans la base de données 
 
+#Supprime sexe_red
 donnees_rbase <- donnees_rbase[, -which(names(donnees_rbase) %in% c("sexe_red"))]
 ```
 
@@ -602,21 +603,21 @@ requete_duckdb %>% rename(sexe=Sexe_red)
 #| eval: false
 /* Nombre de lignes */
 proc sql;select count(*) as Nb_Lignes from Donnees_sas;quit;
+
 /* Nombre de colonnes */
 proc sql;select count(*) as Nb_Colonnes from Var;quit;
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Nombre de lignes et de colonnes dans la base
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 #Nombre de lignes
 donnees_tidyverse %>% nrow()
 
@@ -647,7 +648,6 @@ requete_duckdb %>%  ncol()
 #| eval: false
 proc contents data=donnees_sas; run;
 ```
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -685,7 +685,6 @@ data Donnees_sas;
   Age = intck('year', date_naissance, date_entree);
 run;
 ```
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -733,6 +732,8 @@ requete_duckdb %>%
 
 ### Supression de colonnes et de lignes
 
+*Suppression de lignes à faire*
+
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
@@ -744,7 +745,6 @@ data Donnees_sas;
 run;
 ```
 
-    
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -787,7 +787,6 @@ proc format;
   '5' = "Retraité";
 run;
 ```
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -858,10 +857,15 @@ run;
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$agef[donnees_rbase$age < 26]                     <- "1. De 15 à 25 ans"
-# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
+donnees_rbase$agef[donnees_rbase$age < 26] <- "1. De 15 à 25 ans"
+# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes*
+
 donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
-donnees_rbase$agef[donnees_rbase$age >= 50]                    <- "3. 50 ans ou plus"
+
+donnees_rbase$agef[donnees_rbase$age >= 50] <- "3. 50 ans ou plus"
+```
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre solution
 agef <- cut(donnees_rbase$age, 
             breaks = c(0, 25, 49, Inf),
@@ -912,7 +916,6 @@ proc sql;
 quit; 
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -936,10 +939,10 @@ requete_duckdb %>% select(Identifiant, CSP, starts_with("NI"))
 ### Selection de lignes
 
 ::: {.panel-tabset group="language"}
+
 Selectionner les lignes qui ont sexef="Femme"
 
 ### `SAS` {.unnumbered .unlisted}
-
 
 ```{r}
 #| eval: false
@@ -948,7 +951,6 @@ data donnees_sas;
   where sexef="Femme";
  run;
 ```
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -993,13 +995,14 @@ data Zero_devant;set Donnees_sas (keep = date_entree);
 run;
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Obtenir le mois et la date
 donnees_rbase$mois <- lubridate::month(donnees_rbase$date_entree)
+```
 
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
 donnees_rbase$mois <- sprintf("%02d", donnees_rbase$mois)
 ```
@@ -1025,12 +1028,13 @@ requete_duckdb %>%
 
 ### Réexprimer en masse des valeurs
 
+On souhaite rééxprimer les notes sur 100 et non sur 20
+
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
 ```{r}
 #| eval: false
-/* On souhaite rééxprimer toutes les notes sur 100 et non sur 20 */
 %let notes = Note_Contenu   Note_Formateur Note_Moyens     Note_Accompagnement     Note_Materiel;
 /* On supprime les doubles blancs entre les variables */
 %let notes = %sysfunc(compbl(&notes.));
@@ -1049,7 +1053,6 @@ data Sur100_1;
   drop increment;
 run; 
 ```
-    
 
 ```{r}
 #| eval: false
@@ -1066,7 +1069,6 @@ data Sur100_2;
 run;
 ```
 
-
 ```{r}
 #| eval: false
 /* 3e solution : l'équivalent des list-comprehension de Python en SAS */
@@ -1082,11 +1084,9 @@ data Sur100_3;
 run;
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On souhaite rééxprimer les notes sur 100 et non sur 20
 notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 donnees_rbase[, notes] <- donnees_rbase[, notes] / 20 * 100
 ```
@@ -1094,10 +1094,8 @@ donnees_rbase[, notes] <- donnees_rbase[, notes] / 20 * 100
 ### `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-
 donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(across(notes, ~ .x/20*100))
+  mutate(across(starts_with("note"), ~ .x/20*100))
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -1109,23 +1107,10 @@ requete_duckdb %>%
 ```
 :::
 
-### Passer une variable de numérique à caractère et vice-versa
-
-::: {.panel-tabset group="language"}
-*Déjà fait dans harmoniser la base?*
-
-### `SAS` {.unnumbered .unlisted}
-
-### `R base` {.unnumbered .unlisted}
-
-### `tidyverse` {.unnumbered .unlisted}
-:::
-
 ### Arrondir une valeur numérique
 
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
-
 
 ```{r}
 #| eval: false
@@ -1144,7 +1129,6 @@ data Arrondis;set donnees_sas (keep = poids_sondage);
 run;
 ```
 
-
 ### R {.tabset .tabset-fade .tabset-pills}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -1159,6 +1143,21 @@ poids_inf <- floor(donnees_rbase$poids)
 # Arrondi à l'entier inférieur
 poids_inf <- ceiling(donnees_rbase$poids)
 ```
+
+### tidyverse {.tabset .tabset-fade .tabset-pills}
+
+```{r, warning=FALSE, message=FALSE}
+donnees_tidyverse %>% 
+  mutate(
+    poids_arrondi_0 = round(poids_sondage,0), # Arrondi à l'entier le plus proche
+    poids_arrondi_1 = round(poids_sondage,1), # Arrondi à 1 chiffre après la virgule
+    poids_arrondi_2 = round(poids_sondage,2), # Arrondi à 2 chiffre après la virgule
+    poids_floor = floor(poids_sondage), # Arrondi à l'entier inférieur
+    poids_ceiling = ceiling(poids_sondage), # Arrondi à l'entier inférieur
+    ) %>% 
+  select(starts_with("poids"))
+```
+
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -1182,7 +1181,6 @@ requete_duckdb %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-
 ```{r}
 #| eval: false
 /* On met identifiant date_entree et date_sortie au début de la base */
@@ -1203,7 +1201,6 @@ proc sql;
   select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from Donnees_sas;
 quit;
 ```
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1255,7 +1252,6 @@ proc sort data = Donnees_sas;by Identifiant Date_entree descending;run;
 proc sql;create table Donnes as select * from Donnees_sas order by Identifiant, desc Date_entree;quit;
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -1275,7 +1271,9 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 # Trier la base par ligne (individu et date de début de la formation) par ordre croissant
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, date_entree)
+```
 
+```{r, warning=FALSE, message=FALSE}
 # Tri par ordre croissant de identifiant et décroissant de date_entree 
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, desc(date_entree))
@@ -1315,8 +1313,8 @@ proc sort data = Donnees_sas;
 run;
 proc print;run;
 ```
-En effet, les valeurs manquantes sont considérées comme des valeurs négatives
 
+En effet, les valeurs manquantes sont considérées comme des valeurs négatives
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1327,6 +1325,20 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 # Pour mimer le tri SAS, il faut écrire :
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 ```
+
+### `tidyverse` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, date_entree)
+
+# Pour mimer le tri SAS, il faut écrire :
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, !is.na(date_entree), date_entree)
+```
+
+
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -1356,8 +1368,6 @@ data Donnees;
   date_sortie = intnx('day', date_entree, duree);
 run;
 ```
-
-    
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1411,7 +1421,6 @@ data Donnees_sas;
 run;
 ```
 
-
 ```{r}
 #| eval: false
 /*Majuscule*/
@@ -1421,7 +1430,6 @@ data Donnees_sas;
 run;
 ```
 
-
 ```{r}
 #| eval: false
 /*Minuscule*/
@@ -1430,8 +1438,6 @@ data Donnees_sas;
   CSP_minuscule = lowcase(CSPF);
 run;
 ```
-    
-
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1491,7 +1497,6 @@ data Donnees_sas;
 run;
 ```
 
-
 ### `R base` {.unnumbered .unlisted}
 
 ```{r}
@@ -1505,18 +1510,21 @@ donnees_rbase$niveau <- gsub("Qualifie", "Qualifié", donnees_rbase$niveau)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Manipuler des chaînes de caractères => R = gsub, grepl etc. */
-    data Exemple_chaines;
-    Texte = "              Ce   Texte   mériterait   d être   corrigé                  ";
-    Texte1 = "Je m'appelle";
-    Texte2 = "SAS";
-    run;
-    data Exemple_chaines;set Exemple_chaines;
-    /* Enlever les blancs au début et à la fin de la chaîne de caractère */
-    Enlever_Blancs_Initiaux = strip(Texte);
-    /* Enlever les doubles blancs dans la chaîne de caractères */
-    Enlever_Blancs_Entre = compbl(Enlever_Blancs_Initiaux);
-    run;
+```{r}
+#| eval: false
+/* Manipuler des chaînes de caractères => R = gsub, grepl etc. */
+data Exemple_chaines;
+Texte = "              Ce   Texte   mériterait   d être   corrigé                  ";
+Texte1 = "Je m'appelle";
+Texte2 = "SAS";
+run;
+data Exemple_chaines;set Exemple_chaines;
+/* Enlever les blancs au début et à la fin de la chaîne de caractère */
+Enlever_Blancs_Initiaux = strip(Texte);
+/* Enlever les doubles blancs dans la chaîne de caractères */
+Enlever_Blancs_Entre = compbl(Enlever_Blancs_Initiaux);
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1546,20 +1554,31 @@ texte_tidyverse <- str_squish(texte_tidyverse)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Trois méthodes pour concaténer des chaînes de caractères */
-    Concatener  = Texte1||" "||Texte2;
-    Concatener2 = Texte1!!" "!!Texte2;
-    Concatener3 = catx(" ", Texte1, Texte2);
-    /* Extraire les 2e, 3e et 4e caractères de Concatener */
-    /* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
-    extrait = substr(Concatener, 2, 3);
-    run;
+```{r}
+#| eval: false
+/* Trois méthodes pour concaténer des chaînes de caractères */
+Concatener  = Texte1||" "||Texte2;
+Concatener2 = Texte1!!" "!!Texte2;
+Concatener3 = catx(" ", Texte1, Texte2);
+/* Extraire les 2e, 3e et 4e caractères de Concatener */
+/* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
+extrait = substr(Concatener, 2, 3);
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Concaténer des chaînes de caractères
 paste(texte_rbase_1, texte_rbase_2, sep = " ")
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Concaténer des chaînes de caractères
+
+str_c(texte_tidyverse_1, texte_tidyverse_2, sep = " ")
 ```
 :::
 
@@ -1568,11 +1587,14 @@ paste(texte_rbase_1, texte_rbase_2, sep = " ")
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    data Donnees;
-    set Donnees;
-    /* Nombre de caractères dans une chaîne de caractères*/
-    taille_id = length(identifiant);
-    run;
+```{r}
+#| eval: false
+data Donnees;
+set Donnees;
+/* Nombre de caractères dans une chaîne de caractères*/
+taille_id = length(identifiant);
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1596,11 +1618,14 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Transformer plusieurs caractères différents */
-    chaine = "éèêëàâçîô";
-    /* On transforme le é en e, le â en a, le î en i, ... */
-    chaine_sans_accent = translate(chaine, "eeeeaacio", "éèêëàâçîô");
-    run;
+```{r}
+#| eval: false
+/* Transformer plusieurs caractères différents */
+chaine = "éèêëàâçîô";
+/* On transforme le é en e, le â en a, le î en i, ... */
+chaine_sans_accent = translate(chaine, "eeeeaacio", "éèêëàâçîô");
+run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1610,7 +1635,6 @@ chaine <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", chaine)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
 :::
 
 ## Gestion ligne par ligne
@@ -1620,14 +1644,18 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Numéro de l'observation */
-    data Donnees;set Donnees;
-    Num_observation = _n_;
-    run;
+    
+```{r}
+#| eval: false
+/* Numéro de l'observation */
+data Donnees;set Donnees;
+Num_observation = _n_;
+run;
 
-    /* Autre solution */
-    proc sql noprint;select count(*) into :nbLignes from Donnees;quit;
-    data numLigne;do Num_observation = 1 to &nbLignes.;output;end;run;
+/* Autre solution */
+proc sql noprint;select count(*) into :nbLignes from Donnees;quit;
+data numLigne;do Num_observation = 1 to &nbLignes.;output;end;run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1650,15 +1678,20 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
+    
+```{r}
+#| eval: false
 
-    /* Numéro du contrat de chaque individu, contrat trié par date de survenue */
-    proc sort data = Donnees;by identifiant date_entree;run;
-    data Donnees;set Donnees;
-    by identifiant date_entree;
-    retain numero_contrat 0;
-    if first.identifiant then numero_contrat = 1;
-    else numero_contrat = numero_contrat + 1;
-    run;
+/* Numéro du contrat de chaque individu, contrat trié par date de survenue */
+proc sort data = Donnees;by identifiant date_entree;run;
+data Donnees;set Donnees;
+by identifiant date_entree;
+retain numero_contrat 0;
+if first.identifiant then numero_contrat = 1;
+else numero_contrat = numero_contrat + 1;
+run;
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1667,7 +1700,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
 donnees_rbase$a <- 1
 donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
+```
 
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Pour trier les colonnes
 tri <- c("identifiant", "date_entree", "numero_contrat", "num_observation")
 donnees_rbase_tri <- donnees_rbase[, c(tri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% tri])]
@@ -1682,9 +1717,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
   group_by(identifiant) %>% 
   arrange(identifiant, date_entree) %>% 
   mutate(numero_contrat=row_number())
+```
 
-# arrange() va permettre de trier les observations par identifiant et date d'entrée 
-
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Pour trier les colonnes
 
 donnees_tidyverse_tri <- donnees_tidyverse %>% 
@@ -1697,9 +1732,15 @@ donnees_tidyverse_tri <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* 2e contrat de l'individu (et rien si l'individu a fait 1 seul contrat */
-    data Deuxieme_Contrat;set Donnees;if numero_contrat = 2;run;
-    data Deuxieme_Contrat;set Donnees (where = (numero_contrat = 2));run;
+    
+```{r}
+#| eval: false
+
+  /* 2e contrat de l'individu (et rien si l'individu a fait 1 seul contrat */
+  data Deuxieme_Contrat;set Donnees;if numero_contrat = 2;run;
+  data Deuxieme_Contrat;set Donnees (where = (numero_contrat = 2));run;
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1747,16 +1788,22 @@ ni_prem_ni_der_tidyverse  <- donnees_tidyverse %>%
 ### Date de fin du contrat précédent
 
 ::: {.panel-tabset group="language"}
+
 ### `SAS` {.unnumbered .unlisted}
 
-    /* La date de fin du contrat précédent */
-    proc sort data = Donnees;by identifiant date_entree;run;
-    data DonneesBon;set Donnees;
-    by identifiant date_entree;
-    format Date_fin_1 ddmmyy10.;
-    Date_fin_1 = lag(Date_sortie);
-    if first.identifiant then Date_fin_1 = .;
-    run;
+```{r}
+#| eval: false
+
+/* La date de fin du contrat précédent */
+proc sort data = Donnees;by identifiant date_entree;run;
+data DonneesBon;set Donnees;
+by identifiant date_entree;
+format Date_fin_1 ddmmyy10.;
+Date_fin_1 = lag(Date_sortie);
+if first.identifiant then Date_fin_1 = .;
+run;
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1770,7 +1817,6 @@ donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(leng
 donnees_rbase$date_sortie_1[!duplicated(donnees_rbase$identifiant, fromLast = FALSE)] <- as.Date(NA)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
 :::
 
 ### Valeur retardée (lag)
@@ -1778,16 +1824,21 @@ donnees_rbase$date_sortie_1[!duplicated(donnees_rbase$identifiant, fromLast = FA
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* ATTENTION au lag DANS UNE CONDITION IF (cf. document) */
-    proc sort data = Donnees;by identifiant date_entree;run;
-    data Lag_Bon;set Donnees (keep = identifiant date_entree date_sortie);
-    format date_sortie_1 lag_faux lag_bon ddmmyy10.;
-    /* Erreur */
-    if date_entree = lag(date_sortie) + 1 then lag_faux = lag(date_sortie) + 1;
-    /* Bonne écriture */
-    date_sortie_1 = lag(date_sortie);
-    if date_entree = date_sortie_1 + 1 then lag_bon = date_sortie_1 + 1;
-    run;
+```{r}
+#| eval: false
+
+/* ATTENTION au lag DANS UNE CONDITION IF (cf. document) */
+proc sort data = Donnees;by identifiant date_entree;run;
+data Lag_Bon;set Donnees (keep = identifiant date_entree date_sortie);
+format date_sortie_1 lag_faux lag_bon ddmmyy10.;
+/* Erreur */
+if date_entree = lag(date_sortie) + 1 then lag_faux = lag(date_sortie) + 1;
+/* Bonne écriture */
+date_sortie_1 = lag(date_sortie);
+if date_entree = date_sortie_1 + 1 then lag_bon = date_sortie_1 + 1;
+run;
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1812,13 +1863,19 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Transposer une base */
-    proc freq data = Donnees;table Sexef * cspf / out = Nb;run;
-    proc sort data = Nb;by cspf Sexef;run;
-    proc print data = Nb;run;
-    proc transpose data = Nb out = transpose;by cspf;var count;id Sexef;run;
-    data transpose;set transpose (drop = _name_ _label_);run;
-    proc print data = transpose;run;
+```{r}
+#| eval: false
+
+/* Transposer une base */
+proc freq data = Donnees;table Sexef * cspf / out = Nb;run;
+proc sort data = Nb;by cspf Sexef;run;
+proc print data = Nb;run;
+proc transpose data = Nb out = transpose;by cspf;var count;id Sexef;run;
+data transpose;set transpose (drop = _name_ _label_);run;
+proc print data = transpose;run;
+
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1846,13 +1903,18 @@ nb_transpose_tridyverse <- nb_tidyverse %>% sjmisc::rotate_df()
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
-    /* Repérer les valeurs manquantes */
-    data Missing;set Donnees;
-    /* 1ère solution */
-    if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
-    if age = . or Niveau = '' then missing2 = 1;else missing2 = 0;
-    keep Age Niveau Missing1 Missing2;
-    run;
+```{r}
+#| eval: false
+
+/* Repérer les valeurs manquantes */
+data Missing;set Donnees;
+/* 1ère solution */
+if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
+if age = . or Niveau = '' then missing2 = 1;else missing2 = 0;
+keep Age Niveau Missing1 Missing2;
+run;
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -1879,7 +1941,7 @@ ageManquant_tidyverse <- donnees_tidyverse %>%
 Incidence des valeurs manquantes :
 
 1.  Dans des opérations (*exemple de la moyenne*)
-2.  Dans les tris
+2.  Dans les tris *renvoyer à la partie tri ou mettre la partie sur les NA de tri ici ?* 
 
 ### `SAS` {.unnumbered .unlisted}
 
@@ -1901,34 +1963,6 @@ mean(donnees_rbase$note_formateur, na.rm = TRUE)
 
 #### Tris
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Trier la base par ligne (individu et date de début de la formation) par ordre croissant
-
-# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
-
-# soit croissant ou décroissant
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
-
-# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
-# donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$date_entree, na.last = FALSE), ] #ne marche pas pour les dates à refaire
-```
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Trier la base par colonne (noms de variables)
-# On met identifiant date_entree et date_sortie au début
-# colTri <- c("identifiant", "date_entree", "date_sortie")
-# donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
-```
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
-```
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour mimer le tri SAS, il faut écrire :
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
-```
 :::
 
 ## Les doublons
@@ -1938,6 +1972,8 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
     proc contents data = Donnees out = Var noprint;run;
     proc sql noprint;select name into :derniere_var from Var where varnum = (select max(varnum) from Var);quit;
@@ -1973,6 +2009,9 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
     %put &nom_col.;
     proc sort data = Donnees;by &nom_col.;run;
     data Donnees;set Donnees;by &nom_col.;if first.&derniere_var.;run;
+
+
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2029,6 +2068,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
+
     /* On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes */
     data Diplome;
     infile cards dsd dlm='|';
@@ -2065,6 +2107,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
     quit;
     proc print data = Inner_Join1;run;
     proc sql;select count(*) from Inner_Join1;quit;
+
+```
+
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2107,7 +2152,8 @@ innerJoin_tidyverse <- jointure_tidyverse %>%
 
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
-
+```{r}
+#| eval: false
     /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
     proc sort data = Diplome;by identifiant;run;
     proc sort data = Jointure;by identifiant;run;
@@ -2116,6 +2162,7 @@ innerJoin_tidyverse <- jointure_tidyverse %>%
     by identifiant;
     if a;
     run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2139,6 +2186,8 @@ leftJoin_tidyverse <- jointure_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
     proc sort data = Diplome;by identifiant;run;
     proc sort data = Jointure;by identifiant;run;
@@ -2147,6 +2196,7 @@ leftJoin_tidyverse <- jointure_tidyverse %>%
     by identifiant;
     if a or b;
     run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2170,12 +2220,15 @@ fullJoin_tidyverse <- jointure_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* 4. Cross join : toutes les combinaisons possibles de CSP, sexe et Diplome */
     proc sql;
     select *
     from (select distinct CSPF from Donnees) cross join (select distinct Sexef from Donnees) cross join (select distinct Diplome from Diplome)
     order by CSPF, Sexef, Diplome;
     quit;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2225,6 +2278,8 @@ empilement_tidyverse <- bind_rows(donnees_tidyverse, diplome_tidyverse)
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* Moyenne de chaque note */
     %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
     proc means data = Donnees mean;var &notes.;run;
@@ -2234,6 +2289,7 @@ empilement_tidyverse <- bind_rows(donnees_tidyverse, diplome_tidyverse)
 
     /* Notes pondérées (poids de sondage) */
     proc means data = Donnees sum mean median min max n;var &notes.;weight poids_sondage;run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2312,12 +2368,15 @@ donnees_tidyverse %>%
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* Tableaux de fréquence : proc freq */
     proc freq data = Donnees;
     tables Sexe CSP / missing;
     format Sexe sexef. CSP $cspf.;
     /*weight poids_sondage;*/
     run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
@@ -2390,8 +2449,11 @@ proportion
 ::: {.panel-tabset group="language"}
 ### `SAS` {.unnumbered .unlisted}
 
+```{r}
+#| eval: false
     /* Supprimer toutes les bases de la mémoire vive (la work) => rm(list = ls()) */
     proc datasets lib = work nolist kill;run;
+```
 
 ### `R base` {.unnumbered .unlisted}
 
