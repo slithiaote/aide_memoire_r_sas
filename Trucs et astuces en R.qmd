@@ -32,16 +32,17 @@ categories:
   - R
 ---
 
+::: justify
 Voici quelques trucs et astuces utiles à connaître sur R, des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
-
-[Options quarto](https://quarto.org/docs/reference/formats/html.html)
+:::
 
 # Trucs et astuces en R
-
 
 ## Effets des calculs en virgule flottante
 
 ```{r, warning=FALSE, message=FALSE}
+sqrt(2) ^ 2 == 2
+1 / 49 * 49 == 1
 .1 == .3 / 3
 seq(0, 1, by=.1) == .3
 unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
@@ -57,10 +58,13 @@ class(cars)
 mode(cars)
 str(cars)
 dim(cars)
-is.data.frame(cars)
-is.list(cars)
-is.vector(cars)
-is.array(cars)
+c(is.data.frame(cars), is.list(cars), is.vector(cars), is.array(cars))
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Notation L : imposer à R de créer un nombre sous format "integer", pour des raisons d'efficacité
+class(1)
+class(1L)
 ```
 
 ## Les affectations
@@ -186,7 +190,6 @@ range(valeurs)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# Problèmes
 # Correct
 mean(valeurs)
 
@@ -207,7 +210,9 @@ mean(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 ```{r, warning=FALSE, message=FALSE}
 # Attention aux parenthèses !
 n <- 10
+# Correct
 1:n-1
+# Inattendu ! Correspond à (1-1, 2-1, 3-1, ..., 10-1)
 1:(n-1)
 
 ```
@@ -234,32 +239,51 @@ sapply(x, function(xi, mn, mx) {(xi - mn) / (mx - mn)}, mn = min(x), mx = max(x)
 
 ## Principe de coercion
 
-Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complex et character, jusqu'à ce que la comparaison puisse se faire
+Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complex et character, jusqu'à ce que la comparaison puisse se faire.
 
 ```{r, warning=FALSE, message=FALSE}
 # TRUE / FALSE est transformé en integer (1 / 0)
 TRUE == 1
 TRUE == 2
+FALSE == 0
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# TRUE est converti en character
+# TRUE est convertit en character
 TRUE == "1"
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# 5 est converti en character
+# 5 est convertit en character
 5 < '7'
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# 50 est converti en character
+# 50 est convertit en character
 50 < '7'
 
 ```
+
+
+## Principe de recycling
+
+```{r, warning=FALSE, message=FALSE}
+# Fonctionne sans soulever de message d'erreur
+x <- c(1, 2, 3)
+y <- c(1, 2, 3, 4, 5, 6, 7)
+x + y
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Fonctionne, mais Warning
+x <- c(1, 2, 3)
+y <- c(1, 2, 3, 4, 5, 6, 7)
+x + y
+```
+
 
 ## Opérateurs de contrôle
 
@@ -400,6 +424,16 @@ xna[which(xna == 2)]
 
 ```
 
+```{r, warning=FALSE, message=FALSE}
+# Incidence des NA dans le calcul de statistiques !
+# Besoin de l'instruction na.rm = TRUE pour en supprimer l'incidence
+x <- c(1, 5, 6, NA, 8)
+mean(x)
+mean(x, na.rm = TRUE)
+max(x)
+max(x, na.rm = TRUE)
+```
+
 ## Sélection d'éléments
 
 ```{r, warning=FALSE, message=FALSE}
@@ -415,7 +449,7 @@ for(i in 0:3) print(x[i])
 # Cas où les noms ne sont pas uniques
 x <- c(a = 1, b = 2, a = 3)
 x["a"]
-x[names(x) %in% 'a']
+x[names(x) %in% "a"]
 
 ```
 
@@ -531,6 +565,27 @@ liste
 
 ```
 
+## Informations sur R
+
+```{r, warning=FALSE, message=FALSE}
+# Informations sur la session de R
+sessionInfo()
+Sys.info()
+.Platform
+
+# Version de R
+R.version.string
+
+# Lien vers le bureau de l'utilisateur
+file.path(path.expand('~'), "Desktop")
+
+# Chemin de l'exécutable R est-il installé ?
+R.home("bin")
+
+# Où sont installés les packages R
+.libPaths()
+```
+
 ## Trucs et astuces divers
 
 ```{r, warning=FALSE, message=FALSE}
@@ -556,10 +611,7 @@ options(error=NULL)
 
 ```
 
--   unordered list
-    -   sub-item 1
-    -   sub-item 2
-        -   sub-sub-item 1
+
 
 # Mise en garde
 
