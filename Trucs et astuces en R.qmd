@@ -366,8 +366,8 @@ condition("Français")
 
 ```{r, warning=FALSE, message=FALSE}
 # Penser au print
-for(i in 1:10) i
-for(i in 1:10) print(i)
+for(i in 1:5) i
+for(i in 1:5) print(i)
 
 ```
 
