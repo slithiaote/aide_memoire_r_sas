@@ -738,3 +738,4 @@ R a plusieurs spécificités à connaître par rapport à SAS : COMPLETER
 -   syntaxe parfois déroutante, incohérente, et peu explicite
 -   moins utilisé
 -   certaines tâches sont plus simples à traiter avec les autres environnements
+
