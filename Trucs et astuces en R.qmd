@@ -38,7 +38,6 @@ Voici quelques trucs et astuces utiles à connaître sur R, des livres [The R In
 
 # Trucs et astuces en R
 
-
 ## Effets des calculs en virgule flottante
 
 ```{r, warning=FALSE, message=FALSE}
@@ -632,54 +631,4 @@ R a plusieurs spécificités à connaître par rapport à SAS : COMPLETER
 -   fonctions plutôt que macro
 -   gestion de la mémoire spécifique : shallow / deep copy, créer une colonne / une ligne pour l'exemple / Exemple de boucle inefficace / certaines façons sont +/- efficaces
 
-## Avantages et inconvénients des environnements R
-
-### R Base
-
-#### Avantages :
-
--   absence de dépendance (ne s'appuie sur aucun package) : pas besoin d'installer un package, de gérer sa mise à jour, de craindre pour sa disparition
--   garantit la rétrocompatibilité du code : utile dans des environnements de production
--   dans certains cas, se révèle la solution la plus simple
--   parfois, la seule façon de faire
-
-#### Inconvénients :
-
--   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
--   syntaxe plus complexe et parfois incohérente
--   souvent moins rapide que les autres environnements
--   demande plus de connaissance sur le fonctionnement du langage R
--   certaines tâches sont plus simples à traiter avec les autres environnements
-
-### Tidyverse
-
-#### Avantages :
-
--   plus simple à prendre en main
--   syntaxe plus simple que les autres environnements et cohérente
--   largement utilisé dans la communauté R
--   tend à s'imposer comme la référence de la gestion de données sur R
--   syntaxe utilisée également dans les packages Arrow / DuckDb
-
-#### Inconvénients :
-
--   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
--   forte dépendance : la rétrocompatibilité n'est pas assurée, potentiel problème dans un environnement de production
--   globalement moins rapide que data.table
--   tâches non prévues plus difficiles à réaliser
--   certaines tâches sont plus simples à traiter avec les autres environnements
-
-### data.table
-
-#### Avantages :
-
--   faible dépendance : garantit une rétrocompatibilité élevée
--   syntaxe proche du R Base
--   plus rapide et puissant que ses concurrents
-
-#### Inconvénients :
-
--   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
--   syntaxe parfois déroutante, incohérente, et peu explicite
--   moins utilisé
--   certaines tâches sont plus simples à traiter avec les autres environnements
+## 
