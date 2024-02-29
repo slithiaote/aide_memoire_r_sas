@@ -80,8 +80,8 @@ library(data.table)
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(duckdb)
-library(arrow)
+#library(duckdb)
+#library(arrow)
 ```
 
 :::
