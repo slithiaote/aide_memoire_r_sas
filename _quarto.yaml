@@ -16,7 +16,7 @@ website:
     style: "docked"
     contents:
       - href: 01-aide_memoire_r_sas.qmd
-        text: Introduction
+        text: "Aide-mémoire"
       - href: Trucs%20et%20astuces%20en%20R.qmd
         text: "Trucs et astuces"
       - href: 02-avantages_inconvenients_env_R.qmd
