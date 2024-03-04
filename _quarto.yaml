@@ -19,6 +19,8 @@ website:
         text: Introduction
       - href: Trucs%20et%20astuces%20en%20R.qmd
         text: "Trucs et astuces"
+      - href: 02-avantages_inconvenients_env_R.qmd
+        text: "Avantages et inconvénients des environnements R"
         
 format:
   html:
