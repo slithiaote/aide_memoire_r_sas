@@ -1,5 +1,0 @@
-Problème avec version quarto : 
-
-- pas de copier coller pour les chunk avec sas
-
-- pas de menu déroulant 
