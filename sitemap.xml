@@ -2,10 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://slithiaote.github.io/aide_memoire_r_sas/01-aide_memoire_r_sas.html</loc>
-    <lastmod>2024-02-12T12:30:03.060Z</lastmod>
+    <lastmod>2024-03-15T08:36:29.936Z</lastmod>
+  </url>
+  <url>
+    <loc>https://slithiaote.github.io/aide_memoire_r_sas/02-avantages_inconvenients_env_R.html</loc>
+    <lastmod>2024-03-15T08:36:29.940Z</lastmod>
   </url>
   <url>
     <loc>https://slithiaote.github.io/aide_memoire_r_sas/Trucs et astuces en R.html</loc>
-    <lastmod>2024-02-12T12:30:03.076Z</lastmod>
+    <lastmod>2024-03-15T08:36:29.940Z</lastmod>
   </url>
 </urlset>
