@@ -2,8 +2,10 @@
 title: "Trucs et astuces en `R`"
 lang : fr
 author:
-  - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr]
-  - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr]
+  - name: Nassab ABDALLAH
+    affiliation: Dares/SCS, <nassab.abdallah@travail.gouv.fr>
+  - name: Damien EUZENAT
+    affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
 format:
   html:
     toc: true
@@ -11,8 +13,11 @@ format:
     toc-location: left
     number-sections: true
     code-copy: true
-    filters: 
-      - fix_meta_notes.lua
+    smooth-scroll: true
+    link-external-icon:	true
+    link-external-newwindow: true
+    page-layout: full
+    
 # format : native    
 
 editor: visual
@@ -23,6 +28,7 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
+date-modified: "04/10/2024"
 output:
   rmdformats::robobook:
     highlight: tango
@@ -33,7 +39,7 @@ categories:
 ---
 
 ::: justify
-Voici quelques trucs et astuces utiles à connaître sur R, des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
+Voici quelques trucs et astuces utiles à connaître sur R, issus des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
 :::
 
 # Trucs et astuces en R
@@ -74,11 +80,12 @@ class(1L)
 ```{r, warning=FALSE, message=FALSE}
 # Importance des espaces
 x<-3
-x
 # S'agit-il de ?
 x <- 3
+# Ou de ?
 x < -3
-
+# Il s'agit du premier cas !
+x
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -269,7 +276,6 @@ TRUE == "1"
 
 ```
 
-
 ## Principe de recycling
 
 ```{r}
@@ -285,7 +291,6 @@ x <- c(1, 2, 3)
 y <- c(1, 2, 3, 4, 5, 6, 7)
 x + y
 ```
-
 
 ## Opérateurs de contrôle
 
@@ -489,10 +494,12 @@ subset(x, x1 = 1)
 # Référence à des noms de colonne non usuels
 df <- data.frame(x = rnorm(5), y = runif(5))
 names(df) <- 1:2
-# Incorrect
-df$1
+
 # Correct
 df$`1`
+
+# Incorrect
+df$1
 
 ```
 
@@ -510,7 +517,7 @@ objet_5
 ```{r, warning=FALSE, message=FALSE}
 # Ajouter un élément à une liste
 liste <- list(1, 2)
-liste
+# Il faut passer par cette syntaxe
 liste <- c(liste, list(3))
 liste
 
@@ -614,8 +621,6 @@ options(error=NULL)
 
 ```
 
-
-
 # Mise en garde
 
 ## Comment utiliser cet aide-mémoire ?
@@ -686,4 +691,3 @@ R a plusieurs spécificités à connaître par rapport à SAS : COMPLETER
 -   recycling
 -   fonctions plutôt que macro
 -   gestion de la mémoire spécifique : shallow / deep copy, créer une colonne / une ligne pour l'exemple / Exemple de boucle inefficace / certaines façons sont +/- efficaces
-
