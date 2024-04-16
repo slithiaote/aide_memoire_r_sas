@@ -28,7 +28,7 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "04/10/2024"
+date-modified: "04/16/2024"
 output:
   rmdformats::robobook:
     highlight: tango
@@ -39,7 +39,7 @@ categories:
 ---
 
 ::: justify
-Voici quelques trucs et astuces utiles à connaître sur R, issus des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
+Voici quelques trucs et astuces utiles à connaître sur R, issus en partie des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
 :::
 
 # Trucs et astuces en R
@@ -442,6 +442,13 @@ max(x)
 max(x, na.rm = TRUE)
 ```
 
+```{r, warning=FALSE, message=FALSE}
+# Une moyenne de NA donne NaN (Not a Number) avec na.rm = TRUE !
+mean(c(NA, NA, NA), na.rm = TRUE)
+# Et donne NA avec na.rm = FALSE !
+mean(c(NA, NA, NA), na.rm = FALSE)
+```
+
 ## Sélection d'éléments
 
 ```{r, warning=FALSE, message=FALSE}
@@ -600,9 +607,18 @@ R.home("bin")
 
 ```{r, warning=FALSE, message=FALSE}
 # Créer un objet sous forme de code R !
-data("cars")
-dput(cars)
+data("mtcars")
+dput(mtcars)
+```
 
+```{r, warning=FALSE, message=FALSE}
+# En tidyverse, la fonction tribble peut être utile pour créer des bases lignes par lignes
+library(tidyverse)
+tribble(
+  ~x, ~y,
+  "a",   1,
+  "b",   2
+)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
