@@ -15,11 +15,11 @@ website:
     align: center
     style: "docked"
     contents:
-      - href: 01-aide_memoire_r_sas.qmd
+      - href: 01-integration_chap_aide_mémoire_SAS-R.qmd
         text: "Aide-mémoire"
-      - href: Trucs%20et%20astuces%20en%20R.qmd
+      - href: 02-trucs_et_astuces_en_R.qmd
         text: "Trucs et astuces"
-      - href: 02-avantages_inconvenients_env_R.qmd
+      - href: 03-avantages_inconvenients_env_R.qmd
         text: "Avantages et inconvénients des environnements R"
         
 format:
