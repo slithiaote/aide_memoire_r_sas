@@ -1,0 +1,404 @@
+# Les doublons 
+
+
+
+## Doublons pour toutes les colonnes 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On extraie tous les doublons, pas la première occurrence */
+
+/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :derniere_var
+  from Var
+  where varnum = (select max(varnum) from Var);
+quit;
+proc sort data = donnees_sas;by &nom_col.;run;
+data Doublons;
+  set donnees_sas;
+  by &nom_col.;
+  if not (first.&derniere_var. and last.&derniere_var.);
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+doublons <- donnees_rbase[duplicated(donnees_rbase), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+doublons <- donnees_tidyverse %>%  
+  group_by_all() %>% 
+  filter(n() > 1) %>%
+  slice(-1) %>%
+  ungroup()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+doublons <- donnees_datatable[duplicated(donnees_datatable), ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Doublons pour une ou plusieurs colonnes 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On extraie tous les doublons, pas la première occurrence */
+%let var = identifiant;
+proc sort data = donnees_sas;by &var.;run;
+data doublons;
+  set donnees_sas;
+  by &var.;
+  if not first.&var.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_rbase[duplicated(donnees_rbase[, variable]), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() > 1) %>%
+  slice(-1) %>%
+  ungroup()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extraie tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Récupérer toutes les lignes pour les identifiants en doublon 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let var = identifiant;
+/* On groupe par la colonne identifiant, et si on aboutit à strictement plus d'une ligne, c'est un doublon */
+proc sql;
+  create table enDouble as
+  select * from donnees_sas
+  group by &var.
+  having count(*) > 1;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+enDouble <- donnees_rbase[donnees_rbase[, variable] %in%
+                            donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+enDouble <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() > 1) %>%
+  ungroup()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
+                                donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Récupérer toutes les lignes pour les identifiants sans doublon 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let var = identifiant;
+proc sql;
+  create table sansDouble as
+  select * from donnees_sas
+  group by &var.
+  having count(*) = 1;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+sansDouble <- donnees_rbase[! donnees_rbase[, variable] %in%
+                              donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+sansDouble <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() == 1) %>%
+  ungroup()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
+                                  donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Suppression des doublons pour l'ensemble des variables 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* 1ère méthode */
+proc sort data = donnees_sas nodupkey;
+  by _all_;
+run;
+/* 2e méthode, avec first. et last. (cf. infra) */
+/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :derniere_var from Var
+  where varnum = (select max(varnum) from Var);
+quit;
+proc sql noprint;
+  select name into :nom_col separated by " " from Var order by varnum;
+quit;
+%put Dernière variable de la base : &derniere_var.;
+proc sort data = donnees_sas;by &nom_col.;run;
+data sansDouble;
+  set donnees_sas;
+  by &nom_col.;
+  if first.&derniere_var.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase), ]
+# Autre solution (équivalente à la solution first. de SAS)
+donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(pick(everything())) %>% 
+  distinct()
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(across(everything())) %>% 
+  distinct()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable <- unique(donnees_datatable)
+donnees_datatable <- donnees_datatable[! duplicated(donnees_datatable), ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Suppression des doublons pour une seule variable 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc sort data = donnees_sas;by _all_;run;
+data sansDouble;
+  set donnees_sas;
+  by _all_;
+  if first.identifiant;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+donnees_rbase_sansdoublon <- donnees_rbase_sansdoublon[!duplicated(donnees_rbase_sansdoublon$identifiant), , drop = FALSE]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# L'option .keep_all = TRUE est nécessaire 
+# À FAIRE : REVOIR LE TRI PAR RAPPORT A SAS !!!
+sansDouble <- donnees_tidyverse %>% 
+  arrange(pick(everything())) %>% 
+  distinct(identifiant, .keep_all = TRUE)
+sansDouble <- donnees_tidyverse %>% 
+  arrange(across(everything())) %>% 
+  distinct(identifiant, .keep_all = TRUE)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+setorderv(donnees_datatable, cols = colnames(donnees_datatable), na.last = FALSE)
+sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant")]), ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Identifiants uniques 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
+  create table id as select distinct identifiant from donnees_sas order by identifiant;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+unique(donnees_rbase["identifiant"])
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>%
+  distinct(identifiant)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+unique(donnees_datatable[, "identifiant"])
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Nombre de lignes uniques, sans doublon 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;select name into :nom_col separated by ", " from Var order by varnum;quit;
+proc sql;
+  select count(*) as Nb_Lignes_Uniques
+  from (select &nom_col., count(*) from donnees_sas group by &nom_col.);
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+nrow(unique(donnees_rbase))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>%
+  distinct() %>% 
+  nrow()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# À FAIRE : pas sûr de moi
+uniqueN(donnees_datatable)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::

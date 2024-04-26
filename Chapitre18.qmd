@@ -1,0 +1,70 @@
+# Débogage 
+
+
+
+## Outils d'aide au débogage 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+options symbolgen mprint mlogic;
+%macro Debogage;
+  %local phrase i j;
+  %let phrase = Voici une phrase;
+  %do i = 1 %to %sysfunc(countw(&phrase.));
+    %let j = %scan(&phrase., &i.);
+	%put Mot n°&i. = &j.;
+  %end;
+%mend Debogage;
+%Debogage;
+options nosymbolgen nomprint nomlogic;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# À FAIRE : creuser
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+## `polars` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
