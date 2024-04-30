@@ -1,0 +1,12 @@
+*.xlsx
+*.RData
+*.sas7bdat
+*.docx
+*.xls
+*.Rhistory
+*.log
+*.html
+.Rproj.user
+
+
+/.quarto/

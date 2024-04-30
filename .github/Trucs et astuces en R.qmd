@@ -2,10 +2,8 @@
 title: "Trucs et astuces en `R`"
 lang : fr
 author:
-  - name: Nassab ABDALLAH
-    affiliation: Dares/SCS, <nassab.abdallah@travail.gouv.fr>
-  - name: Damien EUZENAT
-    affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
+  - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr]
+  - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr]
 format:
   html:
     toc: true
@@ -13,11 +11,8 @@ format:
     toc-location: left
     number-sections: true
     code-copy: true
-    smooth-scroll: true
-    link-external-icon:	true
-    link-external-newwindow: true
-    page-layout: full
-    
+    filters: 
+      - fix_meta_notes.lua
 # format : native    
 
 editor: visual
@@ -28,7 +23,6 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "04/16/2024"
 output:
   rmdformats::robobook:
     highlight: tango
@@ -38,41 +32,28 @@ categories:
   - R
 ---
 
-::: justify
-Voici quelques trucs et astuces utiles à connaître sur R, issus en partie des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
-:::
+Voici quelques trucs et astuces utiles à connaître sur R, des livres [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) et [Advanced R](https://adv-r.hadley.nz/), à consulter pour plus de détails.
+
+[Options quarto](https://quarto.org/docs/reference/formats/html.html)
 
 # Trucs et astuces en R
-
-## Effets des calculs en virgule flottante
-
-```{r, warning=FALSE, message=FALSE}
-sqrt(2) ^ 2 == 2
-1 / 49 * 49 == 1
-.1 == .3 / 3
-seq(0, 1, by=.1) == .3
-unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
-```
 
 ## Les types d'objet
 
 ```{r, warning=FALSE, message=FALSE}
 # En savoir plus sur ses données
 data("cars")
-typeof(cars)
-class(cars)
-mode(cars)
-str(cars)
-dim(cars)
-c(is.data.frame(cars), is.list(cars), is.vector(cars), is.array(cars))
-```
+x <- cars
+typeof(x)
+class(x)
+mode(x)
+str(x)
+dim(x)
+is.data.frame(x)
+is.list(x)
+is.vector(x)
+is.array(x)
 
-Notation L
-
-```{r, warning=FALSE, message=FALSE}
-# Notation L : imposer à R de créer un nombre sous format "integer", pour des raisons d'efficacité
-class(1)
-class(1L)
 ```
 
 ## Les affectations
@@ -80,12 +61,11 @@ class(1L)
 ```{r, warning=FALSE, message=FALSE}
 # Importance des espaces
 x<-3
+x
 # S'agit-il de ?
 x <- 3
-# Ou de ?
 x < -3
-# Il s'agit du premier cas !
-x
+
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -145,7 +125,7 @@ for(i in seq(along=x)) print(i)
 ```{r, warning=FALSE, message=FALSE}
 # Equivalent des list-comprehensions de type Python en R
 # Somme des entiers de 1 à 1 000 multiples de 3 ou 5, en une ligne !
-# 4 manières de faire
+# 3 manières de faire
 sum({l <- 1:1000 ; l[l %% 3 == 0 | l %% 5 == 0]})
 sum({l <- 1:1000 ; l[seq_along(l) %% 3 == 0 | seq_along(l) %% 5 == 0]})
 sum(l<-(1:1000)[l %% 3 == 0 | l %% 5 == 0])
@@ -199,6 +179,7 @@ range(valeurs)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
+# Problèmes
 # Correct
 mean(valeurs)
 
@@ -219,9 +200,7 @@ mean(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 ```{r, warning=FALSE, message=FALSE}
 # Attention aux parenthèses !
 n <- 10
-# Inattendu ! Correspond à (1-1, 2-1, 3-1, ..., 10-1)
 1:n-1
-# Correct
 1:(n-1)
 
 ```
@@ -248,48 +227,31 @@ sapply(x, function(xi, mn, mx) {(xi - mn) / (mx - mn)}, mn = min(x), mx = max(x)
 
 ## Principe de coercion
 
-Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complex et character, jusqu'à ce que la comparaison puisse se faire.
+Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complexe et character, jusqu'à ce que la comaraison puisse se faire
 
 ```{r, warning=FALSE, message=FALSE}
 # TRUE / FALSE est transformé en integer (1 / 0)
 TRUE == 1
 TRUE == 2
-FALSE == 0
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# TRUE est convertit en character
+# TRUE est converti en character
 TRUE == "1"
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# 5 est convertit en character
+# 5 est converti en character
 5 < '7'
 
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# 50 est convertit en character
+# 50 est converti en character
 50 < '7'
 
-```
-
-## Principe de recycling
-
-```{r}
-# Fonctionne sans soulever de message d'erreur
-x <- c(1, 2, 3)
-y <- c(1, 2, 3, 4, 5, 6)
-x + y
-```
-
-```{r}
-# Fonctionne, mais Warning
-x <- c(1, 2, 3)
-y <- c(1, 2, 3, 4, 5, 6, 7)
-x + y
 ```
 
 ## Opérateurs de contrôle
@@ -371,8 +333,8 @@ condition("Français")
 
 ```{r, warning=FALSE, message=FALSE}
 # Penser au print
-for(i in 1:5) i
-for(i in 1:5) print(i)
+for(i in 1:10) i
+for(i in 1:10) print(i)
 
 ```
 
@@ -388,9 +350,8 @@ print("Salut !\nComment vas-tu ?")
 ```{r, warning=FALSE, message=FALSE}
 # Transformer les valeurs manquantes en 0
 x <- data.frame(X1 = c(1, NA, 2), X2 = c(NA, NA, 3))
-x
 x[is.na(x)] <- 0
-x
+
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -432,23 +393,6 @@ xna[which(xna == 2)]
 
 ```
 
-```{r, warning=FALSE, message=FALSE}
-# Incidence des NA dans le calcul de statistiques !
-# Besoin de l'instruction na.rm = TRUE pour en supprimer l'incidence
-x <- c(1, 5, 6, NA, 8)
-mean(x)
-mean(x, na.rm = TRUE)
-max(x)
-max(x, na.rm = TRUE)
-```
-
-```{r, warning=FALSE, message=FALSE}
-# Une moyenne de NA donne NaN (Not a Number) avec na.rm = TRUE !
-mean(c(NA, NA, NA), na.rm = TRUE)
-# Et donne NA avec na.rm = FALSE !
-mean(c(NA, NA, NA), na.rm = FALSE)
-```
-
 ## Sélection d'éléments
 
 ```{r, warning=FALSE, message=FALSE}
@@ -464,7 +408,7 @@ for(i in 0:3) print(x[i])
 # Cas où les noms ne sont pas uniques
 x <- c(a = 1, b = 2, a = 3)
 x["a"]
-x[names(x) %in% "a"]
+x[names(x) %in% 'a']
 
 ```
 
@@ -501,12 +445,10 @@ subset(x, x1 = 1)
 # Référence à des noms de colonne non usuels
 df <- data.frame(x = rnorm(5), y = runif(5))
 names(df) <- 1:2
-
-# Correct
-df$`1`
-
 # Incorrect
 df$1
+# Correct
+df$`1`
 
 ```
 
@@ -524,7 +466,7 @@ objet_5
 ```{r, warning=FALSE, message=FALSE}
 # Ajouter un élément à une liste
 liste <- list(1, 2)
-# Il faut passer par cette syntaxe
+liste
 liste <- c(liste, list(3))
 liste
 
@@ -582,43 +524,21 @@ liste
 
 ```
 
-## Informations sur R
+## Effets des calculs en virgule flottante
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Informations sur la session de R
-sessionInfo()
-Sys.info()
-.Platform
-
-# Version de R
-R.version.string
-
-# Lien vers le bureau de l'utilisateur
-file.path(path.expand('~'), "Desktop")
-
-# Chemin de l'exécutable R est-il installé ?
-R.home("bin")
-
-# Où sont installés les packages R
-.libPaths()
+```{r, warning=FALSE, message=FALSE}
+.1 == .3 / 3
+seq(0, 1, by=.1) == .3
+unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
 ```
 
 ## Trucs et astuces divers
 
 ```{r, warning=FALSE, message=FALSE}
 # Créer un objet sous forme de code R !
-data("mtcars")
-dput(mtcars)
-```
+data("cars")
+dput(cars)
 
-```{r, warning=FALSE, message=FALSE}
-# En tidyverse, la fonction tribble peut être utile pour créer des bases lignes par lignes
-library(tidyverse)
-tribble(
-  ~x, ~y,
-  "a",   1,
-  "b",   2
-)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -636,6 +556,11 @@ options(error=NULL)
 "Groupe_" %+% 0:9
 
 ```
+
+-   unordered list
+    -   sub-item 1
+    -   sub-item 2
+        -   sub-sub-item 1
 
 # Mise en garde
 
@@ -707,3 +632,55 @@ R a plusieurs spécificités à connaître par rapport à SAS : COMPLETER
 -   recycling
 -   fonctions plutôt que macro
 -   gestion de la mémoire spécifique : shallow / deep copy, créer une colonne / une ligne pour l'exemple / Exemple de boucle inefficace / certaines façons sont +/- efficaces
+
+## Avantages et inconvénients des environnements R
+
+### R Base
+
+#### Avantages :
+
+-   absence de dépendance (ne s'appuie sur aucun package) : pas besoin d'installer un package, de gérer sa mise à jour, de craindre pour sa disparition
+-   garantit la rétrocompatibilité du code : utile dans des environnements de production
+-   dans certains cas, se révèle la solution la plus simple
+-   parfois, la seule façon de faire
+
+#### Inconvénients :
+
+-   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
+-   syntaxe plus complexe et parfois incohérente
+-   souvent moins rapide que les autres environnements
+-   demande plus de connaissance sur le fonctionnement du langage R
+-   certaines tâches sont plus simples à traiter avec les autres environnements
+
+### Tidyverse
+
+#### Avantages :
+
+-   plus simple à prendre en main
+-   syntaxe plus simple que les autres environnements et cohérente
+-   largement utilisé dans la communauté R
+-   tend à s'imposer comme la référence de la gestion de données sur R
+-   syntaxe utilisée également dans les packages Arrow / DuckDb
+
+#### Inconvénients :
+
+-   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
+-   forte dépendance : la rétrocompatibilité n'est pas assurée, potentiel problème dans un environnement de production
+-   globalement moins rapide que data.table
+-   tâches non prévues plus difficiles à réaliser
+-   certaines tâches sont plus simples à traiter avec les autres environnements
+
+### data.table
+
+#### Avantages :
+
+-   faible dépendance : garantit une rétrocompatibilité élevée
+-   syntaxe proche du R Base
+-   plus rapide et puissant que ses concurrents
+
+#### Inconvénients :
+
+-   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive
+-   syntaxe parfois déroutante, incohérente, et peu explicite
+-   moins utilisé
+-   certaines tâches sont plus simples à traiter avec les autres environnements
