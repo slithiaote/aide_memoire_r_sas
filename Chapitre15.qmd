@@ -2,6 +2,7 @@
 
 
 
+
 ## Tableaux de fréquence (proc freq) pour 1 variable 
 ::: {.panel-tabset group="language"}
 

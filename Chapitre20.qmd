@@ -2,6 +2,7 @@
 
 
 
+
 ## Taille des objets en mémoire 
 ::: {.panel-tabset group="language"}
 

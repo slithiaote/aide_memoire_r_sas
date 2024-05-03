@@ -2,6 +2,7 @@
 
 
 
+
 ## Boucles imbriquées 
 ::: {.panel-tabset group="language"}
 
@@ -410,7 +411,7 @@ run;
 
 ## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+git 
 ```
 
 :::

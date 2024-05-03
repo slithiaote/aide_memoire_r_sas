@@ -2,6 +2,7 @@
 
 
 
+
 ## Repérer les valeurs manquantes (variables Âge et Niveau) 
 ::: {.panel-tabset group="language"}
 
