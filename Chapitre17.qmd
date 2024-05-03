@@ -32,13 +32,13 @@ annee <- lubridate::year(Sys.Date())
 listeMois <- c()
 for (i in seq(2020, annee)) {
   for (j in 1:12) {
-    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))))
+    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = '1970-01-01')
   }
 }
 # 2e  solution : 2 fonctions lapply imbriquées
-listeMois <- as.Date(unlist(lapply(seq(2020, annee), function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))))
+listeMois <- as.Date(unlist(lapply(seq(2020, annee), function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))), origin='1970-01-01')
 # 3e solution : expand.grid
-listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2])))))
+listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))), origin='1970-01-01'))
 # 4e solution, la plus simple !
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
