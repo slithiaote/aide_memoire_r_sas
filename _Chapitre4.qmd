@@ -48,11 +48,6 @@ View(donnees_datatable)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Extraire les x premières lignes de la base (10 par défaut) 
@@ -90,11 +85,6 @@ head(donnees_datatable, 10)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Extraire les x dernières lignes de la base (10 par défaut) 
@@ -127,11 +117,6 @@ tail(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -185,11 +170,6 @@ sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Liste des variables de la base
@@ -237,11 +217,6 @@ sort(colnames(donnees_datatable))
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -302,11 +277,6 @@ donnees_datatable[, uniqueN(identifiant)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Quelle est la position de la variable date_entree ? 
@@ -349,11 +319,6 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Format des variables 
@@ -368,31 +333,27 @@ proc datasets lib = Work nolist;delete Var;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, eval=TRUE}
 # Le pipe peut aussi être utilisé avec R-Base et data.table
 # Le pipe permet d'enchaîner des opérations sur une même base
 1:10 |> sum()
+Sys.time()
 # R-Base est réputé plus lent que ses concurrents, ce qui est souvent vrai.
 # Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 purrr::map(donnees_tidyverse, class)
 class(donnees_tidyverse)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 donnees_datatable[, lapply(.SD, class)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
