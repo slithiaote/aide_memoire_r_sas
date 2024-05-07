@@ -58,21 +58,36 @@ categories:
 
 {{< include _Chapitre4.qmd >}}
 
-<!-- {{< include Chapitre5.qmd >}} -->
-<!-- {{< include Chapitre6.qmd >}} -->
-<!-- {{< include Chapitre7.qmd >}} -->
-<!-- {{< include Chapitre8.qmd >}} -->
-<!-- {{< include Chapitre9.qmd >}} -->
-<!-- {{< include Chapitre10.qmd >}} -->
-<!-- {{< include Chapitre11.qmd >}} -->
-<!-- {{< include Chapitre12.qmd >}} -->
-<!-- {{< include Chapitre13.qmd >}} -->
-<!-- {{< include Chapitre14.qmd >}} -->
-<!-- {{< include Chapitre15.qmd >}} -->
-<!-- {{< include Chapitre16.qmd >}} -->
-<!-- {{< include Chapitre17.qmd >}} -->
-<!-- {{< include Chapitre18.qmd >}} -->
-<!-- {{< include Chapitre19.qmd >}} -->
-<!-- {{< include Chapitre20.qmd >}} -->
+{{< include _Chapitre5.qmd >}}
+
+{{< include _Chapitre6.qmd >}}
+
+{{< include _Chapitre7.qmd >}}
+
+{{< include _Chapitre8.qmd >}}
+
+{{< include _Chapitre9.qmd >}}
+
+{{< include _Chapitre10.qmd >}}
+
+{{< include _Chapitre11.qmd >}}
+
+{{< include _Chapitre12.qmd >}}
+
+{{< include _Chapitre13.qmd >}}
+
+{{< include _Chapitre14.qmd >}}
+
+{{< include _Chapitre15.qmd >}}
+
+{{< include _Chapitre16.qmd >}}
+
+{{< include _Chapitre17.qmd >}}
+
+{{< include _Chapitre18.qmd >}}
+
+{{< include _Chapitre19.qmd >}}
+
+{{< include _Chapitre20.qmd >}}
 
 
