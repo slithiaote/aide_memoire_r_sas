@@ -2,7 +2,6 @@
 
 
 
-
 ## Importation des packages
 ::: {.panel-tabset group="language"}
 
@@ -64,11 +63,6 @@ library(lubridate)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

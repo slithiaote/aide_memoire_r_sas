@@ -2,7 +2,6 @@
 
 
 
-
 ## Emploi des guillemets et double guillemets 
 ::: {.panel-tabset group="language"}
 
@@ -35,10 +34,6 @@
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -89,9 +84,5 @@
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

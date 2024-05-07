@@ -2,7 +2,6 @@
 
 
 
-
 ## Importation de bases pour les jointures 
 ::: {.panel-tabset group="language"}
 
@@ -92,10 +91,6 @@ jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree"
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -157,10 +152,6 @@ dim(innerJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -222,10 +213,6 @@ dim(leftJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -287,10 +274,6 @@ dim(rightJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -351,10 +334,6 @@ dim(fullJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -416,10 +395,6 @@ dim(innerJoin2)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -479,10 +454,6 @@ dim(innerJoinInegalite)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -545,10 +516,6 @@ dim(crossJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -637,10 +604,6 @@ concatener <- cbind(ajout, donnees_datatable)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -734,10 +697,6 @@ set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -772,10 +731,6 @@ ajout_na <- rbindlist(list(donnees_datatable, data.table(NA)), fill = TRUE)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -827,10 +782,6 @@ dim(semiJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -882,10 +833,6 @@ dim(antiJoin)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -982,9 +929,5 @@ fsetdiff(diplome_datatable[, ..variable], jointure_datatable[, ..variable])[orde
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

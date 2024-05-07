@@ -2,7 +2,6 @@
 
 
 
-
 ## Majuscule, minuscule 
 ::: {.panel-tabset group="language"}
 
@@ -73,10 +72,6 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -132,10 +127,6 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -268,10 +259,6 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -330,10 +317,6 @@ unlist(strsplit(chaine, split = " "))
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -380,9 +363,5 @@ inverserTexte(chaine)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

@@ -2,7 +2,6 @@
 
 
 
-
 ## Outils d'aide au débogage 
 ::: {.panel-tabset group="language"}
 
@@ -63,9 +62,5 @@ options nosymbolgen nomprint nomlogic;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

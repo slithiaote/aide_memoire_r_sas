@@ -2,7 +2,6 @@
 
 
 
-
 ## Taille des objets en mémoire 
 ::: {.panel-tabset group="language"}
 
@@ -45,10 +44,6 @@ sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -96,9 +91,5 @@ proc datasets lib = work nolist kill;run;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

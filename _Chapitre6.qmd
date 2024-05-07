@@ -2,7 +2,6 @@
 
 
 
-
 ## Renommer des variables 
 ::: {.panel-tabset group="language"}
 
@@ -49,14 +48,7 @@ setnames(donnees_datatable, "sexe_red", "sexe")
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Formater les modalités des valeurs 
 ::: {.panel-tabset group="language"}
 
@@ -107,14 +99,7 @@ cspform <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé",
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Utiliser les formats 
 ::: {.panel-tabset group="language"}
 
@@ -180,14 +165,7 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Transformer le format d'une variable : put et input 
 ::: {.panel-tabset group="language"}
 
@@ -246,14 +224,7 @@ donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Création et suppressions de plusieurs variables 
 ::: {.panel-tabset group="language"}
 
@@ -346,14 +317,7 @@ donnees_datatable[, (variable) := NULL]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## On souhaite réexprimer toutes les notes sur 100 et non sur 20 
 ::: {.panel-tabset group="language"}
 
@@ -429,14 +393,7 @@ donnees_datatable[, (paste0(notes, "_100")) := lapply(.SD, function(x) x / 20 * 
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Création de variables avec des conditions 
 ::: {.panel-tabset group="language"}
 
@@ -501,14 +458,7 @@ donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Manipuler les dates 
 ::: {.panel-tabset group="language"}
 
@@ -566,7 +516,7 @@ donnees_rbase$duree_inf_6_mois <- ifelse(donnees_rbase$duree < sixmois, 1, 0)
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
 
 # Pour créer une date
-as.Date(paste0(annee,"-12-31"))
+as.Date(paste0(annee,"-12-31"), origin = "1970-01-01")
 lubridate::ymd(paste0(annee,"-12-31"))
 
 # Date 6 mois après la sortie
@@ -640,14 +590,7 @@ donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Mettre un 0 devant un nombre 
 ::: {.panel-tabset group="language"}
 
@@ -696,14 +639,7 @@ donnees_datatable[, mois := sprintf("%02d", mois)]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Arrondir une valeur numérique 
 ::: {.panel-tabset group="language"}
 
@@ -772,10 +708,4 @@ donnees_datatable[, poids_sup := ceiling(poids_sondage)]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::

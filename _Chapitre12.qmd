@@ -2,7 +2,6 @@
 
 
 
-
 ## Doublons pour toutes les colonnes 
 ::: {.panel-tabset group="language"}
 
@@ -52,10 +51,6 @@ doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -104,10 +99,6 @@ doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -154,10 +145,6 @@ enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -203,10 +190,6 @@ sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -267,10 +250,6 @@ donnees_datatable <- donnees_datatable[! duplicated(donnees_datatable), ]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -316,10 +295,6 @@ sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant"
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -354,10 +329,6 @@ unique(donnees_datatable[, "identifiant"])
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -397,9 +368,5 @@ uniqueN(donnees_datatable)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

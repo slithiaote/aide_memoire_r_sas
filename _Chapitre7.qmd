@@ -2,7 +2,6 @@
 
 
 
-
 ## Trier les colonnes de la base 
 ::: {.panel-tabset group="language"}
 
@@ -94,10 +93,6 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -164,10 +159,6 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -234,10 +225,6 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -272,9 +259,5 @@ tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

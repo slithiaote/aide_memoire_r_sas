@@ -1,8 +1,5 @@
 # Informations sur la base de données 
 
-
-
-
 ## Avoir une vue d'ensemble des données 
 ::: {.panel-tabset group="language"}
 
@@ -16,9 +13,14 @@ proc freq data = donnees_sas;tables _character_ / missing;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "date_entree"
-pos <- match(variable, names(donnees_rbase))
-sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
+# Informations sur les variables
+str(donnees_rbase)
+# Statistiques descriptives des variables de la base
+summary(donnees_rbase)
+library(Hmisc)
+Hmisc::describe(donnees_rbase)
+# Visualiser la base de données
+View(donnees_rbase)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -48,11 +50,6 @@ View(donnees_datatable)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Extraire les x premières lignes de la base (10 par défaut) 
@@ -68,7 +65,9 @@ data Lignes&x.;set donnees_sas (firstobs = 1 obs = &x.);proc print;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-sapply(donnees_rbase, class)
+x <- 10
+donnees_rbase[1:x, ]
+head(donnees_rbase, x)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -90,11 +89,6 @@ head(donnees_datatable, 10)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Extraire les x dernières lignes de la base (10 par défaut) 
@@ -110,7 +104,12 @@ data Lignes_&x.;set donnees_sas (firstobs = &deb. obs = &total_lignes.);run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-######################################################## Préambule ##########################################################
+x <- 10
+tail(donnees_rbase, x)
+donnees_rbase[ ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase), ]
+# Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
+( nrow(donnees_rbase) - x ) : nrow(donnees_rbase)
+nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -127,11 +126,6 @@ tail(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -157,9 +151,8 @@ proc sql;select count(*) as Nb_Colonnes from Var;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On récupère déjà l'identifiant de l'utilisateur
-user <- Sys.getenv("USERNAME")
-chemin <- file.path("C:/Users", user, "Desktop")
+sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
+sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", nrow(donnees_rbase), ncol(donnees_rbase))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -185,13 +178,7 @@ sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Liste des variables de la base
 ::: {.panel-tabset group="language"}
 
@@ -211,13 +198,12 @@ proc sql;select name into :nom_col separated by " " from Var;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Année courante
-annee <- lubridate::year(Sys.Date())
-sprintf("Année : %04d", annee)
-print(paste0("Année : ", annee))
-# Année passée
-annee_1 <- annee - 1
-paste0("Année passée: ", annee_1)
+# Liste des variables par ordre d'apparition dans la base
+names(donnees_rbase)
+colnames(donnees_rbase)
+# Liste des variables par ordre alphabétique
+ls(donnees_rbase)
+sort(colnames(donnees_rbase))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -241,11 +227,6 @@ sort(colnames(donnees_datatable))
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Nombre d'identifiants uniques et nombre de lignes dans la base 
@@ -261,19 +242,9 @@ quit;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Construction incorrecte ! Le else doit être sur la même ligne que le {
-#if (annee >= 2024) {
-#  print("Nous sommes en 2024 ou après")
-#}
-#else {
-#  print("Nous sommes en 2023 ou avant")
-#}
-## Construction correcte ! Le else doit être sur la même ligne que le {
-if (annee >= 2024) {
-  print("Nous sommes en 2024 ou après")
-} else {
-  print("Nous sommes avant 2024 !")
-}
+sprintf("La base de données contient %d lignes et %d identifiants uniques !",
+        nrow(donnees_rbase),
+        length(unique(donnees_rbase$identifiant)))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -302,11 +273,6 @@ donnees_datatable[, uniqueN(identifiant)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Quelle est la position de la variable date_entree ? 
@@ -323,11 +289,9 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Afficher le répertoire de travail
-getwd()
-
-# Définir le répertoire de travail, si besoin
-#setwd(dir="nom du répertoire")
+variable <- "date_entree"
+pos <- match(variable, names(donnees_rbase))
+sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -349,11 +313,6 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Format des variables 
@@ -369,11 +328,7 @@ proc datasets lib = Work nolist;delete Var;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Le pipe peut aussi être utilisé avec R-Base et data.table
-# Le pipe permet d'enchaîner des opérations sur une même base
-1:10 |> sum()
-# R-Base est réputé plus lent que ses concurrents, ce qui est souvent vrai.
-# Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
+sapply(donnees_rbase, class)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -392,9 +347,5 @@ donnees_datatable[, lapply(.SD, class)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
+

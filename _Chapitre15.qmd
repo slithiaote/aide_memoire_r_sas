@@ -2,7 +2,6 @@
 
 
 
-
 ## Tableaux de fréquence (proc freq) pour 1 variable 
 ::: {.panel-tabset group="language"}
 
@@ -79,10 +78,6 @@ tab[, c("Freq_cum", "Prop_cum") := list(cumsum(Nombre), cumsum(Prop))]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -129,10 +124,6 @@ donnees_datatable[, {tot = .N; .SD[, .(frac = .N / tot * 100), keyby = cspf]} ]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -181,10 +172,6 @@ donnees_datatable[, .(Nombre = .N,
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -228,10 +215,6 @@ donnees_datatable[, {tot = sum(poids_sondage, na.rm = TRUE); .SD[, .(prop = sum(
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -317,7 +300,7 @@ tab <- donnees_tidyverse %>%
 #ungroup()
 # Somme par colonnes
 tab <- bind_rows(tab, tab %>% 
-                   summarise(across(where(is.numeric), sum, na.rm = TRUE),
+                   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)),
                              across(where(is.character), ~"Total"))
 )
 tab
@@ -392,10 +375,6 @@ tab_prop[, (lapply(.SD, function(col) col / sum(col))), .SDcols = cols]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -471,10 +450,6 @@ addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -556,10 +531,6 @@ kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -601,10 +572,6 @@ donnees_datatable[, chisq.test(cspf, sexef)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -644,10 +611,6 @@ run;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -703,10 +666,6 @@ with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, pro
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -765,10 +724,6 @@ flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -844,10 +799,6 @@ questionr::rprop(tab)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -893,10 +844,6 @@ survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -945,10 +892,6 @@ setDT(donnees_datatable)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -1079,9 +1022,5 @@ gtsummary::tbl_cross(data = donnees_datatable, row = cspf, col = sexef, percent 
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
