@@ -2,7 +2,6 @@
 
 
 
-
 ## Chemin du bureau de l'utilisateur 
 ::: {.panel-tabset group="language"}
 
@@ -19,14 +18,9 @@ libname bur "&bureau.";
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Informations sur les variables
-str(donnees_rbase)
-# Statistiques descriptives des variables de la base
-summary(donnees_rbase)
-library(Hmisc)
-Hmisc::describe(donnees_rbase)
-# Visualiser la base de données
-View(donnees_rbase)
+# On récupère déjà l'identifiant de l'utilisateur
+user <- Sys.getenv("USERNAME")
+chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -44,11 +38,6 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -73,9 +62,13 @@ data _null_;call symput('annee', strip(year(today())));run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
-donnees_rbase[1:x, ]
-head(donnees_rbase, x)
+# Année courante
+annee <- lubridate::year(Sys.Date())
+sprintf("Année : %04d", annee)
+print(paste0("Année : ", annee))
+# Année passée
+annee_1 <- annee - 1
+paste0("Année passée: ", annee_1)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -105,11 +98,6 @@ paste0("Année passée: ", annee_1)
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Construction des instructions if / else 
@@ -126,12 +114,19 @@ paste0("Année passée: ", annee_1)
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
-tail(donnees_rbase, x)
-donnees_rbase[ ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase), ]
-# Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
-( nrow(donnees_rbase) - x ) : nrow(donnees_rbase)
-nrow(donnees_rbase) - x : nrow(donnees_rbase)
+# Construction incorrecte ! Le else doit être sur la même ligne que le {
+#if (annee >= 2024) {
+#  print("Nous sommes en 2024 ou après")
+#}
+#else {
+#  print("Nous sommes en 2023 ou avant")
+#}
+## Construction correcte ! Le else doit être sur la même ligne que le {
+if (annee >= 2024) {
+  print("Nous sommes en 2024 ou après")
+} else {
+  print("Nous sommes avant 2024 !")
+}
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -173,11 +168,6 @@ if (annee >= 2024) {
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Répertoire de travail 
@@ -197,8 +187,11 @@ quit;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
-sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", nrow(donnees_rbase), ncol(donnees_rbase))
+# Afficher le répertoire de travail
+getwd()
+
+# Définir le répertoire de travail, si besoin
+#setwd(dir="nom du répertoire")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -224,11 +217,6 @@ getwd()
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
 
 ## Autres points à connaître 
@@ -242,12 +230,11 @@ getwd()
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Liste des variables par ordre d'apparition dans la base
-names(donnees_rbase)
-colnames(donnees_rbase)
-# Liste des variables par ordre alphabétique
-ls(donnees_rbase)
-sort(colnames(donnees_rbase))
+# Le pipe peut aussi être utilisé avec R-Base et data.table
+# Le pipe permet d'enchaîner des opérations sur une même base
+1:10 |> sum()
+# R-Base est réputé plus lent que ses concurrents, ce qui est souvent vrai.
+# Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -279,10 +266,5 @@ vignette("dplyr")
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
+

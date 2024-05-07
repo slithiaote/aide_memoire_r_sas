@@ -2,7 +2,6 @@
 
 
 
-
 ## Une seule variable de groupement, une seule variable 
 ::: {.panel-tabset group="language"}
 
@@ -98,10 +97,6 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -189,10 +184,6 @@ donnees_datatable[, .(Femmes = sum(sexef == "Femme", na.rm = TRUE), Hommes = sum
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -264,10 +255,6 @@ data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var 
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -368,9 +355,5 @@ data.table::dcast(donnees_datatable, cspf ~ sexef + niveau, value.var = "note_co
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

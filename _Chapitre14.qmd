@@ -2,7 +2,6 @@
 
 
 
-
 ## Moyenne 
 ::: {.panel-tabset group="language"}
 
@@ -45,10 +44,6 @@ donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -99,10 +94,6 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -164,10 +155,6 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poi
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -231,10 +218,6 @@ moyennes
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -276,10 +259,6 @@ moyennes
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -405,10 +384,6 @@ donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -526,10 +501,6 @@ donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -594,10 +565,6 @@ x_2 / p - (x_m / p) ** 2
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -679,10 +646,6 @@ donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "no
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -761,10 +724,6 @@ donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_son
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -808,10 +767,6 @@ donnees_datatable[, rang_note_moyenne := rank(-note_moyenne)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -882,9 +837,5 @@ setNames(donnees_datatable[, lapply(methodes,
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

@@ -2,7 +2,6 @@
 
 
 
-
 ## Boucles imbriquées 
 ::: {.panel-tabset group="language"}
 
@@ -33,13 +32,17 @@ annee <- lubridate::year(Sys.Date())
 listeMois <- c()
 for (i in seq(2020, annee)) {
   for (j in 1:12) {
-    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = '1970-01-01')
+    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
   }
 }
 # 2e  solution : 2 fonctions lapply imbriquées
-listeMois <- as.Date(unlist(lapply(seq(2020, annee), function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))), origin='1970-01-01')
+listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
+                                   function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
+                     origin = "1970-01-01")
 # 3e solution : expand.grid
-listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))), origin='1970-01-01'))
+listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
+                                function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
+                          origin = "1970-01-01"))
 # 4e solution, la plus simple !
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
@@ -47,19 +50,18 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
-library(dplyr)
 annee <- lubridate::year(Sys.Date())
 # 1ère solution : 2 fonctions map imbriquées
 listeMois <- purrr::map(seq(2020, annee), 
                         function(x) purrr::map(1:12,
                                                function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y)))) %>% 
   unlist() %>% 
-  as.Date(origin = '1970-01-01')
+  as.Date(, origin = "1970-01-01")
 
 # 2e solution : expand_grid
 listeMois <- tidyr::expand_grid(annee = seq(2020, annee), mois = 1:12) %>% 
   apply(1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))) %>% 
-  as.Date(origin = '1970-01-01') %>% 
+  as.Date(, origin = "1970-01-01") %>% 
   sort()
 
 # 3e solution, la plus simple
@@ -74,13 +76,17 @@ annee <- lubridate::year(Sys.Date())
 listeMois <- c()
 for (i in seq(2020, annee)) {
   for (j in 1:12) {
-    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = '1970-01-01')
+    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
   }
 }
 # 2e  solution : 2 fonctions lapply imbriquées
-listeMois <- as.Date(unlist(lapply(seq(2020, annee), function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))), origin = '1970-01-01')
+listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
+                                   function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
+                     origin = "1970-01-01")
 # 3e solution : expand.grid
-listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))), origin = '1970-01-01'))
+listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
+                                function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
+                          origin = "1970-01-01"))
 # 4e solution, la plus simple
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
@@ -90,10 +96,6 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -171,10 +173,6 @@ res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y) 
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -217,50 +215,50 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # On va créer une base par année d'entrée
-# anMin <- min(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
-# anMax <- max(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
-# for (i in anMin:anMax) {
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(paste("entree", i, sep = "_"), donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == i), ])
-# }
-# # On va désormais empiler toutes les bases (concaténation par colonne)
-# # do.call applique la fonction rbind à l'ensemble des bases issues du lapply
-# # get permet de faire le chemin inverse de assign
-# concatene <- do.call(rbind, lapply(paste("entree", anMin:anMax, sep = "_"), get))
+# On va créer une base par année d'entrée
+anMin <- min(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
+anMax <- max(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
+for (i in anMin:anMax) {
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(paste("entree", i, sep = "_"), donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == i), ])
+}
+# On va désormais empiler toutes les bases (concaténation par colonne)
+# do.call applique la fonction rbind à l'ensemble des bases issues du lapply
+# get permet de faire le chemin inverse de assign
+concatene <- do.call(rbind, lapply(paste("entree", anMin:anMax, sep = "_"), get))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # À FAIRE : problème pour les entrées où la date est manquante
-# # On va créer une base par année d'entrée
-# anMin <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% min(na.rm = TRUE)
-# anMax <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% max(na.rm = TRUE)
-# for (i in anMin:anMax) {
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(paste("entree", i, sep = "_"),
-#          donnees_tidyverse %>% filter(lubridate::year(date_entree) == as.name(i)))
-# }
-# # On va désormais empiler toutes les bases (concaténation par colonne)
-# # purrr::reduce applique la fonction bind_rows à l'ensemble des bases issues du purrr::map
-# # get permet de faire le chemin inverse de assign
-# concatene <- purrr::map(paste("entree", anMin:anMax, sep = "_"), get) %>% 
-#   purrr::reduce(bind_rows)
+# À FAIRE : problème pour les entrées où la date est manquante
+# On va créer une base par année d'entrée
+anMin <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% min(na.rm = TRUE)
+anMax <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% max(na.rm = TRUE)
+for (i in anMin:anMax) {
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(paste("entree", i, sep = "_"),
+         donnees_tidyverse %>% filter(lubridate::year(date_entree) == as.name(i)))
+}
+# On va désormais empiler toutes les bases (concaténation par colonne)
+# purrr::reduce applique la fonction bind_rows à l'ensemble des bases issues du purrr::map
+# get permet de faire le chemin inverse de assign
+concatene <- purrr::map(paste("entree", anMin:anMax, sep = "_"), get) %>% 
+  purrr::reduce(bind_rows)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # On va créer une base par année d'entrée
-# anMin <- min(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
-# anMax <- max(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
-# for (i in anMin:anMax) {
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(paste("entree", i, sep = "_"), donnees_datatable[lubridate::year(donnees_datatable$date_entree) == i, ])
-# }
-# # On va désormais empiler toutes les bases (concaténation par colonne)
-# # do.call applique la fonction rbind à l'ensemble des bases issues du lapply
-# # get permet de faire le chemin inverse de assign
-# concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
+# On va créer une base par année d'entrée
+anMin <- min(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
+anMax <- max(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
+for (i in anMin:anMax) {
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(paste("entree", i, sep = "_"), donnees_datatable[lubridate::year(donnees_datatable$date_entree) == i, ])
+}
+# On va désormais empiler toutes les bases (concaténation par colonne)
+# do.call applique la fonction rbind à l'ensemble des bases issues du lapply
+# get permet de faire le chemin inverse de assign
+concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -268,10 +266,6 @@ run;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -327,36 +321,36 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # Base par CSP
-# for (i in unique(donnees_rbase$cspf)) {
-#   # Met en minuscule et enlève les accents
-#   nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(nomBase, donnees_rbase[which(donnees_rbase$cspf == i), ])
-# }
+# Base par CSP
+for (i in unique(donnees_rbase$cspf)) {
+  # Met en minuscule et enlève les accents
+  nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(nomBase, donnees_rbase[which(donnees_rbase$cspf == i), ])
+}
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # Base par CSP
-# for (i in donnees_tidyverse %>% distinct(cspf) %>% pull()) {
-#   # Met en minuscule et enlève les accents
-#   nomBase <- chartr("éèêëàâçîô", "eeeeaacio", i) %>% tolower()
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(nomBase, donnees_tidyverse %>% 
-#            filter(cspf == as.name(i)))
-# }
+# Base par CSP
+for (i in donnees_tidyverse %>% distinct(cspf) %>% pull()) {
+  # Met en minuscule et enlève les accents
+  nomBase <- chartr("éèêëàâçîô", "eeeeaacio", i) %>% tolower()
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(nomBase, donnees_tidyverse %>% 
+           filter(cspf == as.name(i)))
+}
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # Créer une base pour chaque individu d'une certaine CSP
-# for (i in unique(donnees_datatable$cspf)) {
-#   # Met en minuscule et enlève les accents
-#   nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
-#   # assign permet de faire passer une chaîne de caractères en variable R
-#   assign(nomBase, donnees_datatable[donnees_datatable$cspf == i, ])
-# }
+# Créer une base pour chaque individu d'une certaine CSP
+for (i in unique(donnees_datatable$cspf)) {
+  # Met en minuscule et enlève les accents
+  nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
+  # assign permet de faire passer une chaîne de caractères en variable R
+  assign(nomBase, donnees_datatable[donnees_datatable$cspf == i, ])
+}
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -364,10 +358,6 @@ run;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -381,27 +371,27 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # Mesurer la durée d'exécution d'un programme
-# system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
-# # En SAS : include("chemin")
-# # En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+# Mesurer la durée d'exécution d'un programme
+system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
+# En SAS : include("chemin")
+# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mesurer la durée d'exécution d'un programme
-# system.time(donnees_tidyverse <- donnees_tidyverse %>% 
-#               arrange(identifiant, date_entree))
-# # En SAS : include("chemin")
-# # En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+system.time(donnees_tidyverse <- donnees_tidyverse %>% 
+              arrange(identifiant, date_entree))
+# En SAS : include("chemin")
+# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# # Mesurer la durée d'exécution d'un programme
-# system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
-# # En SAS : include("chemin")
-# # En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+# Mesurer la durée d'exécution d'un programme
+system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
+# En SAS : include("chemin")
+# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -409,9 +399,5 @@ run;
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-git 
-```
 
 :::

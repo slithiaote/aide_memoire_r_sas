@@ -2,7 +2,6 @@
 
 
 
-
 ## Création d'une base de données SAS d'exemple 
 ::: {.panel-tabset group="language"}
 
@@ -260,11 +259,6 @@ class(donnees_datatable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-## `polars` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

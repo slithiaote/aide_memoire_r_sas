@@ -2,7 +2,6 @@
 
 
 
-
 ## Sélectionner les lignes avec au moins une note < 10 
 ::: {.panel-tabset group="language"}
 
@@ -58,10 +57,6 @@ note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -121,10 +116,6 @@ note_sup_10 <- donnees_datatable[donnees_datatable[, Reduce(`&`, lapply(.SD, `>=
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -212,10 +203,6 @@ donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -260,10 +247,6 @@ table(donnees_datatable$note_superieure_moyenne, useNA = "always")
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -343,9 +326,5 @@ donnees_datatable[, note_moyenne_pond := rowSums(mapply(FUN = `*`, .SD, ponderat
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

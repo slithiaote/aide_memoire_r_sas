@@ -1,8 +1,6 @@
 # Sélectionner des lignes et des colonnes 
 
 
-
-
 ## Selection de colonnes par position 
 ::: {.panel-tabset group="language"}
 
@@ -59,14 +57,7 @@ id <- donnees_datatable[pos] ; class(id)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Selection de colonnes par nom 
 ::: {.panel-tabset group="language"}
 
@@ -118,14 +109,7 @@ id <- donnees_datatable[, list("identifiant")] ; class(id)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Selection de colonnes par variable 
 ::: {.panel-tabset group="language"}
 
@@ -174,14 +158,7 @@ id <- donnees_datatable[, list(variable)] ; class(id)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sauf certaines variables 
 ::: {.panel-tabset group="language"}
 
@@ -218,14 +195,7 @@ exclusion_var <- donnees_datatable[, setdiff(names(donnees_datatable), variable)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner la 3e colonne 
 ::: {.panel-tabset group="language"}
 
@@ -261,14 +231,7 @@ col3 <- donnees_datatable[, 3]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner plusieurs colonnes 
 ::: {.panel-tabset group="language"}
 
@@ -319,14 +282,7 @@ colonnes <- donnees_datatable[, cols, with = FALSE]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner les colonnes qui débutent par le mot Note 
 ::: {.panel-tabset group="language"}
 
@@ -368,14 +324,7 @@ sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner les colonnes qui ne débutent pas par le mot Note 
 ::: {.panel-tabset group="language"}
 
@@ -407,14 +356,7 @@ sel <- donnees_datatable[, .SD, .SDcols = -patterns("^note")]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner l'ensemble des variables numériques de la base 
 ::: {.panel-tabset group="language"}
 
@@ -443,14 +385,7 @@ sel <- donnees_datatable[, .SD, .SDcols = is.numeric]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner l'ensemble des variables de format "Date" 
 ::: {.panel-tabset group="language"}
 
@@ -488,14 +423,7 @@ var_dates <- donnees_datatable[, .SD, .SDcols = is.Date]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélectionner des lignes 
 ::: {.panel-tabset group="language"}
 
@@ -575,14 +503,7 @@ en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélection sur de multiples conditions 
 ::: {.panel-tabset group="language"}
 
@@ -619,14 +540,7 @@ avant2023_femme <- donnees_datatable[lubridate::year(date_entree) < 2023 & sexe 
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélection de ligne par référence : lignes de l'identifiant 087 
 ::: {.panel-tabset group="language"}
 
@@ -670,14 +584,7 @@ donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::
-
 ## Sélection de lignes et de variables 
 ::: {.panel-tabset group="language"}
 
@@ -732,10 +639,4 @@ femmes <- donnees_datatable[sexe == "2", ..cols]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 :::

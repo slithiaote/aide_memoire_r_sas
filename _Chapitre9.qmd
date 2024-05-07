@@ -2,8 +2,6 @@
 
 
 
-
-
 ## Numéroter les lignes 
 ::: {.panel-tabset group="language"}
 
@@ -84,10 +82,6 @@ donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -188,10 +182,6 @@ donnees_datatable[, .SD[.N], by = identifiant]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -301,10 +291,6 @@ ni_prem_ni_der  <- donnees_datatable[! (!duplicated(identifiant, fromLast = FALS
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -371,10 +357,6 @@ deux_dernieres_lignes <- donnees_datatable[, .SD[.N-2:.N], by = identifiant]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -429,10 +411,6 @@ deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -472,10 +450,6 @@ donnees_datatable[, .SD[.N-1], by = identifiant]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -585,10 +559,6 @@ donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.r
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -650,7 +620,7 @@ donnees_datatable[, `:=` (note_contenu_moyenne = mean(note_contenu, na.rm = TRUE
                           note_contenu_somme = sum(note_contenu, na.rm = TRUE)), by = identifiant]
 # Moyenne de chaque note
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-donnees_datatable[, paste0(cols, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDcols = notes, keyby = identifiant]
+donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDcols = notes, keyby = identifiant]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -658,10 +628,6 @@ donnees_datatable[, paste0(cols, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDco
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -745,10 +711,6 @@ donnees_datatable[, .(date_sortie, date_sortie__1)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -812,10 +774,6 @@ data.table::dcast(nb, cspf ~ sexef, value.var = "N")
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -885,10 +843,6 @@ long_datatable <- melt(wide_datatable,
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -947,9 +901,5 @@ wide_datatable <- dcast(long_datatable, identifiant ~ type_note, value.var = "no
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::

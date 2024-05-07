@@ -2,7 +2,6 @@
 
 
 
-
 ## Repérer les valeurs manquantes (variables Âge et Niveau) 
 ::: {.panel-tabset group="language"}
 
@@ -52,10 +51,6 @@ ageManquant <- donnees_datatable[is.na(age)] # Correct
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -140,10 +135,6 @@ donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -194,10 +185,6 @@ donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -275,10 +262,6 @@ donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
@@ -335,9 +318,5 @@ donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 
 ```
 
-## `polars` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
