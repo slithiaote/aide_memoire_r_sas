@@ -64,7 +64,8 @@ library(lubridate)
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+#library(duckdb)
+#library(arrow)
 ```
 
 :::

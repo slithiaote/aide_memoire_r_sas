@@ -37,7 +37,7 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "04/18/2024"
+date-modified: "05/24/2024"
 
 output:
   rmdformats::robobook:
@@ -48,6 +48,23 @@ categories:
   - SAS
   - R
 ---
+
+L'aide-mémoire a pour but de fournir des codes écrits en SAS et d'en donner la traduction en `R` de différentes manières possibles :
+
+-   `base R`
+
+-   `tidyverse`
+
+-   `data.table`
+
+-   `arrow/duckdb`
+
+Les codes traduits sont typiques de la production statistique ou la réalisation d'études descriptives.
+
+Ce document s'adresse notamment aux utilisateurs de `SAS` qui veulent connaître la traduction du code SAS en `R`, aux utilisateurs de `R` qui ont besoin de comprendre le code SAS, ainsi qu'aux utilisateurs d'un environnement R qui sont intéressés par la traduction dans un autre environnement R.
+
+Il se veut complémentaire de la documentation en ligne en français Utilit'R, née à l'Insee (<https://www.book.utilitr.org/>). Le lecteur est invité à s'y référer pour obtenir des informations importantes sur l'utilisation de R et qui ne sont pas discutées dans ce document, comme l'importation de données en `R` (<https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>). 
+
 
 
 {{< include _Chapitre1.qmd >}}
@@ -89,5 +106,3 @@ categories:
 {{< include _Chapitre19.qmd >}}
 
 {{< include _Chapitre20.qmd >}}
-
-
