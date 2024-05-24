@@ -1,8 +1,14 @@
 # Importation des données 
 
 
+## Mode d'emploi de l'aide-mémoire
 
-## Création d'une base de données SAS d'exemple 
+Les codes informatiques sont appliqués sur une base de données illustrative fictive. Cette base est importée à cette étape. Aussi, pour répliquer les codes sur sa machine, le lecteur doit d'abord exécuter le code d'importation de la base de données ci-dessous.
+
+Les codes sont majoritairement exécutables indépendamment les uns des autres.
+
+
+## Création d'une base de données SAS d'exemple
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

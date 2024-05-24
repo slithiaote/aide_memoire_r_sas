@@ -637,6 +637,7 @@ femmes <- donnees_datatable[sexe == "2", ..cols]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# À FAIRE : compléter
+#requete_duckdb %>% filter(sexe == "2")
 ```
 :::
