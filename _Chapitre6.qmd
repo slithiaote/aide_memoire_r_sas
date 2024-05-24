@@ -46,7 +46,10 @@ setnames(donnees_datatable, "sexe_red", "sexe")
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# On renomme la variable sexe en sexe_red
+requete_duckdb %>% rename(sexe_red = sexe)
+# On la renomme en sexe
+requete_duckdb %>% rename(sexe = sexe_red)
 ```
 :::
 ## Formater les modalités des valeurs 
@@ -96,9 +99,24 @@ cspform <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé",
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+Préférer `case_match` quand il s'agit de valeurs déterminées.
 
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% 
+  mutate(sexef = case_when(
+    sexef=="1" ~ "Homme",
+    sexef=="2" ~ "Femme",
+    .default = sexef),
+         cspf = case_match(csp,
+    "1" ~ "Cadre",
+    "2" ~ "Profession intermédiaire",
+    "3" ~ "Employé",
+    "4" ~ "Ouvrier",
+    "5" ~ "Retraité",
+    .default = csp)) %>% 
+  select(Sexe, sexef, csp, cspf)
 ```
+
 :::
 ## Utiliser les formats 
 ::: {.panel-tabset group="language"}
@@ -166,7 +184,7 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 
 ```
 :::
-## Transformer le format d'une variable : put et input 
+## Transformer le format d'une variable
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -315,6 +333,14 @@ donnees_datatable[, (variable) := NULL]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+# À FAIRE : à compléter !
+# Création de la colonne note2
+requete_duckdb %>% 
+  mutate(note2 = as.integer(Note_Contenu) / 20 * 5) %>% 
+  select(note2)
+
+# Suppression de colonnes
+#requete_duckdb %>% select(- CSP, -contains("Date"), -starts_with("Note"))
 
 ```
 :::
@@ -588,7 +614,21 @@ donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+# Création de la colonne age 
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  select(age)
 
+# Âge formaté
+requete_duckdb %>%
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
 ```
 :::
 ## Mettre un 0 devant un nombre 

@@ -176,8 +176,15 @@ sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+Duckdb/SQL ne connaît pas le nombre de lignes sans un calcul. Il faut faire `count()`.
 
+```{r, warning=FALSE, message=FALSE}
+#Nombre de lignes
+requete_duckdb %>% nrow() # retourne NA
+requete_duckdb %>% count() # correct
+
+#Nombre de colonnes
+requete_duckdb %>%  ncol()
 ```
 
 :::
