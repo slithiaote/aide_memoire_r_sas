@@ -23,7 +23,7 @@ format:
     page-layout: full
     theme:
       light: united
-      dark: slate
+      dark: darkly
 # format : native   
 editor: source
 execute:
