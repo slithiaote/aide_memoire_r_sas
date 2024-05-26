@@ -7,7 +7,12 @@
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Sans objet en SAS */
+/* Taille d'une base de données */
+proc sql;
+  select libname, memname, filesize format = sizekmg., filesize format = sizek.
+  from Dictionary.Tables
+  where libname = "WORK" and memname = upcase("donnees_sas") and memtype = "DATA";
+quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
