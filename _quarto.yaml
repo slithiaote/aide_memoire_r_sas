@@ -17,8 +17,12 @@ website:
     contents:
       - href: 01-aide_memoire_r_sas.qmd
         text: "Aide-mémoire"
+      - href: 03-mise_en_garde.qmd
+        text: "Mise en garde"
       - href: Trucs et astuces en R.qmd
         text: "Trucs et astuces"
+      - href: 04-specificites_sas_r.qmd
+        text: "Spécificités de SAS et R"
       - href: 02-avantages_inconvenients_env_R.qmd
         text: "Avantages et inconvénients des environnements R"
         
