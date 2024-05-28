@@ -28,8 +28,7 @@ description: |
   Comment utiliser cet aide-mémoire ?
 
 # Date published
-date: today
-date-format: "DD MMMM, YYYY"
+date: "`r Sys.Date()`"
 date-modified: "05/24/2024"
 output:
   rmdformats::robobook:
