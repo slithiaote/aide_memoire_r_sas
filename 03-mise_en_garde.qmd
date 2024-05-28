@@ -28,7 +28,7 @@ description: |
   Comment utiliser cet aide-mémoire ?
 
 # Date published
-date: "`r Sys.Date()`"
+date: today
 date-format: "DD MMMM, YYYY"
 date-modified: "05/24/2024"
 output:
