@@ -25,7 +25,7 @@ editor: visual
 
 # Summary for listings and search engines
 description: |
-  Trucs et astuces en `R`.
+  Comment utiliser cet aide-mémoire ?
 
 # Date published
 date: "`r Sys.Date()`"

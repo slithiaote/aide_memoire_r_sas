@@ -1,5 +1,5 @@
 ---
-title: "Spécificités de SAS par rapport à R"
+title: "Spécificités de SAS par rapport à `R`"
 lang : fr
 author:
   - name: Nassab ABDALLAH
@@ -25,7 +25,7 @@ editor: visual
 
 # Summary for listings and search engines
 description: |
-  Trucs et astuces en `R`.
+  Spécificités de SAS par rapport à `R`.
 
 # Date published
 date: "`r Sys.Date()`"
