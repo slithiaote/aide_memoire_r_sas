@@ -17,6 +17,7 @@ format:
     link-external-icon:	true
     link-external-newwindow: true
     page-layout: full
+    code-tools: true
     
 # format : native    
 

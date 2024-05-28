@@ -2,8 +2,10 @@
 title: "Avantages et inconvénients des environnements `R`"
 lang : fr
 author:
-  - Nassab ABDALLAH^[Dares/SCS, nassab.abdallah@travail.gouv.fr]
-  - Damien EUZENAT^[Dares/DIP, damien.euzenat@travail.gouv.fr]
+  - name: Nassab ABDALLAH
+    affiliation: Dares/SCS, <nassab.abdallah@travail.gouv.fr>
+  - name: Damien EUZENAT
+    affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
 format:
   html:
     toc: true
@@ -11,9 +13,8 @@ format:
     toc-location: left
     number-sections: true
     code-copy: true
-    filters: 
-      - fix_meta_notes.lua
     embed-resources: true
+    page-layout: full
     code-tools: true
     css: styles.css
 # format : native    
