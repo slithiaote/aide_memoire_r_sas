@@ -21,6 +21,7 @@ format:
     link-external-icon:	true
     link-external-newwindow: true
     page-layout: full
+    code-tools: true
     theme:
       light: united
       dark: darkly
