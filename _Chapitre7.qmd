@@ -90,7 +90,13 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# On met identifiant date_entree au début
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(identifiant, date_entree, everything())
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  relocate(identifiant, date_entree)
 ```
 
 
@@ -222,7 +228,12 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
+  
+# Pour mimer le tri SAS, il faut écrire :
+# Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
+requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
 ```
 
 

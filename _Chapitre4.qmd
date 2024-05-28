@@ -85,8 +85,10 @@ head(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+En duckdb, les dix premières lignes sont affichées par défaut. Si on veut les récupérer, par exemple dans une autre variable, il faut faire `collect()`. Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
 
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% head(10) %>% collect()
 ```
 
 :::
@@ -174,8 +176,15 @@ sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+Duckdb/SQL ne connaît pas le nombre de lignes sans un calcul. Il faut faire `count()`.
 
+```{r, warning=FALSE, message=FALSE}
+#Nombre de lignes
+requete_duckdb %>% nrow() # retourne NA
+requete_duckdb %>% count() # correct
+
+#Nombre de colonnes
+requete_duckdb %>%  ncol()
 ```
 
 :::
@@ -224,7 +233,7 @@ sort(colnames(donnees_datatable))
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% colnames()
 ```
 
 :::

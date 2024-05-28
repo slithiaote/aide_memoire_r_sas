@@ -38,8 +38,6 @@ categories:
   - R
 ---
 
-
-
 # Comment utiliser cet aide-mémoire ?
 
 Sont présentés dans cet aide-mémoire des programmes statistiques courants pour la gestion de données statistiques, traduits dans les langages SAS et R (environnements R-Base, Tidyverse, data.table et Arrow/DuckDb). Ces tâches sont standards dans l'analyse statistique et réalisables en un petit nombre d'instructions.

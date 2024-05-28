@@ -38,8 +38,6 @@ categories:
   - R
 ---
 
-# Spécificités de SAS par rapport à R
-
 Voici une liste non-exhaustive de spécificités de SAS par rapport à R à connaître.
 
 +---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -70,7 +68,7 @@ Voici une liste non-exhaustive de spécificités de SAS par rapport à R à conn
 |                                                                                                                           | Gestion de la mémoire spécifique : shallow / deep copy                                                                                                             |
 +---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-# Logiciel libre
+## Logiciel libre
 
 De par son statut de logiciel libre, de multiples extensions existent (packages). L'usage des packages :
 
@@ -78,7 +76,7 @@ De par son statut de logiciel libre, de multiples extensions existent (packages)
 -   peut aussi être source de problèmes, d'abord de maintenance du fait des dépendances (une mise-à-jour peut casser les dépendances), ensuite du fait que des packages peuvent disparaître ou ne plus être maintenus au cours du temps, engendrant des coûts de maintenance de code ;
 -   peut engendrer des problèmes de rétrocompatibilité (un code écrit dans le passé ne fonctionne plus suite à une mise-à-jour) : il convient d'être conscient de ces considérations avant d'utiliser aveuglément des packages.
 
-# Gestion de la mémoire
+## Gestion de la mémoire
 
 La gestion de la mémoire est différente entre les logiciels. R importe l'ensemble des données en mémoire vive, SAS en copie une partie sur le disque dur. Ceci a plusieurs implications pour le travail statistique :
 
