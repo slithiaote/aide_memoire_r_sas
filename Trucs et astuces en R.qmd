@@ -73,7 +73,7 @@ class(1)
 class(1L)
 ```
 
-## Les affectations
+# Les affectations
 
 ```{r, warning=FALSE, message=FALSE}
 # Importance des espaces
@@ -161,7 +161,7 @@ log(-1)
 
 ```
 
-## Principe de vectorisation
+# Principe de vectorisation
 
 La fonction s'applique à tous les éléments du vecteur !!
 
@@ -244,7 +244,7 @@ sapply(x, function(xi, mn, mx) {(xi - mn) / (mx - mn)}, mn = min(x), mx = max(x)
 
 ```
 
-## Principe de coercion
+# Principe de coercion
 
 Dans les comparaisons, les objets R sont successivement convertis en logical, integer, numeric, complex et character, jusqu'à ce que la comparaison puisse se faire.
 
@@ -274,7 +274,7 @@ TRUE == "1"
 
 ```
 
-## Principe de recycling
+# Principe de recycling
 
 ```{r}
 # Fonctionne sans soulever de message d'erreur
@@ -290,7 +290,7 @@ y <- c(1, 2, 3, 4, 5, 6, 7)
 x + y
 ```
 
-## Opérateurs de contrôle
+# Opérateurs de contrôle
 
 ```{r, warning=FALSE, message=FALSE}
 # Conditions if / else
@@ -381,7 +381,7 @@ print("Salut !\nComment vas-tu ?")
 
 ```
 
-## Les valeurs manquantes
+# Les valeurs manquantes
 
 ```{r, warning=FALSE, message=FALSE}
 # Transformer les valeurs manquantes en 0
@@ -447,7 +447,7 @@ mean(c(NA, NA, NA), na.rm = TRUE)
 mean(c(NA, NA, NA), na.rm = FALSE)
 ```
 
-## Sélection d'éléments
+# Sélection d'éléments
 
 ```{r, warning=FALSE, message=FALSE}
 # Le 1er élément est numéroté 1 et non 0 comme dans Python
@@ -517,7 +517,7 @@ objet_5
 
 ```
 
-## Les listes
+# Les listes
 
 ```{r, warning=FALSE, message=FALSE}
 # Ajouter un élément à une liste
@@ -580,7 +580,7 @@ liste
 
 ```
 
-## Informations sur R
+# Informations sur R
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Informations sur la session de R
@@ -601,7 +601,7 @@ R.home("bin")
 .libPaths()
 ```
 
-## Trucs et astuces divers
+# Trucs et astuces divers
 
 ```{r, warning=FALSE, message=FALSE}
 # Créer un objet sous forme de code R !
@@ -635,7 +635,7 @@ options(error=NULL)
 
 ```
 
-## Le pipe sur R
+# Le pipe sur R
 
 Cet opérateur permet d'enchaîner les opérations et d'avoir un code plus lisible.
 
