@@ -26,7 +26,7 @@ description: |
   Comparaison des différents environnements R proposés dans cet aide-mémoire.
 
 # Date published
-date: "`r Sys.Date()`"
+date: today
 date-modified: "05/24/2024"
 output:
   rmdformats::robobook:
