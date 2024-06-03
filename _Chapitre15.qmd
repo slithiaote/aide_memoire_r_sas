@@ -591,19 +591,19 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 4 packages paraissent pertinents : descr, flextable, survey, procs
+# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 4 packages paraissent pertinents : descr, flextable, survey, procs
+# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 4 packages paraissent pertinents : descr, flextable, survey, procs
+# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
