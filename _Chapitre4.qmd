@@ -26,7 +26,6 @@ View(donnees_rbase)
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Informations sur les variables
-str(donnees_tidyverse)
 donnees_tidyverse %>% str()
 donnees_tidyverse %>% glimpse()
 # Statistiques descriptives des variables de la base
@@ -46,8 +45,15 @@ View(donnees_datatable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+On accède aux données du serveur SQL DuckDB au travers de l'objet `requete_duckdb`, qui est une requête (avec l'adresse du serveur) et non pas un `dataframe` ou un `tibble`. Comme l'accès n'est pas direct, la plupart des fonctions du tidyverse fonctionnent, mais opèrent sur "l'adresse du serveur DuckDB" au lieu d'opérer sur les valeurs (nombres, chaînes de caractères). A part `glimpse`, la plupart des fonctions ne renvoient pas un résultat exploitable.
+
+```{r, warning=FALSE, message=FALSE}
+# Informations sur les variables
+# requete_duckdb %>% str() 
+requete_duckdb %>% glimpse() # préférer glimpse()
+# requete_duckdb %>% summary()
+# requete_duckdb %>% View() 
 ```
 
 :::
@@ -78,20 +84,46 @@ donnees_tidyverse %>%
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 donnees_datatable[, head(.SD, 10)]
 donnees_datatable[, .SD[1:10]]
 head(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-En duckdb, les dix premières lignes sont affichées par défaut. Si on veut les récupérer, par exemple dans une autre variable, il faut faire `collect()`. Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+DuckDB affiche les dix premières lignes par défaut lorsque l'on évalue une requête, comme indiqué dans le code ci-dessous. 
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% head(10) %>% collect()
+requete_duckdb
+# Ceci est équivalent au code suivant
+# requete_duckdb %>% print(n=10)
 ```
 
+Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% arrange(duree) %>% print()
+```
+
+L'objet `requete_duckdb` est bien une requête (i.e. une liste à deux éléments) même si on peut en afficher le résultat avec la fonction `print`. Notamment, les informations restent dans la mémoire de DuckDB. Il faut demander explicitement le transfert du résultat vers la session R avec la fonction `collect()`. On obtient alors un objet de type `data.frame` ou au lieu de `tbl_duckdb_connection`. 
+
+```{r, warning=FALSE, message=FALSE}
+class(requete_duckdb)
+resultat_tibble <- requete_duckdb %>% collect()
+class(resultat_tibble)
+```
+
+La fonction `collect()` transfère l'ensemble des données. Pour obtenir uniquement 10 lignes, il faut utiliser l'une des fonctions `slice_*` (cf [documentation](https://dplyr.tidyverse.org/reference/slice.html)). On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé.
+
+```{r, warning=FALSE, message=FALSE, paged.print=FALSE}
+requete_duckdb %>% slice_max(duree, n=4, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 4 lignes
+```
+
+En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne respecte pas toujours l'ordre indiqué par `arrange`) ou `top_n` (superseded). La fonction `slice` en fonctionne pas : elle ne peut pas respecter l'ordre.
+
 :::
+
+
 
 ## Extraire les x dernières lignes de la base (10 par défaut) 
 ::: {.panel-tabset group="language"}
@@ -128,8 +160,11 @@ tail(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+Mêmes remarques que pour les 10 premières lignes : il n'y a pas d'ordre a priori en SQL. On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé, et l'on déconseille `slice` et `tail`.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% slice_min(duree, n=4, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 4 lignes
 ```
 
 :::

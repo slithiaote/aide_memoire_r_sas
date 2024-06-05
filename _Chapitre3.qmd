@@ -39,7 +39,9 @@ chemin <- file.path("C:/Users", user, "Desktop")
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# On récupère déjà l'identifiant de l'utilisateur
+user <- Sys.getenv("USERNAME")
+chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
 :::
