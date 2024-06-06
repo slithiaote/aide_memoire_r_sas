@@ -88,11 +88,11 @@ options(width=130)
 
 {{< include _Chapitre6.qmd >}}
 
-{{< include _Chapitre7.qmd >}}
+<!-- {{< include _Chapitre7.qmd >}} -->
 
-{{< include _Chapitre8.qmd >}}
+<!-- {{< include _Chapitre8.qmd >}} -->
 
-{{< include _Chapitre9.qmd >}}
+<!-- {{< include _Chapitre9.qmd >}} -->
 
 <!-- {{< include _Chapitre10.qmd >}} -->
 
