@@ -24,7 +24,7 @@ View(donnees_rbase)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 # Informations sur les variables
 donnees_tidyverse %>% str()
 donnees_tidyverse %>% glimpse()
@@ -35,7 +35,7 @@ donnees_tidyverse %>% View()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 # Informations sur les variables
 str(donnees_datatable)
 # Statistiques descriptives des variables de la base
