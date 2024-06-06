@@ -48,8 +48,6 @@ setnames(donnees_datatable, "sexe_red", "sexe")
 ```{r, warning=FALSE, message=FALSE}
 # On renomme la variable sexe en sexe_red
 requete_duckdb %>% rename(sexe_red = sexe)
-# On la renomme en sexe
-requete_duckdb %>% rename(sexe = sexe_red)
 ```
 :::
 ## Formater les modalités des valeurs 
@@ -101,7 +99,7 @@ cspform <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé",
 ## `arrow/duckdb` {.unnumbered .unlisted}
 Préférer `case_match` quand il s'agit de valeurs déterminées.
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 requete_duckdb %>% 
   mutate(sexef = case_when(
     sexef=="1" ~ "Homme",
@@ -342,7 +340,7 @@ donnees_datatable[, (variable) := NULL]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 # À FAIRE : à compléter !
 # Création de la colonne note2
 requete_duckdb %>% 
@@ -426,7 +424,7 @@ donnees_datatable[, (paste0(notes, "_100")) := lapply(.SD, function(x) x / 20 * 
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 requete_duckdb %>% 
   mutate(across(starts_with("note"), ~ as.numeric(.x)/20*100)) %>% 
   select(starts_with("note"))
@@ -625,7 +623,7 @@ donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 # Création de la colonne age 
 requete_duckdb %>% 
   mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
@@ -762,7 +760,7 @@ donnees_datatable[, poids_sup := ceiling(poids_sondage)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 requete_duckdb %>% 
   mutate( # la fonction round de duckdb ne prend pas l'argument digits, mais la traduction fonctionne
     poids_arrondi_0 = round(as.numeric(poids_sondage),0),

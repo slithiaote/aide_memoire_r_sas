@@ -12,7 +12,7 @@ proc freq data = donnees_sas;tables _character_ / missing;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
 # Informations sur les variables
 str(donnees_rbase)
 # Statistiques descriptives des variables de la base
