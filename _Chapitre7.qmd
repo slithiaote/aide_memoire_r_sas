@@ -1,5 +1,10 @@
 # Les tris 
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE
+)
+```
 
 
 ## Trier les colonnes de la base 
