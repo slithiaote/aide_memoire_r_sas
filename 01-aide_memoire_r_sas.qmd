@@ -23,12 +23,12 @@ format:
     page-layout: full
     code-tools: true
     theme:
-      light: united
-      dark: darkly
+    light: united
+    dark: darkly
 # format : native   
 editor: source
 execute:
-  eval: false
+  eval: true
 
 embed-resources: true
 
@@ -70,6 +70,10 @@ Ce document s'adresse notamment aux utilisateurs de `SAS` qui veulent connaître
 Il se veut complémentaire de la documentation en ligne en français Utilit'R, née à l'Insee (<https://www.book.utilitr.org/>). Le lecteur est invité à s'y référer pour obtenir des informations importantes sur l'utilisation de `R` et qui ne sont pas discutées dans ce document, comme l'importation de données en `R` (<https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>). 
 
 Enfin, si vous souhaitez collaborer à cet aide-mémoire ou nous faire part de votre avis, n'hésitez pas à nous contacter via nos adresses email.
+
+```{r}
+options(width=130)
+```
 
 
 {{< include _Chapitre1.qmd >}}
