@@ -48,7 +48,7 @@ View(donnees_datatable)
 
 On accède aux données du serveur SQL DuckDB au travers de l'objet `requete_duckdb`, qui est une requête (avec l'adresse du serveur) et non pas un `dataframe` ou un `tibble`. Comme l'accès n'est pas direct, la plupart des fonctions du tidyverse fonctionnent, mais opèrent sur "l'adresse du serveur DuckDB" au lieu d'opérer sur les valeurs (nombres, chaînes de caractères). A part `glimpse`, la plupart des fonctions ne renvoient pas un résultat exploitable.
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
 # Informations sur les variables
 # requete_duckdb %>% str() 
 requete_duckdb %>% glimpse() # préférer glimpse()
@@ -84,7 +84,7 @@ donnees_tidyverse %>%
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, head(.SD, 10)]
 donnees_datatable[, .SD[1:10]]
 head(donnees_datatable, 10)
@@ -115,7 +115,7 @@ class(resultat_tibble)
 
 La fonction `collect()` transfère l'ensemble des données. Pour obtenir uniquement 10 lignes, il faut utiliser l'une des fonctions `slice_*` (cf [documentation](https://dplyr.tidyverse.org/reference/slice.html)). On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé.
 
-```{r, warning=FALSE, message=FALSE, paged.print=FALSE}
+```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% slice_max(duree, n=4, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 4 lignes
 ```
 
@@ -125,10 +125,11 @@ En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne
 
 
 
-## Extraire les x dernières lignes de la base (10 par défaut) 
+## Extraire les x dernières lignes de la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
+
 ``` sas
 %let x = 10;
 proc sql noprint;select count(*) into :total_lignes from donnees_sas;quit;
@@ -137,37 +138,57 @@ data Lignes_&x.;set donnees_sas (firstobs = &deb. obs = &total_lignes.);run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
+
+```{r, warning=FALSE, message=FALSE}
+x <- 5
 tail(donnees_rbase, x)
+```
+
+Alternativement
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[ ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase), ]
-# Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
+```
+
+Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
+
+```{r, warning=FALSE, message=FALSE}
 ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase)
 nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ```
 
+
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
+
+```{r, warning=FALSE, message=FALSE}
 donnees_tidyverse %>% 
-  slice( (n()-10) : n())
+  slice( (n()-5) : n())
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, tail(.SD, 10)]
-tail(donnees_datatable, 10)
+
+```{r, warning=FALSE, message=FALSE}
+tail(donnees_datatable, 5)
 ```
+
+Alternativement
+
+```{r, warning=FALSE, message=FALSE, echo = FALSE}
+donnees_datatable[, tail(.SD, 5)]
+```
+
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
-Mêmes remarques que pour les 10 premières lignes : il n'y a pas d'ordre a priori en SQL. On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé, et l'on déconseille `slice` et `tail`.
+Mêmes remarques que pour les premières lignes : il n'y a pas d'ordre a priori en SQL. On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé, et l'on déconseille `slice` et `tail`.
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% slice_min(duree, n=4, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 4 lignes
+requete_duckdb %>% slice_min(duree, n=5, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 5 lignes
 ```
 
 :::
+
+
 
 ## Nombre de lignes et de colonnes dans la base 
 ::: {.panel-tabset group="language"}
@@ -273,6 +294,9 @@ requete_duckdb %>% colnames()
 
 :::
 
+
+
+
 ## Nombre d'identifiants uniques et nombre de lignes dans la base 
 ::: {.panel-tabset group="language"}
 
@@ -313,9 +337,13 @@ donnees_datatable[, uniqueN(identifiant)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% nrow()
+requete_duckdb %>% distinct(identifiant) %>% count()
 ```
+Note : on a vu que `nrow` ne fonctionne pas en DuckDB. 
 
 :::
 
@@ -353,9 +381,14 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r, warning=FALSE, message=FALSE}
+variable <- "date_entree"
+pos <- match(variable, requete_duckdb %>% colnames())
+sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
+requete_duckdb %>% select(pos) %>% print(n=4)
 ```
+
 
 :::
 
@@ -363,6 +396,7 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
+
 ``` sas
 proc contents data = donnees_sas;run;
 
@@ -371,24 +405,30 @@ proc datasets lib = Work nolist;delete Var;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sapply(donnees_rbase, class)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 purrr::map(donnees_tidyverse, class)
 class(donnees_tidyverse)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, lapply(.SD, class)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+On ne peut pas appliquer directement la fonction `class` sur un objet de type `connection`. Cependant, DuckDB affiche le type des variables dans un print. On peut également appliquer la fonction `class` sur un extrait des données (après `collect`).
 
+```{r, warning=FALSE, message=FALSE}
+purrr::map(requete_duckdb %>% select(c(1,2)) %>% head() %>% collect(), class)
+class(requete_duckdb)
 ```
 
 :::
