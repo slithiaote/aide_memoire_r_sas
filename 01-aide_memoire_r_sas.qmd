@@ -96,22 +96,23 @@ options(width=130)
 
 {{< include _Chapitre10.qmd >}}
 
-<!-- {{< include _Chapitre11.qmd >}} -->
+{{< include _Chapitre11.qmd >}}
 
-<!-- {{< include _Chapitre12.qmd >}} -->
+{{< include _Chapitre12.qmd >}}
 
-<!-- {{< include _Chapitre13.qmd >}} -->
+{{< include _Chapitre13.qmd >}}
 
-<!-- {{< include _Chapitre14.qmd >}} -->
+{{< include _Chapitre14.qmd >}}
 
-<!-- {{< include _Chapitre15.qmd >}} -->
+{{< include _Chapitre15.qmd >}}
 
-<!-- {{< include _Chapitre16.qmd >}} -->
+{{< include _Chapitre16.qmd >}}
 
-<!-- {{< include _Chapitre17.qmd >}} -->
+{{< include _Chapitre17.qmd >}}
 
-<!-- {{< include _Chapitre18.qmd >}} -->
+{{< include _Chapitre18.qmd >}}
 
-<!-- {{< include _Chapitre19.qmd >}} -->
+{{< include _Chapitre19.qmd >}}
 
-<!-- {{< include _Chapitre20.qmd >}} -->
+{{< include _Chapitre20.qmd >}}
+
