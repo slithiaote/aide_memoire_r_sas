@@ -29,7 +29,6 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "05/28/2024"
 output:
   rmdformats::robobook:
     highlight: tango
@@ -667,7 +666,6 @@ Les deux pipes fonctionnent de la même manière mais diffèrent sur les points 
 *Source* :
 
 -   https://larmarange.github.io/guide-R/manipulation/pipe.html#le-pipe-natif-de-r
-
 
 # Conseils divers
 

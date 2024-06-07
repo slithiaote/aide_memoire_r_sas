@@ -36,6 +36,7 @@ output:
     number_sections: true
   
 categories:
+  - SAS
   - R
 ---
 
