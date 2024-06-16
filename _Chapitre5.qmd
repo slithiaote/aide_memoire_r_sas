@@ -170,25 +170,23 @@ data Colonnes;set donnees_sas (drop = &var.);run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- c("identifiant", "sexe", "note_contenu")
 # Ne fonctionne pas !
-variable <- c("identifiant", "identifiant", "sexe", "note_contenu")
 #exclusion_var <- donnees_rbase[, -c(variable)]
 exclusion_var <- donnees_rbase[, setdiff(names(donnees_rbase), variable)]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- c("identifiant", "identifiant", "sexe", "note_contenu")
+variable <- c("identifiant", "sexe", "note_contenu")
 exclusion_var <- donnees_tidyverse %>% select(!all_of(variable))
 exclusion_var <- donnees_tidyverse %>% select(-all_of(variable))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- c("identifiant", "identifiant", "sexe", "note_contenu")
-# Ne fonctionne pas !
-#exclusion_var <- donnees_datatable[, -c(variable)]
-exclusion_var <- donnees_datatable[, setdiff(names(donnees_datatable), variable)]
+variable <- c("identifiant", "sexe", "note_contenu")
+exclusion_var <- donnees_datatable[, !..variable]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -415,8 +413,6 @@ varDates <- donnees_tidyverse %>% select(where(is.Date))
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 var_dates <- donnees_datatable[, .SD, .SDcols = is.Date]
-
-# Sélection de lignes
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

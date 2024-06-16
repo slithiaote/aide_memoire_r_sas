@@ -23,10 +23,13 @@ mean(donnees_rbase$note_contenu, na.rm = TRUE)
 # Importance du na.rm = TRUE
 donnees_tidyverse %>% pull(note_contenu) %>% mean()
 donnees_tidyverse %>% pull(note_contenu) %>% mean(na.rm = TRUE)
-# Autre solution
+
+# Autres solutions
 # Le chiffre est arrondi lorsqu'il est affiché, du fait des propriétés des tibbles
+donnees_tidyverse %>% summarise(mean(note_contenu, na.rm = TRUE))
 donnees_tidyverse %>% 
   summarise(across(note_contenu, ~mean(., na.rm = TRUE)))
+
 # Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
 # donnees_tidyverse %>% mean(note_formateur)
 # donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
@@ -72,7 +75,11 @@ donnees_tidyverse %>%
   filter(sexef == "Femme") %>% 
   pull(note_contenu) %>%
   mean(na.rm = TRUE)
+
 # Autres solutions
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>% 
+  summarise(moyenne = mean(note_contenu, na.rm = TRUE))
 donnees_tidyverse %>%
   filter(sexef == "Femme") %>% 
   summarise(across(note_contenu, ~ mean(., na.rm = TRUE)))

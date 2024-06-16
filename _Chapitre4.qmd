@@ -79,8 +79,9 @@ donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, head(.SD, 10)]
+donnees_datatable[, first(.SD, 10)]
 donnees_datatable[, .SD[1:10]]
+first(donnees_datatable, 10)
 head(donnees_datatable, 10)
 ```
 
@@ -123,7 +124,8 @@ donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, tail(.SD, 10)]
+donnees_datatable[, last(.SD, 10)]
+last(donnees_datatable, 10)
 tail(donnees_datatable, 10)
 ```
 
