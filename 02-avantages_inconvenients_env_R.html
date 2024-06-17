@@ -4779,7 +4779,7 @@ vertical-align: -.125em;
 
 <div>
   <div class="description">
-    <p>Comparaison des différents environnements R proposés dans cet aide-mémoire.</p>
+    <p>Comparaison des différents environnements <code>R</code> proposés dans cet aide-mémoire.</p>
   </div>
 </div>
 
@@ -4831,9 +4831,9 @@ vertical-align: -.125em;
 
 <table class="caption-top table">
 <colgroup>
-<col style="width: 8%">
-<col style="width: 51%">
-<col style="width: 40%">
+<col style="width: 6%">
+<col style="width: 37%">
+<col style="width: 56%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -4853,9 +4853,9 @@ vertical-align: -.125em;
 </ul></td>
 <td><ul>
 <li>ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive</li>
-<li>syntaxe plus complexe et parfois incohérente</li>
+<li>syntaxe plus complexe que <code>tidyverse</code> et parfois incohérente</li>
 <li>souvent moins rapide que les autres environnements</li>
-<li>demande plus de connaissance sur le fonctionnement du langage R</li>
+<li>demande plus de connaissance sur le fonctionnement du langage <code>R</code></li>
 <li>certaines tâches sont plus simples à traiter avec les autres environnements</li>
 </ul></td>
 </tr>
@@ -4864,29 +4864,74 @@ vertical-align: -.125em;
 <td><ul>
 <li>plus simple à prendre en main</li>
 <li>syntaxe plus simple que les autres environnements et cohérente</li>
-<li>largement utilisé dans la communauté R</li>
-<li>tend à s’imposer comme la référence de la gestion de données sur R</li>
-<li>syntaxe utilisée également dans les packages Arrow / DuckDb</li>
+<li>largement utilisé dans la communauté <code>R</code></li>
+<li>tend à s’imposer comme la référence de la gestion de données sur <code>R</code></li>
+<li>syntaxe utilisée également dans les packages <code>arrow</code> / <code>duckdb</code></li>
 </ul></td>
 <td><ul>
 <li>ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive</li>
-<li>globalement moins rapide que data.table</li>
-<li>tâches non prévues plus difficiles à réaliser</li>
-<li>forte dépendance : la rétrocompatibilité n’est pas assurée, potentiel problème dans un environnement de production</li>
+<li>globalement moins rapide que <code>data.table</code></li>
+<li>certaines tâches sont plus difficiles à réaliser que dans les autres environnements</li>
+<li>dette technique importante : la syntaxe est plus souvent modifiée au gré des mises à jour du langage. Ainsi, la rétrocompatibilité est moins bien assurée, ce qui peut se révéler un problème dans un environnement de production</li>
 </ul></td>
 </tr>
 <tr class="odd">
 <td><pre><code>       data.table</code></pre></td>
 <td><ul>
-<li>faible dépendance : garantit une rétrocompatibilité élevée</li>
-<li>syntaxe proche du R Base</li>
-<li>plus rapide et puissant que ses concur</li>
+<li>faible dépendance : garantit une rétrocompatibilité élevée, utile dans un environnement de production</li>
+<li>syntaxe proche du <code>R-Base</code></li>
+<li>généralement plus rapide que ses concurrents <code>R-Base</code> et <code>tidyverse</code></li>
+<li>utile dans la gestion des grosses volumétries ou lorsque des considérations de vitesse d’exécution sont en jeu</li>
 </ul></td>
 <td><ul>
 <li>ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive</li>
-<li>syntaxe parfois déroutante, incohérente, et peu explicite</li>
+<li>syntaxe parfois jugée comme plus difficile à maîtriser que celle du <code>tidyverse</code></li>
 <li>certaines tâches sont plus simples à traiter avec les autres environnements</li>
-<li>moins utilisé</li>
+<li>moins utilisé que <code>tidyverse</code>, communauté plus réduite</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><pre><code>       duckdb</code></pre></td>
+<td><ul>
+<li>base de de données analytique open source. Se rapproche d’outils tels <code>SQLite</code> ou <code>PostgreSQL</code></li>
+<li>optimisé pour des traitements de données orientées colonnes : plus performant pour les analyses statistiques que <code>SQLite</code></li>
+<li>simple d’utilisation par rapport à des outils comme <code>PostgreSQL</code></li>
+<li>permet de gérer des bases de données plus volumineuses que la mémoire vive</li>
+<li>permet la syntaxe en <code>SQL</code> et en <code>tidyverse</code>, pratique pour ceux qui connaissent</li>
+<li>compatible avec de nombreux autres langages (tel <code>Python</code>)</li>
+<li>tend à être plus rapide que ses concurrents</li>
+</ul></td>
+<td><ul>
+<li>capacités très importantes pour gérer de très grosses volumétries, mais a ses limites face aux données les plus volumineuses</li>
+<li>à privilégier pour les données saturant ou excédant la mémoire vive, moins utile pour les données de taille petite ou moyenne</li>
+<li>outil plus récent : est susceptible de subir des changements dans les prochaines années</li>
+<li>la syntaxe <code>tidyverse</code> est largement, mais pas totalement prise en compte, et elle peut changer à la marge</li>
+<li>documentation officielle encore incomplète</li>
+<li>outil moins utilisé que les autres environnements, et surtout par des personnes ayant plus d’expérience</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><pre><code>       arrow</code></pre></td>
+<td><ul>
+<li>très similaire à <code>duckdb</code></li>
+<li>projet plus ancien et plus mature que <code>duckdb</code>, moins de changements à attendre dans le futur</li>
+<li>met à disposition le format de compression de données très utilisé <code>parquet</code></li>
+</ul></td>
+<td><ul>
+<li>très similaires à <code>duckdb</code></li>
+<li>moins de fonctions standards du <code>tidyverse</code> prises en charge par rapport à <code>duckdb</code></li>
+<li>jointures de bases volumineuses moins performantes qu’avec <code>duckdb</code></li>
+<li>offre moins de fonctionnalités que <code>duckdb</code></li>
 </ul></td>
 </tr>
 </tbody>
@@ -5501,65 +5546,82 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Code source</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Avantages et inconvénients des environnements `R`&quot;</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang :</span><span class="co"> fr</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Nassab ABDALLAH</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliation: Dares/SCS, &lt;nassab.abdallah@travail.gouv.fr&gt;</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Damien EUZENAT</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliation: Dares/DIP, &lt;damien.euzenat@travail.gouv.fr&gt;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-expand: 2</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-copy: true</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">    embed-resources: true</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">    page-layout: full</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">    css: styles.css</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># format : native    </span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> visual</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary for listings and search engines</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> |</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">  Comparaison des différents environnements R proposés dans cet aide-mémoire.</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Date published</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;`r Sys.Date()`&quot;</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> &quot;05/24/2024&quot;</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="an">output:</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co">  rmdformats::robobook:</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight: tango</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co">    number_sections: true</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">  </span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">  - R</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>|       Environnements R |               Avantages                                                                                                                                 |             Inconvénients                                                                                              |</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>+========================+=========================================================================================================================================================+========================================================================================================================+</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>|            R base      | -   absence de dépendance (ne s&#39;appuie sur aucun package) : pas besoin d&#39;installer un package, de gérer sa mise à jour, de craindre pour sa disparition | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                  |</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>|                        | -   garantit la rétrocompatibilité du code : utile dans des environnements de production                                                                | -   syntaxe plus complexe et parfois incohérente                                                                       |</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>|                        | -   dans certains cas, se révèle la solution la plus simple                                                                                             | -   souvent moins rapide que les autres environnements                                                                 |</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>|                        | -   parfois, la seule façon de faire                                                                                                                    | -   demande plus de connaissance sur le fonctionnement du langage R                                                    |</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         | -   certaines tâches sont plus simples à traiter avec les autres environnements                                        |</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>|            tidyverse   | -   plus simple à prendre en main                                                                                                                       | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                  |</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe plus simple que les autres environnements et cohérente                                                                                      | -   globalement moins rapide que data.table                                                                            |</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>|                        | -   largement utilisé dans la communauté R                                                                                                              | -   tâches non prévues plus difficiles à réaliser                                                                      |</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>|                        | -   tend à s&#39;imposer comme la référence de la gestion de données sur R                                                                                  | -   forte dépendance : la rétrocompatibilité n&#39;est pas assurée, potentiel problème dans un environnement de production |</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe utilisée également dans les packages Arrow / DuckDb                                                                                         |                                                                                                                        |</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>|            data.table  | -   faible dépendance : garantit une rétrocompatibilité élevée                                                                                          | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                  |</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe proche du R Base                                                                                                                            | -   syntaxe parfois déroutante, incohérente, et peu explicite                                                          |</span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>|                        | -   plus rapide et puissant que ses concur                                                                                                              | -   certaines tâches sont plus simples à traiter avec les autres environnements                                        |</span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         | -   moins utilisé                                                                                                      |</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------+</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Avantages et inconvénients des environnements `R`&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang :</span><span class="co"> fr</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Nassab ABDALLAH</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliation: Dares/SCS, &lt;nassab.abdallah@travail.gouv.fr&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Damien EUZENAT</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliation: Dares/DIP, &lt;damien.euzenat@travail.gouv.fr&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-expand: 2</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-copy: true</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">    embed-resources: true</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">    page-layout: full</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">    css: styles.css</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># format : native    </span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> visual</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary for listings and search engines</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> |</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">  Comparaison des différents environnements `R` proposés dans cet aide-mémoire.</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Date published</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;`r Sys.Date()`&quot;</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> &quot;05/24/2024&quot;</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="an">output:</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">  rmdformats::robobook:</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight: tango</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">    number_sections: true</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">  </span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co">  - R</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>|       Environnements R |               Avantages                                                                                                                                 |             Inconvénients                                                                                                                                                                                                             |</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>+========================+=========================================================================================================================================================+=======================================================================================================================================================================================================================================+</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>|            R base      | -   absence de dépendance (ne s&#39;appuie sur aucun package) : pas besoin d&#39;installer un package, de gérer sa mise à jour, de craindre pour sa disparition | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                                                                                                                                 |</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>|                        | -   garantit la rétrocompatibilité du code : utile dans des environnements de production                                                                | -   syntaxe plus complexe que <span class="in">`tidyverse`</span> et parfois incohérente                                                                                                                                                                      |</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>|                        | -   dans certains cas, se révèle la solution la plus simple                                                                                             | -   souvent moins rapide que les autres environnements                                                                                                                                                                                |</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>|                        | -   parfois, la seule façon de faire                                                                                                                    | -   demande plus de connaissance sur le fonctionnement du langage <span class="in">`R`</span>                                                                                                                                                                 |</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         | -   certaines tâches sont plus simples à traiter avec les autres environnements                                                                                                                                                       |</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>|            tidyverse   | -   plus simple à prendre en main                                                                                                                       | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                                                                                                                                 |</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe plus simple que les autres environnements et cohérente                                                                                      | -   globalement moins rapide que <span class="in">`data.table`</span>                                                                                                                                                                                         |</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>|                        | -   largement utilisé dans la communauté <span class="in">`R`</span>                                                                                                            | -   certaines tâches sont plus difficiles à réaliser que dans les autres environnements                                                                                                                                               |</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>|                        | -   tend à s&#39;imposer comme la référence de la gestion de données sur <span class="in">`R`</span>                                                                                | -   dette technique importante : la syntaxe est plus souvent modifiée au gré des mises à jour du langage. Ainsi, la rétrocompatibilité est moins bien assurée, ce qui peut se révéler un problème dans un environnement de production |</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe utilisée également dans les packages <span class="in">`arrow`</span> / <span class="in">`duckdb`</span>                                                                                     |                                                                                                                                                                                                                                       |</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>|            data.table  | -   faible dépendance : garantit une rétrocompatibilité élevée, utile dans un environnement de production                                               | -   ne permet pas de gérer des bases de données plus volumineuses que la mémoire vive                                                                                                                                                 |</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>|                        | -   syntaxe proche du <span class="in">`R-Base`</span>                                                                                                                          | -   syntaxe parfois jugée comme plus difficile à maîtriser que celle du <span class="in">`tidyverse`</span>                                                                                                                                                   |</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>|                        | -   généralement plus rapide que ses concurrents <span class="in">`R-Base`</span> et <span class="in">`tidyverse`</span>                                                                                | -   certaines tâches sont plus simples à traiter avec les autres environnements                                                                                                                                                       |</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>|                        | -   utile dans la gestion des grosses volumétries ou lorsque des considérations de vitesse d&#39;exécution sont en jeu                                      | -   moins utilisé que <span class="in">`tidyverse`</span>, communauté plus réduite                                                                                                                                                                            |</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         |                                                                                                                                                                                                                                       |</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>|            duckdb      | -   base de de données analytique open source. Se rapproche d&#39;outils tels <span class="in">`SQLite`</span> ou <span class="in">`PostgreSQL`</span>                                                      | -   capacités très importantes pour gérer de très grosses volumétries, mais a ses limites face aux données les plus volumineuses                                                                                                      |</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>|                        | -   optimisé pour des traitements de données orientées colonnes : plus performant pour les analyses statistiques que <span class="in">`SQLite`</span>                           | -   à privilégier pour les données saturant ou excédant la mémoire vive, moins utile pour les données de taille petite ou moyenne                                                                                                     |</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>|                        | -   simple d&#39;utilisation par rapport à des outils comme <span class="in">`PostgreSQL`</span>                                                                                    | -   outil plus récent : est susceptible de subir des changements dans les prochaines années                                                                                                                                           |</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>|                        | -   permet de gérer des bases de données plus volumineuses que la mémoire vive                                                                          | -   la syntaxe <span class="in">`tidyverse`</span> est largement, mais pas totalement prise en compte, et elle peut changer à la marge                                                                                                                        |</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>|                        | -   permet la syntaxe en <span class="in">`SQL`</span> et en <span class="in">`tidyverse`</span>, pratique pour ceux qui connaissent                                                                    | -   documentation officielle encore incomplète                                                                                                                                                                                        |</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>|                        | -   compatible avec de nombreux autres langages (tel <span class="in">`Python`</span>)                                                                                          | -   outil moins utilisé que les autres environnements, et surtout par des personnes ayant plus d&#39;expérience                                                                                                                           |</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>|                        | -   tend à être plus rapide que ses concurrents                                                                                                         |                                                                                                                                                                                                                                       |</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         |                                                                                                                                                                                                                                       |</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>|            arrow       | -   très similaire à <span class="in">`duckdb`</span>                                                                                                                           | -   très similaires à <span class="in">`duckdb`</span>                                                                                                                                                                                                        |</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>|                        | -   projet plus ancien et plus mature que <span class="in">`duckdb`</span>, moins de changements à attendre dans le futur                                                       | -   moins de fonctions standards du <span class="in">`tidyverse`</span> prises en charge par rapport à <span class="in">`duckdb`</span>                                                                                                                                               |</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>|                        | -   met à disposition le format de compression de données très utilisé <span class="in">`parquet`</span>                                                                        | -   jointures de bases volumineuses moins performantes qu&#39;avec <span class="in">`duckdb`</span>                                                                                                                                                               |</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>|                        |                                                                                                                                                         | -   offre moins de fonctionnalités que <span class="in">`duckdb`</span>                                                                                                                                                                                       |</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>+------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
