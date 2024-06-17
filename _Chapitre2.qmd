@@ -283,7 +283,7 @@ DBI::dbDisconnect(con, shutdown = TRUE)
 
 Pour la suite, on suppose que la connexion est ouverte sous le nom `con`, et que les données sont accessibles par la requête `requete_duckdb`. Le code modifiera la requête, mais pas la table dans le serveur SQL.
 
-```{r, eval=TRUE}
+```{r}
 con <- DBI::dbConnect(duckdb::duckdb()); 
 con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
 requete_duckdb <- con %>% tbl("table_duckdb")
