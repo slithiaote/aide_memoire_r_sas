@@ -82,7 +82,7 @@ library(lubridate)
 library(magrittr)
 
 # Documentation de tidyverse
-vignette("dplyr")
+# vignette("dplyr")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -93,7 +93,7 @@ library(data.table)
 library(lubridate)
 
 # Documentation de data.table
-?'[.data.table'
+# ?'[.data.table'
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

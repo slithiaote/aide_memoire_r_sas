@@ -28,9 +28,9 @@ website:
         
 format:
   html:
-    theme:
-      light: flatly
-      dark: darkly
+#    theme:
+#      light: flatly
+#      dark: darkly
     code-copy: true
     code-overflow: wrap
     toc: true

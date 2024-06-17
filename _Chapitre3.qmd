@@ -252,7 +252,7 @@ getwd()
 # - expliquer les différences entre le pipe de magrittr et de R-Base
 
 # Documentation de tidyverse (dplyr et tidyr)
-vignette("dplyr")
+# vignette("dplyr")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
