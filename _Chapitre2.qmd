@@ -88,8 +88,6 @@ donnees_rbase <- data.frame(
 )
 
 # Mise en forme des données
-# On vérifie que la base importée est bien un data.frame
-is.data.frame(donnees_rbase)
 
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
 # Renommer les colonnes de la base
@@ -112,15 +110,11 @@ donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
 
 # Date de sortie du dispositif
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
-
-# Format de la base
-class(donnees_rbase)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Données fictives sur des formations
-# Autre solution !
 donnees_tidyverse <- tibble(
   Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
   Sexe = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "2", "2", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
@@ -149,12 +143,6 @@ donnees_tidyverse <- tibble(
 
 # Mise en forme des données
 
-# On vérifie que la base importée est bien un tibble
-is_tibble(donnees_tidyverse)
-
-# Transformation en tibble, le format de Tidyverse
-donnees_tidyverse <- tibble::as_tibble(donnees_tidyverse)
-
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
 # Renommer les colonnes de la base en minuscule
 donnees_tidyverse <- donnees_tidyverse %>% rename_with(tolower)
@@ -177,9 +165,6 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Date de sortie du dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(date_sortie = date_entree + lubridate::days(duree))
-
-# Format de la base
-class(donnees_tidyverse)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -212,25 +197,6 @@ donnees_datatable <- data.table(
 
 # Mise en forme des données
 
-# On vérifie que la base est bien un data.table
-is.data.table(donnees_datatable)
-
-# Transformation en data.frame
-setDF(donnees_datatable)
-is.data.frame(donnees_datatable)
-
-# Transformation en data.table
-# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
-# Ceci est plus efficace pour manipuler des données volumineuses.
-setDT(donnees_datatable)
-is.data.table(donnees_datatable)
-# Autre possibilité
-donnees_datatable <- as.data.table(donnees_datatable)
-
-
-# Est-ce une liste ?
-is.list(donnees_datatable)
-
 # Extraire les noms des variables de la base
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
 nomCol <- tolower(colnames(donnees_datatable))
@@ -258,9 +224,6 @@ donnees_datatable[, (varDates) := lapply(.SD, lubridate::dmy), .SDcols = varDate
 
 # Date de sortie du dispositif
 donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
-
-# Format de la base
-class(donnees_datatable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -289,6 +252,72 @@ requete_duckdb <- con %>% tbl("table_duckdb")
 ```
 
 N.B. Duckdb est envisagé pour des traitements sans charger des données en mémoire, par exemple en lisant directement un fichier `.parquet` sur le disque dur. Dans ce cas, les opérations sont effectuées à la volée, mais n'affectent pas les fichiers source.
+
+
+:::
+
+
+## Manipulation du format de la base de données
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Sans objet pour SAS */
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+# On vérifie que la base importée est bien un data.frame
+is.data.frame(donnees_rbase)
+
+# Format de la base
+class(donnees_rbase)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+# On vérifie que la base importée est bien un tibble
+is_tibble(donnees_tidyverse)
+
+# Transformation en tibble, le format de Tidyverse
+donnees_tidyverse <- tibble::as_tibble(donnees_tidyverse)
+
+# Format de la base
+class(donnees_tidyverse)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+# On vérifie que la base est bien un data.table
+is.data.table(donnees_datatable)
+
+# Transformation en data.frame
+setDF(donnees_datatable)
+is.data.frame(donnees_datatable)
+
+# Transformation en data.table
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setDT(donnees_datatable)
+is.data.table(donnees_datatable)
+# Autre possibilité
+donnees_datatable <- as.data.table(donnees_datatable)
+
+# Est-ce une liste ?
+is.list(donnees_datatable)
+
+# Format de la base
+class(donnees_datatable)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+
+```
 
 
 :::
