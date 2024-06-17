@@ -29,7 +29,6 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "05/28/2024"
 output:
   rmdformats::robobook:
     highlight: tango
@@ -624,7 +623,6 @@ tribble(
 # Outils de debuggage
 options(error = recover)
 options(error=NULL)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -633,7 +631,11 @@ options(error=NULL)
 # Exemple, simplifier la fonction paste
 '%+%' <- function(x, y) { paste(x, y, sep = "") }
 "Groupe_" %+% 0:9
+```
 
+```{r, warning=FALSE, message=FALSE}
+# Récupérer les éléments à la diagonale d'un dataframe
+diag(as.matrix(mtcars))
 ```
 
 # Le pipe sur R
@@ -667,7 +669,6 @@ Les deux pipes fonctionnent de la même manière mais diffèrent sur les points 
 *Source* :
 
 -   https://larmarange.github.io/guide-R/manipulation/pipe.html#le-pipe-natif-de-r
-
 
 # Conseils divers
 

@@ -37,6 +37,9 @@ sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Liste des bases de données en mémoire
+data.table::tables() 
+
 # Taille, en mémoire, d'une base (en Mb)
 format(object.size(donnees_datatable), nsmall = 3, digits = 2, unit = "Mb")
 

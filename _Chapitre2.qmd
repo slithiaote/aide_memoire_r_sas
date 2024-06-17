@@ -8,7 +8,7 @@ Les codes informatiques sont appliqués sur une base de données illustrative fi
 Les codes sont majoritairement exécutables indépendamment les uns des autres.
 
 
-## Création d'une base de données SAS d'exemple
+## Création d'une base de données d'exemple
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -209,7 +209,6 @@ donnees_datatable <- data.table(
   Sexef = c("Femme", "Femme", "Femme", "Femme", "Homme", "Homme", "Femme", "Femme", "Femme", "Homme", "Femme", "Homme", "Femme", "Homme", "Homme", "Homme", "Femme", "Femme",
             "Homme", "Homme", "Homme", "Femme", "Femme", "Homme", "Homme", "Homme", "Homme")
 )
-
 
 # Mise en forme des données
 

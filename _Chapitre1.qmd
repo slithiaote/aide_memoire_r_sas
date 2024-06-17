@@ -1,40 +1,69 @@
-# Importation des packages 
+# Importation des packages
 
+## Installation des packages
 
-
-## Importation des packages
 ::: {.panel-tabset group="language"}
-
 ## `SAS` {.unnumbered .unlisted}
+
 ``` sas
 /* Sans objet pour SAS */
 ```
 
 ## `R base` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les packages doivent au préalable être installés sur le disque dur
+# Pour installer un package :
+# install.packages("nom_du_package")
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les packages doivent au préalable être installés sur le disque dur
+# Pour installer un package :
+# install.packages("nom_du_package")
+```
+
+## `data.table` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les packages doivent au préalable être installés sur le disque dur
+# Pour installer un package :
+# install.packages("nom_du_package")
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+# Les packages doivent au préalable être installés sur le disque dur
+# Pour installer un package :
+# install.packages("nom_du_package")
+```
+:::
+
+## Importation des packages
+
+::: {.panel-tabset group="language"}
+## `SAS` {.unnumbered .unlisted}
+
+``` sas
+/* Sans objet pour SAS */
+```
+
+## `R base` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sans objet pour R-Base
 
 # Cependant, on importe le package lubridate pour faciliter la gestion des dates
-
-# Les packages doivent au préalable être installés sur le disque dur
-# Pour installer un package :
-# install.packages("nom_du_package")
-
-# Pour manipuler les dates
 library(lubridate)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les packages doivent au préalable être installés sur le disque dur
-# Pour installer un package :
-# install.packages("nom_du_package")
 
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Chargement des packages
-# Pour manipuler les dates
-library(lubridate)
-# Pour utiliser le pipe %>%
-library(magrittr)
 # Le tidyverse proprement dit
 library(tidyverse)
 # Les packages importés par le tidyverse sont :
@@ -46,26 +75,31 @@ library(tidyverse)
 # - stringr (manipulation de chaînes de caractères)
 # - ggplot2 (création de graphiques)
 # - forcats (gestion des formats "factors")
+
+# Pour manipuler les dates
+library(lubridate)
+# Pour utiliser le pipe %>%
+library(magrittr)
+
 # Documentation de tidyverse
 vignette("dplyr")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les packages doivent au préalable être installés sur le disque dur
-# Pour installer un package :
-# install.packages("nom_du_package")
 library(data.table)
-# Documentation de data.table
-?'[.data.table'
 # Pour manipuler les dates
 library(lubridate)
+
+# Documentation de data.table
+?'[.data.table'
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 #library(duckdb)
 #library(arrow)
 ```
-
 :::

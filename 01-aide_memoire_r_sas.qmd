@@ -12,7 +12,7 @@ author:
 format:
   html:
     toc: true
-    toc-expand: 2
+    toc-expand: 1
     toc-location: left
     number-sections: true
     code-copy: true
@@ -41,7 +41,6 @@ description: |
 
 # Date published
 date: "`r Sys.Date()`"
-date-modified: "05/24/2024"
 
 output:
   rmdformats::robobook:
