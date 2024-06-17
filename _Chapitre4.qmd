@@ -12,7 +12,7 @@ proc freq data = donnees_sas;tables _character_ / missing;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Informations sur les variables
 str(donnees_rbase)
 # Statistiques descriptives des variables de la base
@@ -24,9 +24,8 @@ View(donnees_rbase)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Informations sur les variables
-str(donnees_tidyverse)
 donnees_tidyverse %>% str()
 donnees_tidyverse %>% glimpse()
 # Statistiques descriptives des variables de la base
@@ -36,7 +35,7 @@ donnees_tidyverse %>% View()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE}
 # Informations sur les variables
 str(donnees_datatable)
 # Statistiques descriptives des variables de la base
@@ -46,8 +45,15 @@ View(donnees_datatable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+On accède aux données du serveur SQL DuckDB au travers de l'objet `requete_duckdb`, qui est une requête (avec l'adresse du serveur) et non pas un `dataframe` ou un `tibble`. Comme l'accès n'est pas direct, la plupart des fonctions du tidyverse fonctionnent, mais opèrent sur "l'adresse du serveur DuckDB" au lieu d'opérer sur les valeurs (nombres, chaînes de caractères). A part `glimpse`, la plupart des fonctions ne renvoient pas un résultat exploitable.
+
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+# Informations sur les variables
+# requete_duckdb %>% str() 
+requete_duckdb %>% glimpse() # préférer glimpse()
+# requete_duckdb %>% summary()
+# requete_duckdb %>% View() 
 ```
 
 :::
@@ -86,18 +92,45 @@ head(donnees_datatable, 10)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-En duckdb, les dix premières lignes sont affichées par défaut. Si on veut les récupérer, par exemple dans une autre variable, il faut faire `collect()`. Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+DuckDB affiche les dix premières lignes par défaut lorsque l'on évalue une requête, comme indiqué dans le code ci-dessous. 
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% head(10) %>% collect()
+requete_duckdb
+# Ceci est équivalent au code suivant
+# requete_duckdb %>% print(n=10)
 ```
+
+Attention, comme il n'y a pas d'ordre en SQL, il faut ordonner les lignes si on veut un résultat reproductible. C'est une opération qui peut être couteuse en temps CPU.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% arrange(duree) %>% print()
+```
+
+L'objet `requete_duckdb` est bien une requête (i.e. une liste à deux éléments) même si on peut en afficher le résultat avec la fonction `print`. Notamment, les informations restent dans la mémoire de DuckDB. Il faut demander explicitement le transfert du résultat vers la session R avec la fonction `collect()`. On obtient alors un objet de type `data.frame` ou au lieu de `tbl_duckdb_connection`. 
+
+```{r, warning=FALSE, message=FALSE}
+class(requete_duckdb)
+resultat_tibble <- requete_duckdb %>% collect()
+class(resultat_tibble)
+```
+
+La fonction `collect()` transfère l'ensemble des données. Pour obtenir uniquement 10 lignes, il faut utiliser l'une des fonctions `slice_*` (cf [documentation](https://dplyr.tidyverse.org/reference/slice.html)). On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% slice_max(duree, n=4, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 4 lignes
+```
+
+En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne respecte pas toujours l'ordre indiqué par `arrange`) ou `top_n` (superseded). La fonction `slice` en fonctionne pas : elle ne peut pas respecter l'ordre.
 
 :::
 
-## Extraire les x dernières lignes de la base (10 par défaut) 
+
+
+## Extraire les x dernières lignes de la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
+
 ``` sas
 %let x = 10;
 proc sql noprint;select count(*) into :total_lignes from donnees_sas;quit;
@@ -106,35 +139,59 @@ data Lignes_&x.;set donnees_sas (firstobs = &deb. obs = &total_lignes.);run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
+
+```{r, warning=FALSE, message=FALSE}
+x <- 5
 tail(donnees_rbase, x)
+```
+
+Alternativement
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[ ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase), ]
-# Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
+```
+
+Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
+
+```{r, warning=FALSE, message=FALSE}
 ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase)
 nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ```
 
+
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-x <- 10
+
+```{r, warning=FALSE, message=FALSE}
 donnees_tidyverse %>% 
-  slice( (n()-10) : n())
+  slice( (n()-5) : n())
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, last(.SD, 10)]
 last(donnees_datatable, 10)
 tail(donnees_datatable, 10)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+Alternativement
 
+```{r, warning=FALSE, message=FALSE, echo = FALSE}
+donnees_datatable[, tail(.SD, 5)]
+```
+
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+Mêmes remarques que pour les premières lignes : il n'y a pas d'ordre a priori en SQL. On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé, et l'on déconseille `slice` et `tail`.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% slice_min(duree, n=5, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 5 lignes
 ```
 
 :::
+
+
 
 ## Nombre de lignes et de colonnes dans la base 
 ::: {.panel-tabset group="language"}
@@ -240,6 +297,9 @@ requete_duckdb %>% colnames()
 
 :::
 
+
+
+
 ## Nombre d'identifiants uniques et nombre de lignes dans la base 
 ::: {.panel-tabset group="language"}
 
@@ -280,9 +340,13 @@ donnees_datatable[, uniqueN(identifiant)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% nrow()
+requete_duckdb %>% distinct(identifiant) %>% count()
 ```
+Note : on a vu que `nrow` ne fonctionne pas en DuckDB. 
 
 :::
 
@@ -320,16 +384,25 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r, warning=FALSE, message=FALSE}
+variable <- "date_entree"
+pos <- match(variable, requete_duckdb %>% colnames())
+sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
+
 
 :::
 
-## Format des variables 
+
+# Type des variables (int, char, bool, etc.)
+
+## Afficher le type des variables
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
+
 ``` sas
 proc contents data = donnees_sas;run;
 
@@ -338,25 +411,131 @@ proc datasets lib = Work nolist;delete Var;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sapply(donnees_rbase, class)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 purrr::map(donnees_tidyverse, class)
 class(donnees_tidyverse)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, lapply(.SD, class)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+On ne peut pas appliquer directement la fonction `class` sur un objet de type `connection`. Cependant, DuckDB affiche le type des variables dans un print. On peut également appliquer la fonction `class` sur un extrait des données (après `collect`).
 
+```{r, warning=FALSE, message=FALSE}
+purrr::map(requete_duckdb %>% select(c(1,2)) %>% head() %>% collect(), class)
+class(requete_duckdb)
 ```
 
 :::
+
+## Convertir le type d'une seule variable
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas;
+  set donnees_sas;
+  /* Transformer la variable Sexe en caractère */
+  Sexe_car = put(Sexe, $1.);
+  /* Transformer la variable Sexe_car en numérique */
+  Sexe_num = input(Sexe_car, 1.);
+  /* Transformer une date d'un format caractère à un format Date */
+  format date $10.;
+  date = "01/01/2000";
+  format date_sas yymmdd10.;
+  date_sas = input(date, ddmmyy10.);
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Transformer la variable sexe en numérique
+donnees_rbase$sexe_numerique <- as.numeric(donnees_rbase$sexe)
+# Transformer la variable sexe_numerique en caractère
+donnees_rbase$sexe_caractere <- as.character(donnees_rbase$sexe_numerique)
+# Transformer une date d'un format caractère à un format Date
+donnees_rbase$date_r <- lubridate::dmy("01/01/2000")
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Transformer la variable sexe en numérique
+donnees_tidyverse <- donnees_tidyverse %>%  
+  mutate(sexe_numerique = as.numeric(sexe))
+
+# Transformer la variable sexe_numerique en caractère
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(sexe_caractere = as.character(sexe_numerique))
+
+# Transformer une date d'un format caractère à un format Date
+donnees_tidyverse <- donnees_tidyverse %>%  
+  mutate(date_r = lubridate::dmy("01/01/2000"))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Transformer la variable sexe en numérique
+donnees_datatable[, sexe_numerique := as.numeric(sexe)]
+# Transformer la variable sexe_numerique en caractère
+donnees_datatable[, sexe_caractere := as.numeric(sexe_numerique)]
+# Transformer une date d'un format caractère à un format Date
+donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>%  
+  mutate(sexe_numerique = as.numeric(sexe)) %>% # Transformer la variable sexe en numérique
+  mutate(sexe_caractere = as.character(sexe_numerique)) %>% # Transformer la variable sexe_numerique en caractère
+  select(starts_with("sexe")) %>% print(n=5)
+```
+
+En DuckDB, plusieurs syntaxes sont possibles pour transformer une chaîne de caractères en date. Sauf lorsque la chaîne de caractères n'est pas au format `YYYY-MM-DD`. On conseille de passer par la fonction `strptime` de DuckDB pour indiquer le format de la date.
+
+```{r, warning=FALSE, message=FALSE}
+# Transformer une date d'un format caractère à un format Date
+requete_duckdb %>%  
+  mutate(date_0 = as.Date("2000-01-01")) %>% 
+  mutate(date_1 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
+  # mutate(date_r = lubridate::dmy("01/01/2000")) %>% # no known SQL translation
+  select(starts_with("date")) %>% print(n=5)
+```
+
+:::
+
+
+## Convertir le type de plusieurs variables 
+
+::: {.panel-tabset group="language"}
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+enNumerique <- c("duree", "note_contenu", "note_formateur")
+enDate <- c('date_naissance', 'date_entree')
+
+requete_duckdb %>%  
+  mutate_at(enNumerique, as.integer) %>% 
+  mutate_at(enDate, as.character) %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%Y-%m-%d'))) %>% # strptime est une fonction duckdb
+  select(enNumerique, enDate) %>% print(n=5)
+```
+:::
+
+
+
+
+
+
 
