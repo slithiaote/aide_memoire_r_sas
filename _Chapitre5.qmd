@@ -54,9 +54,13 @@ id <- donnees_datatable[pos] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+En DuckDB, il y a une vraie différence entre `select` et `pull`. Dans le premier cas, les calculs restent du côté DuckDB, et c'est donc le moteur SQL qui continue à exécuter les calculs. Avec `pull`, le résultat est un `tibble` et les données sont transférées à la session R.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(3)
 ```
+
 :::
 ## Selection de colonnes par nom 
 ::: {.panel-tabset group="language"}
@@ -106,11 +110,17 @@ id <- donnees_datatable[, list("identifiant")] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(identifiant)
+requete_duckdb %>% select("identifiant")
+requete_duckdb %>% select(any_of("identifiant"))
 ```
+Note : on déconseille l'utilisation de `select` sur des chaînes de caractère : certaines fonction du tidyvers nécessient de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple).
+
 :::
-## Selection de colonnes par variable 
+
+## Selection de colonnes par un vecteur contenant des chaînes de caractères
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -155,10 +165,14 @@ id <- donnees_datatable[, list(variable)] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r, warning=FALSE, message=FALSE}
+variable <- c("identifiant","duree")
+requete_duckdb %>% select(any_of(variable))
 ```
+
 :::
+
 ## Sauf certaines variables 
 ::: {.panel-tabset group="language"}
 
@@ -192,10 +206,16 @@ exclusion_var <- donnees_datatable[, setdiff(names(donnees_datatable), variable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+Les opérateurs `-` et `!` fonctionnent.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(!identifiant)
+requete_duckdb %>% select(-all_of(variable))
 ```
+
 :::
+
 ## Sélectionner la 3e colonne 
 ::: {.panel-tabset group="language"}
 
@@ -228,10 +248,13 @@ col3 <- donnees_datatable[, 3]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(3)
 ```
+
 :::
+
 ## Sélectionner plusieurs colonnes 
 ::: {.panel-tabset group="language"}
 
@@ -280,7 +303,12 @@ colonnes <- donnees_datatable[, cols, with = FALSE]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs possibilités
+requete_duckdb %>% select(all_of(cols))
+requete_duckdb %>% select(any_of(cols))
+requete_duckdb %>% select({{cols}})
+requete_duckdb %>% select(!!cols)
 ```
 :::
 ## Sélectionner les colonnes qui débutent par le mot Note 
@@ -322,7 +350,7 @@ sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% select(starts_with("note"))
 ```
 :::
 ## Sélectionner les colonnes qui ne débutent pas par le mot Note 
@@ -354,7 +382,8 @@ sel <- donnees_datatable[, .SD, .SDcols = -patterns("^note")]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% select(-starts_with("note"))
+requete_duckdb %>% select(!starts_with("note"))
 ```
 :::
 ## Sélectionner l'ensemble des variables numériques de la base 
@@ -383,7 +412,8 @@ sel <- donnees_datatable[, .SD, .SDcols = is.numeric]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% select_if(is.numeric)
+# requete_duckdb %>% select(where(is.numeric))
 ```
 :::
 ## Sélectionner l'ensemble des variables de format "Date" 
@@ -421,7 +451,8 @@ var_dates <- donnees_datatable[, .SD, .SDcols = is.Date]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% select_if(is.Date)
+# requete_duckdb %>% select(where(is.Date))
 ```
 :::
 ## Sélectionner des lignes 
@@ -500,10 +531,15 @@ en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
+
 :::
+
 ## Sélection sur de multiples conditions 
 ::: {.panel-tabset group="language"}
 
@@ -538,7 +574,8 @@ avant2023_femme <- donnees_datatable[lubridate::year(date_entree) < 2023 & sexe 
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% 
+  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
 ```
 :::
 ## Sélection de ligne par référence : lignes de l'identifiant 087 
@@ -582,7 +619,13 @@ donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% filter(identifiant %in% c("087")) %>% select(identifiant)
+requete_duckdb %>% filter(identifiant == "087") %>% select(identifiant)
+# Essayons désormais par variables
+variable <- "identifiant"
+sel <- "087"
+# À FAIRE : peut-on faire plus simplement ?
+requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable))
 ```
 :::
 ## Sélection de lignes et de variables 
@@ -637,7 +680,8 @@ femmes <- donnees_datatable[sexe == "2", ..cols]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-# À FAIRE : compléter
-#requete_duckdb %>% filter(sexe == "2")
+cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
+requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
+requete_duckdb %>% filter(sexe == "2") %>% select({{cols}})
 ```
 :::
