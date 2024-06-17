@@ -228,7 +228,8 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
-Duckdb fonctionne comme un serveur SQL. Il faut transférer les données vers le serveur SQL.
+Duckdb est un serveur SQL séparé de la session R. Les calculs sont effectués _en dehors_ de `R` et l'espace mémoire est distinct de celui de `R`. 
+Au lieu d'accéder directement aux données, il faut passer par un objet _connection_ qui contient l'adresse du serveur, un peu comme lorsque l'on se connecte à un serveur web. Ici en particulier, il est nécessaire de transférer les données vers `duckdb`.
 
 ```{r, warning=FALSE, message=FALSE}
 # Ouvrir une connexion au serveur duckdb
