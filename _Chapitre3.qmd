@@ -20,6 +20,7 @@ libname bur "&bureau.";
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+# Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
@@ -27,6 +28,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+# Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
@@ -34,6 +36,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+# Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
@@ -119,7 +122,7 @@ paste0("Année passée: ", annee_1)
 #  print("Nous sommes en 2024 ou après")
 #}
 #else {
-#  print("Nous sommes en 2023 ou avant")
+#  print("Nous sommes avant 2024")
 #}
 ## Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
@@ -136,7 +139,7 @@ if (annee >= 2024) {
 #  print("Nous sommes en 2024 ou après")
 #}
 #else {
-#  print("Nous sommes en 2024 ou avant")
+#  print("Nous sommes avant 2024")
 #}
 ## Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
@@ -233,6 +236,7 @@ getwd()
 # Le pipe peut aussi être utilisé avec R-Base et data.table
 # Le pipe permet d'enchaîner des opérations sur une même base
 1:10 |> sum()
+
 # R-Base est réputé plus lent que ses concurrents, ce qui est souvent vrai.
 # Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
 ```
@@ -242,15 +246,10 @@ getwd()
 # tidyverse promeut l'utilisation du pipe (%>%), qui permet d'enchaîner des opérations sur une même base modifiée successivement.
 # 2 types de pipes existent, le pipe de magrittr (%>%) et le pipe de R-Base (|>, à partir de la version 4.1)
 # Les fonctionnalités simples des deux opérateurs sont identiques, mais il existe des différences.
-# Le tidyverse peut s'utiliser sans pipe, mais le pipe simplifie la gestion des programmes.
-# Les autres environnements (R-Base, data.table) peuvent aussi se présenter avec le pipe
 # Dans cet aide-mémoire, le pipe de magrittr (%>%) est privilégié.
 
-# À FAIRE :
-# - expliquer les différences entre le pipe de magrittr et de R-Base
-
-# Documentation de tidyverse (dplyr et tidyr)
-vignette("dplyr")
+# Le tidyverse peut s'utiliser sans pipe, mais le pipe simplifie la gestion des programmes.
+# Les autres environnements (R-Base, data.table) peuvent aussi se présenter avec le pipe.
 ```
 
 ## `data.table` {.unnumbered .unlisted}

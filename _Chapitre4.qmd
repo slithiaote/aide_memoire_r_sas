@@ -126,7 +126,7 @@ En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne
 
 
 
-## Extraire les x dernières lignes de la base
+## Extraire les x dernières lignes de la base (10 par défaut) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -141,7 +141,7 @@ data Lignes_&x.;set donnees_sas (firstobs = &deb. obs = &total_lignes.);run;
 ## `R base` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-x <- 5
+x <- 10
 tail(donnees_rbase, x)
 ```
 
@@ -163,7 +163,7 @@ nrow(donnees_rbase) - x : nrow(donnees_rbase)
 
 ```{r, warning=FALSE, message=FALSE}
 donnees_tidyverse %>% 
-  slice( (n()-5) : n())
+  slice( (n()-10) : n())
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -177,7 +177,7 @@ tail(donnees_datatable, 10)
 Alternativement
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE}
-donnees_datatable[, tail(.SD, 5)]
+donnees_datatable[, tail(.SD, 10)]
 ```
 
 
@@ -212,6 +212,7 @@ proc sql;select count(*) as Nb_Colonnes from Var;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les syntaxes dim(donnees_rbase)[1] et dim(donnees_rbase)[2] sont plus rapides que nrow() et ncol()
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_rbase)[1], dim(donnees_rbase)[2])
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", nrow(donnees_rbase), ncol(donnees_rbase))
 ```
@@ -229,6 +230,7 @@ donnees_tidyverse %>% ncol()
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les syntaxes dim(donnees_rbase)[1] et dim(donnees_rbase)[2] sont plus rapides que nrow() et ncol()
 dim(donnees_datatable) ; dim(donnees_datatable)[1] ; dim(donnees_datatable)[2]
 dim(donnees_datatable) ; nrow(donnees_datatable) ; ncol(donnees_datatable)
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable)[1], dim(donnees_datatable)[2])
@@ -255,11 +257,14 @@ requete_duckdb %>%  ncol()
 /* Par ordre d'apparition dans la base */
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql;select name into :nom_col separated by " " from Var order by varnum;run;
+
 /* On affiche les noms des variables */
 %put Liste des variables : &nom_col.;
+
 /* Par ordre alphabétique */
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql;select name into :nom_col separated by " " from Var;run;
+
 /* On affiche les noms des variables */
 %put Liste des variables : &nom_col.;
 ```
