@@ -70,10 +70,6 @@ Il se veut complémentaire de la documentation en ligne en français Utilit'R, n
 
 Enfin, si vous souhaitez collaborer à cet aide-mémoire ou nous faire part de votre avis, n'hésitez pas à nous contacter via nos adresses email.
 
-```{r}
-options(width=130)
-```
-
 
 {{< include _Chapitre1.qmd >}}
 
@@ -114,4 +110,3 @@ options(width=130)
 {{< include _Chapitre19.qmd >}}
 
 {{< include _Chapitre20.qmd >}}
-
