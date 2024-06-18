@@ -1,70 +1,163 @@
-# Manipuler des chaînes de caractères 
+# Les tris 
 
 
 
-## Majuscule, minuscule 
+## Trier les colonnes de la base 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Fonction tranwrd (TRANslate WoRD) */
+/* On met identifiant, date_entree au début de la base */
+%let colTri = identifiant date_entree;
 data donnees_sas;
+  retain &colTri.;
   set donnees_sas;
-  /* Première lettre en majuscule */
-  Niveau = propcase(Niveau);
-  /* En majuscule */
-  CSP_majuscule = upcase(CSPF);
-  /* En minuscule */
-  CSP_minuscule = lowcase(CSPF);
-  /* Nombre de caractères dans une chaîne de caractères */
-  taille_id = length(identifiant);
+run;
+/* Autre solution */
+proc sql;
+  create table donnees_sas as
+  /* Dans la proc SQL, les variables doivent être séparées par des virgules */
+  /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
+  select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from donnees_sas;
+quit;
+/* Mettre la variable poids_sondage au début de la base */
+data donnees_sas;
+  retain poids_sondage;
+  set donnees_sas;
+run;
+/* Mettre la variable poids_sondage à la fin de la base */
+proc contents data = donnees_sas out = var;run;
+proc sql noprint;
+  select name into :var separated by " " from var
+  where lowcase(name) ne "poids_sondage" order by varnum;
+quit;
+data donnees_sas;
+  retain &var. poids_sondage;
+  set donnees_sas;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
-
-# En majuscule
-donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
-# En minuscule
-donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
-# Nombre de caractères dans une chaîne de caractères
-donnees_rbase$taille_id <- nchar(donnees_rbase$identifiant)
+# Mettre les variables identifiant, date_entree au début de la base
+colTri <- c("identifiant", "date_entree")
+donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
+# Autre possibilité, plus longue !
+donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
+donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
+# Mettre la variable poids_sondage au début de la base
+donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
+# Mettre la variable poids_sondage à la fin de la base
+donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sondage"), "poids_sondage")]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_tidyverse <- donnees_tidyverse %>%  
-  mutate(niveau = str_to_title(niveau))
+# Mettre les variables identifiant, date_entree et date_sortie au début de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(identifiant, date_entree)
+# Autres solutions
+colTri <- c("identifiant", "date_entree")
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(all_of(colTri))
+donnees_tidyverse_tri <- donnees_tidyverse %>% 
+  select(all_of(colTri), everything())
 
-# En majuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = toupper(cspf))
-# En minuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = tolower(cspf))
-# Nombre de caractères dans une chaîne de caractères
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(taille_id = nchar(identifiant))
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(taille_id = str_split(identifiant, '') %>% 
-           lengths)
+
+# Mettre la variable poids_sondage au début de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(poids_sondage)
+# Mettre la variable poids_sondage à la fin de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(poids_sondage, .after = last_col())
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(substr(niveau, 2, length(niveau))))]
+# On met identifiant, date_entree au début
+colTri <- c("identifiant", "date_entree")
+tri <- union(colTri, colnames(donnees_datatable))
+donnees_datatable <- donnees_datatable[, ..tri]
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setcolorder(donnees_datatable, colTri)
 
-# En majuscule
-donnees_datatable[, csp_maj := toupper(cspf)]
-# En minuscule
-donnees_datatable[, csp_min := tolower(cspf)]
-# Nombre de caractères dans une chaîne de caractères
-donnees_datatable[, taille_id := nchar(identifiant)]
+# Mettre la variable poids_sondage au début de la base
+setcolorder(donnees_datatable, union("poids_sondage", colnames(donnees_datatable)))
+# Mettre la variable poids_sondage à la fin de la base
+setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_sondage"), "poids_sondage"))
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# On met identifiant date_entree au début
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(identifiant, date_entree, everything())
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  relocate(identifiant, date_entree)
+```
+
+
+:::
+
+## Trier les lignes (par ordre décroissant 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* 1ère possibilité */
+proc sort data = donnees_sas;by Identifiant Date_entree;run;
+/* 2e possibilité */
+proc sql;
+  create table Donnes as select * from donnees_sas
+  order by Identifiant, Date_entree;
+quit;
+/* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
+proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
+proc sql;
+  create table Donnes as select * from donnees_sas
+  order by Identifiant, Date_entree desc;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
+# soit croissant ou décroissant
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
+# Autre possibilité : - devant la variable (uniquement pour les variables numériques)
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$duree, na.last = FALSE), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, date_entree)
+# Tri par ordre croissant de identifiant et décroissant de date_entree
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
+# soit croissant ou décroissant
+donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+donnees_datatable <- donnees_datatable[order(identifiant, -date_entree, na.last = FALSE)]
+setorder(donnees_datatable, "identifiant", -"date_entree", na.last = FALSE)
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -75,287 +168,101 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 
 :::
 
-## Remplacer une chaîne de caractères par une autre 
+## Incidence des valeurs manquantes dans les tris 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data A_Corriger;
-  infile cards dsd dlm='|';
-  format A_corriger $8.;
-  input A_corriger $;
-  cards;
-  Qualifie
-  qualifie
-  Qualifie
-  QUALIFIE
-;
-run;
-data A_Corriger;
-  set A_Corriger;
-  Corrige = lowcase(A_corriger);
-  Corrige = tranwrd(Corrige, "qualifie", "Qualifié");
-run;
+/* Dans SAS, les valeurs manquantes sont considérées comme des valeurs négatives */
+/* Elles sont donc situées en premier dans un tri par ordre croissant ... */
+proc sort data = donnees_sas;by identifiant date_entree;run;proc print;run;
+/* ... et en dernier dans un tri par ordre décroissant */
+proc sort data = donnees_sas;by identifiant descending date_entree;run;
+proc print;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Le mot Qualifié n'a pas d'accent : on le corrige
-aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
-# [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
-gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
+
+# SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Pour mimer le tri par ordre croissant en SAS :
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+# Pour mimer le tri par ordre décroissant en SAS :
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree,
+                                     na.last = FALSE,
+                                     decreasing = c(FALSE, TRUE),
+                                     method = "radix"), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Le mot Qualifié n'a pas d'accent : on le corrige
-aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
-# [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
-aCorriger %>% tolower() %>% str_replace_all("[Q-q]ualifie", "Qualifié")
+# Attention, avec arrange, les variables manquantes (NA) sont toujours classées en dernier, même avec desc()
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, date_entree)
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
+
+# Or, SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Elles sont donc classées en premier dans un tri par ordre croissant, et en dernier dans un tri par ordre décroissant
+
+# Pour mimer le tri par ordre croissant en SAS : les valeurs manquantes de date_entree sont classées en premier
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, !is.na(date_entree), date_entree)
+# Pour mimer le tri par ordre décroissant en SAS
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Le mot Qualifié n'a pas d'accent : on le corrige
-aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
-# [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
-gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_datatable <- donnees_datatable[order(identifiant, date_entree)]
+# SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Pour mimer le tri par ordre croissant en SAS :
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+# Pour mimer le tri par ordre décroissant en SAS :
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
+  
+# Pour mimer le tri SAS, il faut écrire :
+# Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
+requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
 ```
 
 
 :::
 
-## Manipuler des chaînes de caractères 
+## Trier par ordre croissant par toutes les variables de la base 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data Exemple_chaines;
-  Texte = "              Ce   Texte   mériterait   d être   corrigé                  ";
-  Texte1 = "Je m'appelle";
-  Texte2 = "SAS";
-  Texte3 = "Phrase à découper";
-  /* Valeur manquante sous forme caractère */
-  Texte4 = "";
-run;
-data Exemple_chaines;
-  set Exemple_chaines;
-  /* Enlever les blancs au début et à la fin de la chaîne de caractère */
-  Enlever_Blancs_Initiaux = strip(Texte);
-  /* Enlever les doubles blancs dans la chaîne de caractères */
-  Enlever_Blancs_Entre = compbl(Enlever_Blancs_Initiaux);
-  /* Enlever doubles blancs */
-  /* REVOIR !!!!! */
-  Enlever_Doubles_Blancs = compress(Texte, "  ", "t");
-  /* Trois méthodes pour concaténer des chaînes de caractères */
-  Concatener  = Texte1||" "||Texte2;
-  Concatener2 = Texte1!!" "!!Texte2;
-  Concatener3 = catx(" ", Texte1, Texte2);
-  /* Effet des valeurs manquantes */
-  /* Le séparateur est enlevé lors d'une concaténation avec une chaîne de caractère vide */
-  Concatener4 = catx("-", Texte4, Texte3);
-  /* Extraire les 2e, 3e et 4e caractère de Concatener */
-  /* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
-  extrait = substr(Concatener, 2, 3);
-  /* Transformer plusieurs caractères différents */
-  /* On transforme le é en e, le â en a, le î en i, ... */
-  chaine = "éèêëàâçîô";
-  chaine_sans_accent = translate(chaine, "eeeeaacio", "éèêëàâçîô");
-run;
-proc print data = Exemple_chaines;run;
+proc sort data = donnees_sas;by _all_;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-texte  <- "              Ce   Texte   mériterait   d être   corrigé                  "
-texte1 <- "Ce texte"
-texte2 <- "va être"
-texte3 <- "concaténé"
-# Valeur manquante sous forme caractère
-texte4 <- ""
-
-# Enlever les blancs au début et à la fin de la chaîne de caractère
-# "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
-# Le gsub remplace 1 ou plusieurs espaces successifs par un seul espace
-# trimws enlève les espaces au début et à la fin d'une chaîne de caractère 
-texte <- gsub("\\s+", " ", trimws(texte))
-
-
-# Concaténer des chaînes de caractères
-concatene <- paste(texte1, texte2, texte3, sep = " ")
-paste0(texte1, texte2, texte3)
-
-# Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
-paste(texte4, texte3, sep = "-")
-
-# Extraire les 2e, 3e et 4e caractères de Concatener
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- substr(concatene, 2, 5)
-
-# Transformer plusieurs caractères différents
-chaine <- "éèêëàâçîô"
-chartr("éèêëàâçîô", "eeeeaacio", chaine)
+tri_toutes_variables <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE)]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-texte  <- "              Ce   Texte   mériterait   d être   corrigé                  "
-texte1 <- "Ce texte"
-texte2 <- "va être"
-texte3 <- "concaténé"
-# Valeur manquante sous forme caractère
-texte4 <- ""
-
-# Enlever les blancs au début et à la fin de la chaîne de caractère
-# str_squish() supprime les espaces blancs au début et à la fin, et remplace tous les espaces blancs internes par un seul espace
-texte <- str_squish(texte)
-
-# Concaténer des chaînes de caractères
-concatene <- str_flatten(c(texte1, texte2, texte3), collapse = " ")
-
-# Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
-str_flatten(c(texte4, texte3), collapse = "-")
-
-# Extraire les 2e, 3e et 4e caractères de Concatener
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- str_sub(concatene, 2, 5)
-
-# Transformer plusieurs caractères différents
-chaine <- "éèêëàâçîô"
-chartr("éèêëàâçîô", "eeeeaacio", chaine)
+tri_toutes_variables <- donnees_tidyverse %>% 
+  arrange(pick(everything()))
+tri_toutes_variables <- donnees_tidyverse %>% 
+  arrange(across(everything()))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-texte  <- "              Ce   Texte   mériterait   d être   corrigé                  "
-texte1 <- "Je m'appelle"
-texte2 <- "R"
-# Enlever les blancs au début et à la fin de la chaîne de caractère
-# "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
-# Le gsub remplace 1 ou plusieurs espaces successifs par un seul espace
-# trimws enlève les espaces au début et à la fin d'une chaîne de caractère 
-texte <- gsub("\\s+", " ", trimws(texte))
-# Concaténer des chaînes de caractères
-paste(texte1, texte2, sep = " ")
-paste0(texte1, texte2)
-
-
-# Extraire les 2e, 3e et 4e caractères de texte
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- substr(texte, 2, 5)
-
-# Transformer plusieurs caractères différents
-chaine <- "éèêëàâçîô"
-chartr("éèêëàâçîô", "eeeeaacio", chaine)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Découper une chaîne de caractères selon un caractère donné 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots */
-data Mots;
-  delim = " ";
-  Texte = "Mon texte va être coupé !";
-  /* Chaque mot dans une variable */
-  %macro Decouper;
-    %do i = 1 %to %sysfunc(countw(Texte, delim));
-	  Mot&i. = scan(Texte, &i., delim);
-	%end;
-  %mend Decouper;
-  %Decouper;
-  /* Les mots empilés */
-  nb_mots = countw(Texte, delim);
-  do nb = 1 to nb_mots;
-    mots = scan(Texte, nb, delim);
-    output;
-  end;
-run;
-proc print data = Mots;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper uen chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
-chaine  <- "Mon texte va être coupé !"
-unlist(strsplit(chaine, split = " "))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper une chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
-chaine  <- "Mon texte va être coupé !"
-str_split(chaine, pattern = " ") %>% unlist()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper uen chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
-chaine  <- "Mon texte va être coupé !"
-unlist(strsplit(chaine, split = " "))
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Inverser une chaîne de caractères 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-data Mots;
-  Texte = "Mon texte va être coupé !";
-  x = left(reverse(Texte));
-run;
-proc print data = Mots;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-inverserTexte <- function(x) {
-  sapply(
-    lapply(strsplit(x, NULL), rev),
-    paste, collapse = "")
-  }
-inverserTexte(chaine)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(stringi)
-stringi::stri_reverse(chaine)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-inverserTexte <- function(x) {
-  sapply(
-    lapply(strsplit(x, NULL), rev),
-    paste, collapse = "")
-}
-inverserTexte(chaine)
+tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

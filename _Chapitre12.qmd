@@ -1,248 +1,49 @@
-# Les doublons 
+# Les valeurs manquantes 
 
 
 
-## Doublons pour toutes les colonnes 
+## Repérer les valeurs manquantes (variables Âge et Niveau) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On extraie tous les doublons, pas la première occurrence */
-
-/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;
-  select name into :derniere_var
-  from Var
-  where varnum = (select max(varnum) from Var);
-quit;
-proc sort data = donnees_sas;by &nom_col.;run;
-data Doublons;
+data Missing;
   set donnees_sas;
-  by &nom_col.;
-  if not (first.&derniere_var. and last.&derniere_var.);
+  /* 1ère solution */
+  if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
+  /* 2e solution */
+  if age = . or Niveau = '' then missing2 = 1;else missing2 = 0;
+  keep Age Niveau Missing1 Missing2;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-doublons <- donnees_rbase[duplicated(donnees_rbase), ]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-doublons <- donnees_tidyverse %>%  
-  group_by_all() %>% 
-  filter(n() > 1) %>%
-  slice(-1) %>%
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-doublons <- donnees_datatable[duplicated(donnees_datatable), ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Doublons pour une ou plusieurs colonnes 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On extraie tous les doublons, pas la première occurrence */
-%let var = identifiant;
-proc sort data = donnees_sas;by &var.;run;
-data doublons;
-  set donnees_sas;
-  by &var.;
-  if not first.&var.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-variable <- "identifiant"
-doublons <- donnees_rbase[duplicated(donnees_rbase[, variable]), ]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-variable <- "identifiant"
-doublons <- donnees_tidyverse %>%  
-  group_by(across(variable)) %>% 
-  filter(n() > 1) %>%
-  slice(-1) %>%
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extraie tous les doublons, pas la première occurrence
-variable <- "identifiant"
-doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Récupérer toutes les lignes pour les identifiants en doublon 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let var = identifiant;
-/* On groupe par la colonne identifiant, et si on aboutit à strictement plus d'une ligne, c'est un doublon */
-proc sql;
-  create table enDouble as
-  select * from donnees_sas
-  group by &var.
-  having count(*) > 1;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-enDouble <- donnees_rbase[donnees_rbase[, variable] %in%
-                            donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-enDouble <- donnees_tidyverse %>%  
-  group_by(across(variable)) %>% 
-  filter(n() > 1) %>%
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
-                                donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Récupérer toutes les lignes pour les identifiants sans doublon 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let var = identifiant;
-proc sql;
-  create table sansDouble as
-  select * from donnees_sas
-  group by &var.
-  having count(*) = 1;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-sansDouble <- donnees_rbase[! donnees_rbase[, variable] %in%
-                              donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-sansDouble <- donnees_tidyverse %>%  
-  group_by(across(variable)) %>% 
-  filter(n() == 1) %>%
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
-                                  donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Suppression des doublons pour l'ensemble des variables 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* 1ère méthode */
-proc sort data = donnees_sas nodupkey;
-  by _all_;
-run;
-/* 2e méthode, avec first. et last. (cf. infra) */
-/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;
-  select name into :derniere_var from Var
-  where varnum = (select max(varnum) from Var);
-quit;
-proc sql noprint;
-  select name into :nom_col separated by " " from Var order by varnum;
-quit;
-%put Dernière variable de la base : &derniere_var.;
-proc sort data = donnees_sas;by &nom_col.;run;
-data sansDouble;
-  set donnees_sas;
-  by &nom_col.;
-  if first.&derniere_var.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase), ]
-# Autre solution (équivalente à la solution first. de SAS)
-donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
-donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
+donnees_rbase$manquant <- ifelse(is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), 1, 0)
+# Mauvaise méthode pour repérer les valeurs manquantes
+ageManquant <- donnees_rbase[donnees_rbase$age == NA,  ]
+# Bonne méthode pour repérer les valeurs manquantes
+ageManquant <- donnees_rbase[is.na(donnees_rbase$age), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
-  arrange(pick(everything())) %>% 
-  distinct()
-donnees_tidyverse <- donnees_tidyverse %>% 
-  arrange(across(everything())) %>% 
-  distinct()
+  mutate(manquant = ifelse(is.na(age) | is.na(niveau), 1, 0))
+
+# Mauvaise méthode pour repérer les valeurs manquantes
+ageManquant <- donnees_tidyverse %>%
+  filter(age == NA)
+# Bonne méthode pour repérer les valeurs manquantes
+ageManquant <- donnees_tidyverse %>%
+  filter(is.na(age))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable <- unique(donnees_datatable)
-donnees_datatable <- donnees_datatable[! duplicated(donnees_datatable), ]
+donnees_datatable[, manquant := fifelse(is.na(donnees_datatable$age) | is.na(donnees_datatable$niveau), 1, 0)]
+ageManquant <- donnees_datatable[age == NA] # Faux
+ageManquant <- donnees_datatable[is.na(age)] # Correct
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -253,114 +54,263 @@ donnees_datatable <- donnees_datatable[! duplicated(donnees_datatable), ]
 
 :::
 
-## Suppression des doublons pour une seule variable 
+## Nombre et proportion de valeurs manquantes par variable 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-proc sort data = donnees_sas;by _all_;run;
-data sansDouble;
+/* Pour les variables numériques ou date */
+/* Partie "Missing Values" en bas du tableau consacré à la variable */
+proc univariate data = donnees_sas;var _numeric_;run;
+
+/* Pour l'ensemble des variables */
+/* Une solution possible */
+%macro Iteration(base = donnees_sas);
+  %local nbVar;
+  proc contents data = donnees_sas out = ListeVar noprint;run;
+  proc sql noprint;select count(*) into :nbVar from ListeVar;quit;
+  %do i = 1 %to &nbVar.;
+    data _null_;
+      set ListeVar (firstobs = &i. obs = &i.);
+	  call symput('var', name);
+	run;
+    proc sql;
+      select max("&var.") as Variable, sum(missing(&var.)) as Manquants, sum(missing(&var.)) / count(*) * 100 as Prop_Manquants
+      from &base.;
+    quit;
+  %end;
+  proc datasets lib = work nolist;delete ListeVar;run;
+%mend Iteration;
+%Iteration;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Pour les variables numériques ou date
+apply(is.na(
+  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))]
+  ), 2, mean) * 100
+# Autres solutions
+sapply(
+  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
+  function(x) mean(is.na(x)) * 100)
+sapply(
+  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
+  function(x) sum(is.na(x)) / length(x) * 100)
+
+# Pour l'ensemble des variables
+colMeans(is.na(donnees_rbase)) * 100
+apply(is.na(donnees_rbase), 2, mean) * 100
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Pour les variables numériques ou date
+donnees_tidyverse %>%
+  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
+                   list(~sum(is.na(.x)), ~mean(is.na(.x)))))
+donnees_tidyverse %>%
+  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
+                   list(~sum(is.na(.x)), ~sum(is.na(.x)) / length(.x))))
+
+# Pour l'ensemble des variables
+donnees_tidyverse %>%
+  summarise(across(everything(), ~mean(is.na(.x))))
+# Autres solutions
+donnees_tidyverse %>% map(~ mean(is.na(.)) * 100)
+# Obsolète
+donnees_tidyverse %>% summarise_each(funs(mean(is.na(.)) * 100))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Pour les variables numériques ou date
+donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100), .SDcols = function(x) c(lubridate::is.Date(x) | is.numeric(x))]
+# Pour l'ensemble des variables
+donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Incidence des valeurs manquantes 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* En SAS, les valeurs manquantes sont des nombres négatifs faibles */
+data Valeur_Manquante;
   set donnees_sas;
-  by _all_;
-  if first.identifiant;
+  /* Lorsque Age est manquant (missing), Jeune_Correct vaut 0 mais Jeune_Incorrect vaut 1 */
+  /* En effet, pour SAS, un Age manquant est une valeur inférieure à 0, donc bien inférieure à 25.
+     Donc la variable Jeune_Incorrect vaut bien 1 pour les âges inconnus */
+  Jeune_Incorrect = (Age <= 25);
+  Jeune_Correct   = (0 <= Age <= 25);
+run;
+proc print data = Valeur_Manquante (keep  = Age Jeune_Correct Jeune_Incorrect
+                                    where = (missing(Age)));
+run;
+proc freq data = Valeur_Manquante;tables Jeune_Incorrect Jeune_Correct;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+mean(donnees_rbase$note_formateur)
+mean(donnees_rbase$note_formateur, na.rm = TRUE)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>% pull(note_formateur) %>% mean()
+donnees_tidyverse %>% pull(note_formateur) %>% mean(na.rm = TRUE)
+# Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
+# NE PAS ECRIRE !
+# donnees_tidyverse %>% mean(note_formateur)
+# donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, mean(note_formateur)]
+donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Remplacer toutes les valeurs numériques manquantes par 0 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On sélectionne toutes les variables numériques */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :nom_col separated by " " from Var where format = "";
+run;
+data donnees_sas_sans_missing;
+  set donnees_sas;
+  %macro Missing;
+    %local i var;
+    %do i = 1 %to %sysfunc(countw(&nom_col.));
+	  %let var = %scan(&nom_col., &i);
+	  if missing(&var.) then &var. = 0;
+	%end;
+  %mend Missing;
+  %Missing;
+run;
+proc datasets lib = Work nolist;delete Var;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Dans le cas des dates, la valeur manquante a été remplacée par 1970-01-01
+donnees_rbase_sans_na <- donnees_rbase
+donnees_rbase_sans_na[is.na(donnees_rbase_sans_na)] <- 0
+# On remplace seulement les valeurs numériques par 0
+donnees_rbase_sans_na <- donnees_rbase
+varNumeriques <- names(donnees_rbase)[unlist(lapply(donnees_rbase, is.numeric))]
+donnees_rbase_sans_na[, varNumeriques][is.na(donnees_rbase_sans_na[, varNumeriques])] <- 0
+# Autre solution, avec replace
+donnees_rbase_sans_na[, varNumeriques] <- lapply(donnees_rbase_sans_na[, varNumeriques],
+                                                 function(x) {replace(x, is.na(x), 0)})
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On remplace seulement les valeurs numériques par 0
+donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
+  mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0)))
+# Autres façons d'écrire les fonctions anonymes
+# La méthode complète
+donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
+  mutate(across(where(is.numeric), function(x) tidyr::replace_na(x, 0)))
+# Une autre façon de raccourcir (depuis R 4.1)
+# \(x) est un raccourci pour function(x)
+donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
+  mutate(across(where(is.numeric), \(x) tidyr::replace_na(x, 0)))
+# Autre solution
+donnees_tidyverse_sans_na <- donnees_tidyverse %>%
+  purrr::modify_if(is.numeric, ~tidyr::replace_na(.x, 0))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable_sans_na <- copy(donnees_datatable)
+setnafill(donnees_datatable[, .SD, .SDcols = is.numeric], fill = 0)
+# Autre solution
+donnees_datatable_sans_na <- copy(donnees_datatable)
+cols <- colnames(donnees_datatable_sans_na[, .SD, .SDcols = is.numeric])
+donnees_datatable_sans_na[, (cols) := lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = cols]
+# Ensemble des colonnes
+donnees_datatable_sans_na <- copy(donnees_datatable)
+donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Remplacer les valeurs manquantes d'une seule variable par 0 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let var = note_contenu;
+data donnees_sas_sans_missing;
+  set donnees_sas;
+  if missing(&var.) then &var. = 0;
+  /* Ou alors */
+  if &var. = . then &var. = 0;
+  /* Ou encore */
+  if note_contenu = . then note_contenu = 0;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
-donnees_rbase_sansdoublon <- donnees_rbase_sansdoublon[!duplicated(donnees_rbase_sansdoublon$identifiant), , drop = FALSE]
+variable <- "note_contenu"
+donnees_rbase_sans_na <- donnees_rbase
+donnees_rbase_sans_na[, variable][is.na(donnees_rbase_sans_na[, variable])] <- 0
+donnees_rbase_sans_na[, variable] <- replace(donnees_rbase_sans_na[, variable],
+                                             is.na(donnees_rbase_sans_na[, variable]), 0)
+# Ou alors
+donnees_rbase_sans_na <- donnees_rbase
+donnees_rbase_sans_na$note_contenu[is.na(donnees_rbase_sans_na$note_contenu)] <- 0
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# L'option .keep_all = TRUE est nécessaire 
-# À FAIRE : REVOIR LE TRI PAR RAPPORT A SAS !!!
-sansDouble <- donnees_tidyverse %>% 
-  arrange(pick(everything())) %>% 
-  distinct(identifiant, .keep_all = TRUE)
-sansDouble <- donnees_tidyverse %>% 
-  arrange(across(everything())) %>% 
-  distinct(identifiant, .keep_all = TRUE)
+variable <- "note_contenu"
+donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
+  mutate(across(variable,  ~tidyr::replace_na(.x, 0)))
+# Ou alors
+donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
+  mutate(note_contenu = tidyr::replace_na(note_contenu, 0))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-setorderv(donnees_datatable, cols = colnames(donnees_datatable), na.last = FALSE)
-sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant")]), ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Identifiants uniques 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc sql;
-  create table id as select distinct identifiant from donnees_sas order by identifiant;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-unique(donnees_rbase["identifiant"])
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>%
-  distinct(identifiant)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-unique(donnees_datatable[, "identifiant"])
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Nombre de lignes uniques, sans doublon 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;select name into :nom_col separated by ", " from Var order by varnum;quit;
-proc sql;
-  select count(*) as Nb_Lignes_Uniques
-  from (select &nom_col., count(*) from donnees_sas group by &nom_col.);
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-nrow(unique(donnees_rbase))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>%
-  distinct() %>% 
-  nrow()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : pas sûr de moi
-uniqueN(donnees_datatable)
+variable <- "note_contenu"
+donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = variable]
+donnees_datatable[, lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
+donnees_datatable[, lapply(.SD, \(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
+# Ou alors
+donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
