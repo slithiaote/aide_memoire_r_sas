@@ -13,6 +13,7 @@ data donnees_sas;
   retain &colTri.;
   set donnees_sas;
 run;
+
 /* Autre solution */
 proc sql;
   create table donnees_sas as
@@ -20,11 +21,13 @@ proc sql;
   /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
   select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from donnees_sas;
 quit;
+
 /* Mettre la variable poids_sondage au début de la base */
 data donnees_sas;
   retain poids_sondage;
   set donnees_sas;
 run;
+
 /* Mettre la variable poids_sondage à la fin de la base */
 proc contents data = donnees_sas out = var;run;
 proc sql noprint;
@@ -42,9 +45,11 @@ run;
 # Mettre les variables identifiant, date_entree au début de la base
 colTri <- c("identifiant", "date_entree")
 donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
+
 # Autre possibilité, plus longue !
 donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
 donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
+
 # Mettre la variable poids_sondage au début de la base
 donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
 # Mettre la variable poids_sondage à la fin de la base
@@ -56,13 +61,13 @@ donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sonda
 # Mettre les variables identifiant, date_entree et date_sortie au début de la base
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(identifiant, date_entree)
+
 # Autres solutions
 colTri <- c("identifiant", "date_entree")
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(all_of(colTri))
 donnees_tidyverse_tri <- donnees_tidyverse %>% 
   select(all_of(colTri), everything())
-
 
 # Mettre la variable poids_sondage au début de la base
 donnees_tidyverse <- donnees_tidyverse %>%
@@ -78,6 +83,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 colTri <- c("identifiant", "date_entree")
 tri <- union(colTri, colnames(donnees_datatable))
 donnees_datatable <- donnees_datatable[, ..tri]
+
 # En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
 # Ceci est plus efficace pour manipuler des données volumineuses.
 setcolorder(donnees_datatable, colTri)
@@ -94,6 +100,7 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 requete_duckdb %>% 
   mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
   select(identifiant, date_entree, everything())
+
 requete_duckdb %>% 
   mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
   relocate(identifiant, date_entree)
@@ -102,18 +109,20 @@ requete_duckdb %>%
 
 :::
 
-## Trier les lignes (par ordre décroissant 
+## Trier les lignes (par ordre croissant ou décroissant) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 /* 1ère possibilité */
 proc sort data = donnees_sas;by Identifiant Date_entree;run;
+
 /* 2e possibilité */
 proc sql;
   create table Donnes as select * from donnees_sas
   order by Identifiant, Date_entree;
 quit;
+
 /* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
 proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
 proc sql;
@@ -150,13 +159,17 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
 # soit croissant ou décroissant
 donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
+
 # En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
 # Ceci est plus efficace pour manipuler des données volumineuses.
 setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+setorder(donnees_datatable, identifiant, date_entree, na.last = FALSE)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+
 # Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
 donnees_datatable <- donnees_datatable[order(identifiant, -date_entree, na.last = FALSE)]
 setorder(donnees_datatable, "identifiant", -"date_entree", na.last = FALSE)
+setorder(donnees_datatable, identifiant, -date_entree, na.last = FALSE)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 

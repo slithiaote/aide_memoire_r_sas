@@ -524,6 +524,7 @@ ligne3 <- donnees_datatable[3]
 # Pas de problème avec les valeurs manquantes comme pour la syntaxe en R-Base
 en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023, ]
 en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023]
+en2023 <- subset(donnees_datatable, lubridate::year(date_entree) == 2023)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -541,14 +542,15 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Ecriture correcte */
+data Avant2023_Femme;
+  set donnees_sas (where = (year(date_entree) < 2023 and not missing(date_entree) and sexe = 2));
+run;
+
 /* Ecriture incorrecte. Les valeurs manquantes sont considérées comme des nombres négatifs faibles, et inférieurs à 2023. */
 /* Ils sont sélectionnés dans le code suivant : */
 data Avant2023_Femme;
   set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
-run;
-/* Ecriture correcte */
-data Avant2023_Femme;
-  set donnees_sas (where = (year(date_entree) < 2023 and not missing(date_entree) and sexe = 2));
 run;
 ```
 
@@ -566,6 +568,7 @@ avant2023_femme <- donnees_tidyverse %>%
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 avant2023_femme <- donnees_datatable[lubridate::year(date_entree) < 2023 & sexe == "2"]
+avant2023_femme <- subset(donnees_datatable, lubridate::year(date_entree) < 2023 & sexe == "2")
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -598,7 +601,8 @@ donnees_rbase[donnees_rbase[, variable] %in% sel, ]
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% filter(identifiant %in% c("087")) %>% select(identifiant)
 donnees_tidyverse %>% filter(identifiant == "087") %>% select(identifiant)
-# Essayons désormais par variables
+
+# Essayons désormais par variable
 variable <- "identifiant"
 sel <- "087"
 # À FAIRE : peut-on faire plus simplement ?
@@ -659,6 +663,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
 femmes <- donnees_rbase[donnees_rbase$sexe %in% c("2"), cols]
+femmes <- subset(donnees_rbase, sexe %in% c("2"), cols)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -672,6 +677,7 @@ femmes <- donnees_tidyverse %>% filter(sexe == "2") %>% select({{cols}})
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
 femmes <- donnees_datatable[sexe == "2", ..cols]
+femmes <- subset(donnees_datatable, sexe %in% c("2"), cols)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
