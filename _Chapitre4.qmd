@@ -234,6 +234,9 @@ donnees_tidyverse %>% ncol()
 dim(donnees_datatable) ; dim(donnees_datatable)[1] ; dim(donnees_datatable)[2]
 dim(donnees_datatable) ; nrow(donnees_datatable) ; ncol(donnees_datatable)
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable)[1], dim(donnees_datatable)[2])
+
+# Autre solution
+donnees_datatable[, .N]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -394,6 +397,39 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 variable <- "date_entree"
 pos <- match(variable, requete_duckdb %>% colnames())
 sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
+```
+
+:::
+
+
+## Variables qui débutent par "note"
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = Variables;run;
+proc sql;select Name from Variables where upcase(substr(Name,1,4)) = "NOTE";run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+grep("^note", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+names(donnees_tidyverse) |> str_subset("^note")
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+
 ```
 
 
