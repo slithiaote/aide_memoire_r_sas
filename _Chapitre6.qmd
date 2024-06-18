@@ -1,7 +1,7 @@
 # Sélectionner des lignes et des colonnes 
 
 
-## Selection de colonnes par position 
+## Selectionner une colonne par sa position 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -62,7 +62,49 @@ requete_duckdb %>% select(3)
 ```
 
 :::
-## Selection de colonnes par nom 
+
+
+## Sélectionner la 3e colonne 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :nom_col separated by " "
+  from Var
+  where varnum = 3;
+run;
+data Col3;set donnees_sas (keep = &nom_col.);run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_rbase[, 3]
+col3 <- donnees_rbase[3]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_tidyverse %>% pull(3)
+col3 <- donnees_tidyverse %>% select(3)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_datatable[, 3]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(3)
+```
+
+:::
+
+
+## Selectionner une colonne par son nom 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -118,6 +160,63 @@ requete_duckdb %>% select(any_of("identifiant"))
 ```
 Note : on déconseille l'utilisation de `select` sur des chaînes de caractère : certaines fonction du tidyvers nécessient de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple).
 
+:::
+
+## Sélectionner plusieurs colonnes 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let var = identifiant note_contenu sexe;
+data Colonnes;set donnees_sas (keep = &var.);run;
+proc sql;
+  create table Colonnes as
+  select %sysfunc(tranwrd(&var., %str( ), %str(, )))
+  from donnees_sas;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+colonnes <- donnees_rbase[, cols]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs possibilités
+colonnes <- donnees_tidyverse %>% select(all_of(cols))
+colonnes <- donnees_tidyverse %>% select(any_of(cols))
+colonnes <- donnees_tidyverse %>% select({{cols}})
+colonnes <- donnees_tidyverse %>% select(!!cols)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs écritures possibles
+# Peut-être l'écriture la plus simple, à privilégier
+colonnes <- donnees_datatable[, mget(cols)]
+# Ecriture cohérente avec la logique data.table
+colonnes <- donnees_datatable[, .SD, .SDcols = cols]
+# Ecriture un peu contre-intuitve. Attention ! L'écriture est bien ..cols, et non ..(cols) !!
+# Les syntaxes donnees_datatable[, ..(cols)] et donnees_datatable[, .(cols)] ne fonctionnent pas
+colonnes <- donnees_datatable[, ..cols]
+# Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
+# Avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
+colonnes <- donnees_datatable[, cols, with = FALSE]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs possibilités
+requete_duckdb %>% select(all_of(cols))
+requete_duckdb %>% select(any_of(cols))
+requete_duckdb %>% select({{cols}})
+requete_duckdb %>% select(!!cols)
+```
 :::
 
 ## Selection de colonnes par un vecteur contenant des chaînes de caractères
@@ -214,101 +313,7 @@ requete_duckdb %>% select(-all_of(variable))
 
 :::
 
-## Sélectionner la 3e colonne 
-::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;
-  select name into :nom_col separated by " "
-  from Var
-  where varnum = 3;
-run;
-data Col3;set donnees_sas (keep = &nom_col.);run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-col3 <- donnees_rbase[, 3]
-col3 <- donnees_rbase[3]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-col3 <- donnees_tidyverse %>% pull(3)
-col3 <- donnees_tidyverse %>% select(3)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-col3 <- donnees_datatable[, 3]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-
-```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% select(3)
-```
-
-:::
-
-## Sélectionner plusieurs colonnes 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let var = identifiant note_contenu sexe;
-data Colonnes;set donnees_sas (keep = &var.);run;
-proc sql;
-  create table Colonnes as
-  select %sysfunc(tranwrd(&var., %str( ), %str(, )))
-  from donnees_sas;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe")
-colonnes <- donnees_rbase[, cols]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe")
-# Plusieurs possibilités
-colonnes <- donnees_tidyverse %>% select(all_of(cols))
-colonnes <- donnees_tidyverse %>% select(any_of(cols))
-colonnes <- donnees_tidyverse %>% select({{cols}})
-colonnes <- donnees_tidyverse %>% select(!!cols)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe")
-# Plusieurs écritures possibles
-# Peut-être l'écriture la plus simple, à privilégier
-colonnes <- donnees_datatable[, mget(cols)]
-# Ecriture cohérente avec la logique data.table
-colonnes <- donnees_datatable[, .SD, .SDcols = cols]
-# Ecriture un peu contre-intuitve. Attention ! L'écriture est bien ..cols, et non ..(cols) !!
-# Les syntaxes donnees_datatable[, ..(cols)] et donnees_datatable[, .(cols)] ne fonctionnent pas
-colonnes <- donnees_datatable[, ..cols]
-# Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
-# Avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
-colonnes <- donnees_datatable[, cols, with = FALSE]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-cols <- c("identifiant", "note_contenu", "sexe")
-# Plusieurs possibilités
-requete_duckdb %>% select(all_of(cols))
-requete_duckdb %>% select(any_of(cols))
-requete_duckdb %>% select({{cols}})
-requete_duckdb %>% select(!!cols)
-```
-:::
 ## Sélectionner les colonnes qui débutent par le mot Note 
 ::: {.panel-tabset group="language"}
 
@@ -451,6 +456,8 @@ requete_duckdb %>% select_if(is.Date)
 # requete_duckdb %>% select(where(is.Date))
 ```
 :::
+
+
 ## Sélectionner des lignes 
 ::: {.panel-tabset group="language"}
 
@@ -536,44 +543,6 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 
 :::
 
-## Sélection sur de multiples conditions 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Ecriture incorrecte. Les valeurs manquantes sont considérées comme des nombres négatifs faibles, et inférieurs à 2023. */
-/* Ils sont sélectionnés dans le code suivant : */
-data Avant2023_Femme;
-  set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
-run;
-/* Ecriture correcte */
-data Avant2023_Femme;
-  set donnees_sas (where = (year(date_entree) < 2023 and not missing(date_entree) and sexe = 2));
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-avant2023_femme <- subset(donnees_rbase, lubridate::year(date_entree) < 2023 & sexe == "2")
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-avant2023_femme <- donnees_tidyverse %>% 
-  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-avant2023_femme <- donnees_datatable[lubridate::year(date_entree) < 2023 & sexe == "2"]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% 
-  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
-```
-:::
 ## Sélection de ligne par référence : lignes de l'identifiant 087 
 ::: {.panel-tabset group="language"}
 
@@ -624,6 +593,48 @@ sel <- "087"
 requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable))
 ```
 :::
+
+
+## Sélectionner des lignes : multiples conditions 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Ecriture incorrecte. Les valeurs manquantes sont considérées comme des nombres négatifs faibles, et inférieurs à 2023. */
+/* Ils sont sélectionnés dans le code suivant : */
+data Avant2023_Femme;
+  set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
+run;
+/* Ecriture correcte */
+data Avant2023_Femme;
+  set donnees_sas (where = (year(date_entree) < 2023 and not missing(date_entree) and sexe = 2));
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+avant2023_femme <- subset(donnees_rbase, lubridate::year(date_entree) < 2023 & sexe == "2")
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+avant2023_femme <- donnees_tidyverse %>% 
+  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+avant2023_femme <- donnees_datatable[lubridate::year(date_entree) < 2023 & sexe == "2"]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% 
+  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
+```
+:::
+
+
 ## Sélection de lignes et de variables 
 ::: {.panel-tabset group="language"}
 
