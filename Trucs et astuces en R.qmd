@@ -620,7 +620,7 @@ tribble(
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-# Outils de debuggage
+# Outils de debogage
 options(error = recover)
 options(error=NULL)
 ```
