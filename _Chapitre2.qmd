@@ -5,7 +5,7 @@
 
 Les codes informatiques sont appliqués sur une base de données illustrative fictive. Cette base est importée à cette étape. Aussi, pour répliquer les codes sur sa machine, le lecteur doit d'abord exécuter le code d'importation de la base de données ci-dessous.
 
-Les codes sont majoritairement exécutables indépendamment les uns des autres.
+Les codes sont majoritairement exécutables indépendamment les uns des autres. Les codes de la partie "Les jointures de bases" nécessitent cependant l'importation des bases réalisée lors de la première section de la partie.
 
 
 ## Création d'une base de données d'exemple
