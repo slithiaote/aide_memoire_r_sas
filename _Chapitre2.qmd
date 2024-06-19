@@ -352,25 +352,26 @@ Les options de la fonction utiles sont :
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* À écrire */
 ```
 
-## `R base` {.unnumbered .unlisted}
-On peut utiliser les fonctions read.table, read.csv et read.csv2.
+### `R base` {.unnumbered .unlisted}
+
+On utilisera les fonctions read.table, read.csv et read.csv2.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 
 On utilisera les fonctions du package readr : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-readr>.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 
 On utilisera la fonction fread : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-data.table>.
 
@@ -381,7 +382,7 @@ Si cette option est valorisée à TRUE, les valeurs numériques précédées par
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 ```
