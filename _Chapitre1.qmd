@@ -2,6 +2,8 @@
 
 ## Installation des packages
 
+Des informations sur l'installation des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/01_R_Insee/Fiche_installer_packages.html>.
+
 ::: {.panel-tabset group="language"}
 ## `SAS` {.unnumbered .unlisted}
 

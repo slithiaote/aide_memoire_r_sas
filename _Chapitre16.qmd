@@ -1,4 +1,4 @@
-# Tableaux de fréquence 
+# Tableaux de fréquence (proc freq de `SAS`)
 
 
 
@@ -576,16 +576,15 @@ donnees_datatable[, chisq.test(cspf, sexef)]
 :::
 
 ## Solutions avec package R permettant de pondérer 
+
+Des informations sur l'usage des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html>.
+
 ::: {.panel-tabset group="language"}
+
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
 ```
 
 ## `R base` {.unnumbered .unlisted}

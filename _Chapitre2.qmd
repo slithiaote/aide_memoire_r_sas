@@ -320,5 +320,50 @@ class(donnees_datatable)
 
 ```
 
+:::
+
+
+
+## Importation de données extérieures
+
+Importer des données extérieures dans `SAS` ou `R` est sans doute la première tâche à laquelle est confronté l'utilisateur de ces logiciels. Ce point important est décrit sur le site Utilit'R : <https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>.
+
+Quelques éléments additionnels non couverts dans Utilit'R sont présentés ici.
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* À écrire */
+```
+
+## `R base` {.unnumbered .unlisted}
+On peut utiliser les fonctions read.table, read.csv et read.csv2.
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+
+On utilisera les fonctions du package readr : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-readr>.
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+```
+
+## `data.table` {.unnumbered .unlisted}
+
+On utilisera la fonction fread : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-data.table>.
+
+Une option utile non présentée dans le lien est : keepLeadingZeros.
+Si cette option est valorisée à TRUE, les valeurs numériques précédées par des 0 seront importées sous forme caractère et le zéro initial sera conservé.
+
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+```
 
 :::

@@ -22,9 +22,6 @@ format:
     link-external-newwindow: true
     page-layout: full
     code-tools: true
-    theme:
-      light: united
-      dark: darkly
 # format : native   
 editor: source
 execute:
