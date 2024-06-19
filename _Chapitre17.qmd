@@ -204,19 +204,23 @@ run;
 # Tableau croisé Cspf par Sexef
 varGroupement <- c("cspf", "sexef")
 variable <- c("note_contenu")
+
 # Solution avec tapply
 tapply(donnees_rbase[, variable], donnees_rbase[varGroupement], function(x) moyenne = mean(x, na.rm = TRUE))
+
 # Solution avec xtabs
 xtabs(note_contenu ~ cspf + sexef, aggregate(note_contenu ~ cspf + sexef, data = donnees_rbase, FUN = mean, na.rm = TRUE))
 # Ou, sous forme de formule
 formule <- as.formula(paste(variable, paste(varGroupement, collapse = " + "), sep = " ~ "))
 xtabs(formule, aggregate(formule, data = donnees_rbase, FUN = mean, na.rm = TRUE))
-# Autre solution, en calculant un tableau "long", et en le transformant en "wide"
+
+# Solution avec aggregate, en calculant un tableau "long" et en le transformant en "wide"
 tableau <- aggregate(note_contenu ~ cspf + sexef, data = donnees_rbase, FUN = mean, na.rm = TRUE)
-reshape(tableau, 
+tableau <- reshape(tableau, 
         timevar = varGroupement[2],
         idvar = varGroupement[1],
         direction = "wide")
+tableau[is.na(tableau)] <- 0
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -228,6 +232,7 @@ donnees_tidyverse %>%
   group_by(across(all_of(varGroupement))) %>% 
   summarise(across(all_of(variable), ~ mean(.x, na.rm = TRUE), .names = "Moyenne")) %>% 
   spread(varGroupement[2], Moyenne)
+
 # Autre solution
 donnees_tidyverse %>% 
   group_by(!!!syms(varGroupement)) %>% 
@@ -241,9 +246,11 @@ donnees_tidyverse %>%
 varGroupement <- c("cspf", "sexef")
 variable <- "note_contenu"
 data.table::dcast(donnees_datatable, cspf ~ sexef, value.var = "note_contenu", fun.aggregate = mean, na.rm = TRUE)
+
 # Avec références seulement
 data.table::dcast(donnees_datatable, get(varGroupement[1]) ~ get(varGroupement[2]), value.var = variable,
                   fun.aggregate = mean, na.rm = TRUE)
+
 # Autre solution, plus indirecte
 # À FAIRE : attention, toujours utiliser lapply, même avec une seule variable ! LE DIRE !!!
 tab <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = varGroupement, .SDcols = "note_contenu"]
@@ -284,6 +291,7 @@ run;
 # 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 var_groupe <- c("cspf", "sexef")
+
 tableau <- aggregate(donnees_rbase[, varNotes], donnees_rbase[var_groupe], function(x) moyenne = mean(x, na.rm = TRUE))
 reshape(tableau, 
         timevar = var_groupe[2],

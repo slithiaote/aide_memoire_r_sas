@@ -328,7 +328,27 @@ class(donnees_datatable)
 
 Importer des données extérieures dans `SAS` ou `R` est sans doute la première tâche à laquelle est confronté l'utilisateur de ces logiciels. Ce point important est décrit sur le site Utilit'R : <https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>.
 
+Pour importer des fichiers :
+
+-   plats (.csv, .tsv, .txt) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html>
+-   SAS : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tables_sas.html>
+-   issus de tableurs (Excel, Calc) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tableurs.html>
+-   parquet : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_parquet.html>
+
 Quelques éléments additionnels non couverts dans Utilit'R sont présentés ici.
+
+### La fonction ReadLines() en `R`
+
+La fonction readLines() de R peut s'avérer utile lors de l'import de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
+
+Les options de la fonction utiles sont :
+
+-   con : chemin du fichier à importer
+-   n : nombre maximal de lignes du fichier lues
+-   encoding : définir l’encodage du fichier ("UTF-8" ou "Latin-1")
+
+
+### Spécificité des environnements
 
 ::: {.panel-tabset group="language"}
 
