@@ -339,7 +339,7 @@ Quelques éléments additionnels non couverts dans Utilit'R sont présentés ici
 
 ### La fonction ReadLines() en `R`
 
-La fonction readLines() de R peut s'avérer utile lors de l'import de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
+La fonction readLines() de `R` peut s'avérer utile lors de l'import de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
 
 Les options de la fonction utiles sont :
 
