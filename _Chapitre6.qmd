@@ -637,6 +637,9 @@ data Selection;
   set donnees_sas;
   if &var. in ("&sel.");
 run;
+data Selection;
+  set donnees_sas (where = (&var. in ("&sel.")));
+run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
