@@ -77,11 +77,11 @@ data Colonnes;set donnees_sas;keep identifiant;run;
 id <- donnees_rbase$identifiant ; class(id)
 id <- donnees_rbase[["identifiant"]] ; class(id)
 id <- donnees_rbase[, "identifiant"] ; class(id)
+
 # Résultat sous forme de data.frame
 class(donnees_rbase[, "identifiant"])
 # Attention, utilisation du drop = FALSE étrange
-# En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie
-# un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
+# En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
 class(donnees_rbase[, "identifiant", drop = FALSE])
 id <- donnees_rbase["identifiant"] ; class(id)
 id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
@@ -92,6 +92,7 @@ id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
 # Sous forme de vecteur
 id <- donnees_tidyverse %>% pull(identifiant)
 id <- donnees_tidyverse %>% pull("identifiant")
+
 # Sous forme de tibble
 id <- donnees_tidyverse %>% select(identifiant)
 id <- donnees_tidyverse %>% select("identifiant")
@@ -103,6 +104,7 @@ id <- donnees_tidyverse %>% select("identifiant")
 id <- donnees_datatable$identifiant ; class(id)
 id <- donnees_datatable[["identifiant"]] ; class(id)
 id <- donnees_datatable[, identifiant] ; class(id)
+
 # Résultat sous forme de data.table
 id <- donnees_datatable[, "identifiant"] ; class(id)
 id <- donnees_datatable[, .("identifiant")] ; class(id)
@@ -295,7 +297,6 @@ colonnes <- donnees_datatable[, .SD, .SDcols = cols]
 # Les syntaxes donnees_datatable[, ..(cols)] et donnees_datatable[, .(cols)] ne fonctionnent pas
 colonnes <- donnees_datatable[, ..cols]
 # Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
-# Avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
 colonnes <- donnees_datatable[, cols, with = FALSE]
 ```
 
@@ -316,6 +317,7 @@ requete_duckdb %>% select(!!cols)
 ``` sas
 /* 1ère solution */
 data Selection_Variables;set donnees_sas (keep = Note:);run;
+
 /* 2e solution */
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql;
@@ -351,6 +353,8 @@ sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
 requete_duckdb %>% select(starts_with("note"))
 ```
 :::
+
+
 ## Sélectionner les colonnes qui ne débutent pas par le mot Note 
 ::: {.panel-tabset group="language"}
 
@@ -373,7 +377,7 @@ varNotes <- donnees_tidyverse %>% select(!starts_with("note"))
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- names(donnees_datatable)[substr(names(donnees_datatable), 1, 4) == "note"]
+cols <- grep("^note", names(donnees_datatable), value = TRUE, ignore.case = TRUE)
 sel <- donnees_datatable[, .SD, .SDcols = -cols]
 sel <- donnees_datatable[, .SD, .SDcols = -patterns("^note")]
 ```
@@ -384,6 +388,7 @@ requete_duckdb %>% select(-starts_with("note"))
 requete_duckdb %>% select(!starts_with("note"))
 ```
 :::
+
 ## Sélectionner l'ensemble des variables numériques de la base 
 ::: {.panel-tabset group="language"}
 
@@ -451,15 +456,50 @@ requete_duckdb %>% select_if(is.Date)
 # requete_duckdb %>% select(where(is.Date))
 ```
 :::
-## Sélectionner des lignes 
+## Sélectionner des lignes
+
+### 3e ligne
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* 3e ligne */
 data Ligne3;set donnees_sas (firstobs = 3 obs = 3);run;
+```
 
-/* Sélection des 3 premières lignes et des 3 premières colonnes de la base */
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+ligne3 <- donnees_rbase[3, ]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+ligne3 <- donnees_tidyverse %>% slice(3)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+ligne3 <- donnees_datatable[3, ]
+ligne3 <- donnees_datatable[3]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
+```
+
+:::
+
+
+### Sélection des 3 premières lignes et des 3 premières colonnes de la base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql noprint;
   select name into :nom_col separated by " " from Var
@@ -469,65 +509,73 @@ data Top3;
   set donnees_sas (firstobs = 1 obs = 3 keep = &nom_col.);
 run;
 proc datasets lib = Work nolist;delete Var;run;
+```
 
-/* Sélection de lignes */
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+top3 <- donnees_rbase[1:3, 1:3]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+top3 <- donnees_tidyverse %>% slice(1:3) %>% select(1:3)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+top3 <- donnees_datatable[1:3, 1:3]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+
+DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
+```
+
+:::
+
+
+### Entrées en 2023
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Entrées en 2023 */
 data En2023;
   set donnees_sas (where = (year(date_entree) = 2023));
 run;
-data Avant2023_femme;
-  set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
-run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sélection des 3 premières lignes et des 3 premières colonnes de la base
-top3 <- donnees_rbase[1:3, 1:3]
-
-# 3e ligne
-ligne3 <- donnees_rbase[3, ]
-
-# Sélection de lignes
 # Entrées en 2023
 # ATTENTION, solution qui ne fonctionne pas toujours bien ! En effet, les valeurs manquantes sont sélectionnées !
 en2023 <- donnees_rbase[lubridate::year(donnees_rbase$date_entree) == 2023, ]
+
 # Bonnes écritures, qui excluent les valeurs manquantes
 en2023 <- donnees_rbase[lubridate::year(donnees_rbase$date_entree) %in% c(2023), ]
 en2023 <- donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == 2023), ]
 en2023 <- subset(donnees_rbase, lubridate::year(donnees_rbase$date_entree) == 2023)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sélection des 3 premières lignes et des 3 premières colonnes de la base
-top3 <- donnees_tidyverse %>% slice(1:3) %>% select(1:3)
-
-# 3e ligne
-ligne3 <- donnees_tidyverse %>% slice(3)
-
-# Sélection de lignes
 # Entrées en 2023
 en2023 <- donnees_tidyverse %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-top3 <- donnees_datatable[1:3, 1:3]
-
-# 3e ligne
-ligne3 <- donnees_datatable[3, ]
-ligne3 <- donnees_datatable[3]
-
-# Sélection de lignes
-# Entrées en 2023
 # Pas de problème avec les valeurs manquantes comme pour la syntaxe en R-Base
 en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023, ]
 en2023 <- donnees_datatable[lubridate::year(date_entree) == 2023]
 en2023 <- subset(donnees_datatable, lubridate::year(date_entree) == 2023)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 
 DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
 
@@ -548,7 +596,7 @@ data Avant2023_Femme;
 run;
 
 /* Ecriture incorrecte. Les valeurs manquantes sont considérées comme des nombres négatifs faibles, et inférieurs à 2023. */
-/* Ils sont sélectionnés dans le code suivant : */
+/* Elles sont sélectionnées dans le code suivant : */
 data Avant2023_Femme;
   set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
 run;
@@ -577,6 +625,7 @@ requete_duckdb %>%
   filter(lubridate::year(date_entree) < 2023 & sexe == "2")
 ```
 :::
+
 ## Sélection de ligne par référence : lignes de l'identifiant 087 
 ::: {.panel-tabset group="language"}
 
