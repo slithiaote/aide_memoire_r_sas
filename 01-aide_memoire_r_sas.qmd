@@ -34,7 +34,7 @@ syntax-definitions:
 
 # Summary for listings and search engines
 description: |
-  Un aide-mémoire pour les statisticiens traduisant des codes standards en `SAS` et en `R`, suivant 4 environnements (`R base`, `tidyverse`, `data.table`, `arrow / duckdb`).
+  Un aide-mémoire pour les statisticiens traduisant des codes standards en `SAS` et en `R`, suivant 4 environnements (`R base`, `tidyverse`, `data.table`, `arrow/duckdb`).
 
 # Date published
 date: "`r Sys.Date()`"

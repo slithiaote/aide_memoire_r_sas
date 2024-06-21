@@ -2,12 +2,16 @@
 
 
 
-## Trier les colonnes de la base 
+## Trier les colonnes de la base
+
+
+### Mettre identifiant et date_entree au début de la base
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On met identifiant, date_entree au début de la base */
+/* Mettre les variables identifiant et date_entree au début de la base */
 %let colTri = identifiant date_entree;
 data donnees_sas;
   retain &colTri.;
@@ -21,13 +25,108 @@ proc sql;
   /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
   select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from donnees_sas;
 quit;
+```
 
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre les variables identifiant et date_entree au début de la base
+colTri <- c("identifiant", "date_entree")
+donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
+
+# Autre possibilité, plus longue !
+donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
+donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre les variables identifiant et date_entree au début de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(identifiant, date_entree)
+
+# Autres solutions
+colTri <- c("identifiant", "date_entree")
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(all_of(colTri))
+donnees_tidyverse_tri <- donnees_tidyverse %>% 
+  select(all_of(colTri), everything())
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre les variables identifiant et date_entree au début de la base
+colTri <- c("identifiant", "date_entree")
+tri <- union(colTri, colnames(donnees_datatable))
+donnees_datatable <- donnees_datatable[, ..tri]
+
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setcolorder(donnees_datatable, colTri)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# Mettre les variables identifiant et date_entree au début de la base
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(identifiant, date_entree, everything())
+
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  relocate(identifiant, date_entree)
+```
+
+:::
+
+
+### Mettre la variable poids_sondage au début de la base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Mettre la variable poids_sondage au début de la base */
 data donnees_sas;
   retain poids_sondage;
   set donnees_sas;
 run;
+```
 
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage au début de la base
+donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage au début de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(poids_sondage)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage au début de la base
+setcolorder(donnees_datatable, union("poids_sondage", colnames(donnees_datatable)))
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+```
+
+
+:::
+
+
+
+
+### Mettre la variable poids_sondage à la fin de la base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Mettre la variable poids_sondage à la fin de la base */
 proc contents data = donnees_sas out = var;run;
 proc sql noprint;
@@ -40,79 +139,40 @@ data donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre les variables identifiant, date_entree au début de la base
-colTri <- c("identifiant", "date_entree")
-donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
-
-# Autre possibilité, plus longue !
-donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
-donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
-
-# Mettre la variable poids_sondage au début de la base
-donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
 # Mettre la variable poids_sondage à la fin de la base
 donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sondage"), "poids_sondage")]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre les variables identifiant, date_entree et date_sortie au début de la base
-donnees_tidyverse <- donnees_tidyverse %>%
-  relocate(identifiant, date_entree)
-
-# Autres solutions
-colTri <- c("identifiant", "date_entree")
-donnees_tidyverse <- donnees_tidyverse %>%
-  relocate(all_of(colTri))
-donnees_tidyverse_tri <- donnees_tidyverse %>% 
-  select(all_of(colTri), everything())
-
-# Mettre la variable poids_sondage au début de la base
-donnees_tidyverse <- donnees_tidyverse %>%
-  relocate(poids_sondage)
 # Mettre la variable poids_sondage à la fin de la base
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage, .after = last_col())
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On met identifiant, date_entree au début
-colTri <- c("identifiant", "date_entree")
-tri <- union(colTri, colnames(donnees_datatable))
-donnees_datatable <- donnees_datatable[, ..tri]
-
-# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
-# Ceci est plus efficace pour manipuler des données volumineuses.
-setcolorder(donnees_datatable, colTri)
-
-# Mettre la variable poids_sondage au début de la base
-setcolorder(donnees_datatable, union("poids_sondage", colnames(donnees_datatable)))
 # Mettre la variable poids_sondage à la fin de la base
 setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_sondage"), "poids_sondage"))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-# On met identifiant date_entree au début
-requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  select(identifiant, date_entree, everything())
-
-requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  relocate(identifiant, date_entree)
 ```
 
 
 :::
 
-## Trier les lignes (par ordre croissant ou décroissant) 
+
+## Trier les lignes
+
+### Tri par ordre croissant
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* 1ère possibilité */
 proc sort data = donnees_sas;by Identifiant Date_entree;run;
@@ -122,7 +182,50 @@ proc sql;
   create table Donnes as select * from donnees_sas
   order by Identifiant, Date_entree;
 quit;
+```
 
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, date_entree)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
+donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
+
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+setorder(donnees_datatable, identifiant, date_entree, na.last = FALSE)
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+
+### Tri par ordre décroissant
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
 proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
 proc sql;
@@ -131,41 +234,24 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tri par ordre croissant
-# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
-# soit croissant ou décroissant
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 # Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
+
 # Autre possibilité : - devant la variable (uniquement pour les variables numériques)
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$duree, na.last = FALSE), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tri par ordre croissant
-donnees_tidyverse <- donnees_tidyverse %>% 
-  arrange(identifiant, date_entree)
 # Tri par ordre croissant de identifiant et décroissant de date_entree
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, desc(date_entree))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tri par ordre croissant
-# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri
-# soit croissant ou décroissant
-donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
-
-# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
-# Ceci est plus efficace pour manipuler des données volumineuses.
-setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
-setorder(donnees_datatable, identifiant, date_entree, na.last = FALSE)
-setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
-
 # Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
 donnees_datatable <- donnees_datatable[order(identifiant, -date_entree, na.last = FALSE)]
 setorder(donnees_datatable, "identifiant", -"date_entree", na.last = FALSE)
@@ -173,13 +259,14 @@ setorder(donnees_datatable, identifiant, -date_entree, na.last = FALSE)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 
 :::
+
 
 ## Incidence des valeurs manquantes dans les tris 
 ::: {.panel-tabset group="language"}
