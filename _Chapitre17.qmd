@@ -8,15 +8,18 @@
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Moyenne de note_contenu et nombre de personnes */
+
 /* 1ère solution */
 proc sort data = donnees_sas;by cspf;run;
 proc means data = donnees_sas mean n;var note_contenu;class cspf;run;
+
 /* 2e solution */
 proc tabulate data = donnees_sas;
   var note_contenu;
   class cspf;
   table (cspf all = "Total"), note_contenu * (mean n);
 run;
+
 /* 3e solution */
 proc sql;
   select cspf, mean(note_contenu) as note_contenu_moyenne, count(*) as N
@@ -24,6 +27,7 @@ proc sql;
   group by cspf
   order by cspf;
 quit;
+
 /* Avec la pondération */
 proc sort data = donnees_sas;by cspf;run;
 proc means data = donnees_sas mean n;
@@ -42,11 +46,14 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 aggregate(note_contenu ~ cspf, donnees_rbase, function(x) c(Moyenne = mean(x, na.rm = TRUE), Nombre = length(x)))
+
 # Moyenne de note_contenu
 # Une seule variable, une seule variable de groupe, une seule fonction
 aggregate(note_contenu ~ cspf, donnees_rbase, mean, na.rm = TRUE)
-# rowsum, à ne pas confondre avec rowSums, calcule des sommes, et uniquement des sommes
+
+# rowsum (à ne pas confondre avec rowSums) calcule des sommes, et uniquement des sommes
 rowsum(donnees_rbase$note_contenu, donnees_rbase$cspf, recorder = TRUE, na.rm = TRUE)
+
 # Fonctions tapply et by
 tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
 with(donnees_rbase, tapply(note_contenu, cspf, mean, na.rm = TRUE))
@@ -64,16 +71,23 @@ sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) weighted.mean(x$not
 donnees_tidyverse %>% 
   group_by(cspf) %>% 
   summarise(Nombre = n(), Moyenne = mean(note_contenu, na.rm = TRUE))
+# Ou alors :
+summarise(Nombre = n(), Moyenne = mean(note_contenu, na.rm = TRUE), .by = cspf)
+
 # Moyenne de note_contenu
 # Une seule variable, une seule variable de groupe, une seule fonction
 donnees_tidyverse %>% 
   group_by(cspf) %>% 
   summarise(Moyenne = mean(note_contenu, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE), .by = cspf)
 
 # Avec la pondération
 donnees_tidyverse %>% 
   group_by(cspf) %>% 
   summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE), .by = cspf)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -81,12 +95,14 @@ donnees_tidyverse %>%
 # Moyenne de note_contenu et nombre de personnes
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), by = cspf]
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), keyby = "cspf"]
+
 # Variables définies à part
 varNotes <- "note_contenu"
 var_groupe <- "cspf"
 # À FAIRE : les deux variables sont empilées, pourquoi ??
 donnees_datatable[, lapply(.SD, function(x) list(moyenne = mean(x, na.rm = TRUE), n = length(x))), keyby = var_groupe,
                   .SDcols = varNotes]
+
 # Avec la pondération
 donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), keyby = var_groupe,
                   .SDcols = varNotes]
@@ -113,6 +129,7 @@ proc means data = donnees_sas mean n;
   var &var_notes.;
   output out = Resultat;
 run;
+
 /* Autre solution */
 %macro sel;
   %global select;
@@ -124,6 +141,7 @@ run;
   %end;
 %mend sel;
 %sel;
+
 %let group = %sysfunc(tranwrd(&var_groupe., %str( ), %str(, )));
 proc sql;
   select &group., &select. count(*) as N
@@ -138,14 +156,17 @@ quit;
 # Plusieurs solutions avec aggregate (plutôt lent)
 aggregate(note_contenu ~ cspf + sexef, donnees_rbase, function(x) c(mean = mean(x), n = length(x)))
 aggregate(cbind(note_contenu, note_materiel) ~ cspf + sexef, donnees_rbase, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x)))
+
 # Via les formules
 variable <- c("note_contenu")
 varGroupement <- c("cspf", "sexef")
 formule <- as.formula(paste(variable, paste(varGroupement, collapse = " + "), sep = " ~ "))
 aggregate(formule, donnees_rbase, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x)))
+
 # Avec by
 by(donnees_rbase[, variable], donnees_rbase[, varGroupement], function(x) c(mean = mean(x, na.rm = TRUE), n = length(x)))
-# Avec rowum : on ne peut calculer que la somme
+
+# Avec rowsum (à ne pas confondre avec rowSums) : on ne peut calculer que la somme
 rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], sep = "_", lex.order = TRUE))
 ```
 
@@ -154,13 +175,19 @@ rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], se
 donnees_tidyverse %>% 
   group_by(cspf, sexef) %>% 
   summarise(Moyenne = mean(note_contenu, na.rm = TRUE), n = n())
+
+# Autre solution : l'ordre des modalités est modifié
+donnees_tidyverse %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE), n = n(), .by = c(cspf, sexef))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), keyby = c("cspf", "sexef")]
+
 # Autre solution
 data.table::dcast(donnees_datatable, cspf + sexef ~ ., value.var = "note_contenu", fun.aggregate = mean, na.rm = TRUE)
+
 # Variables définies à part
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 var_groupe <- c("cspf", "sexef")
@@ -331,8 +358,6 @@ donnees_tidyverse %>%
   summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE))) %>% 
   pivot_wider(names_from = sexef,
               values_from = all_of(varNotes))
-
-
 
 # 2e exemple : CSPF en ligne, et croisement Sexe x Qualifié en colonne, note_contenu sommée
 varNotes <- c("note_contenu")
