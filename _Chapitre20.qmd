@@ -1,4 +1,4 @@
-# Points de vigilance en SAS 
+# Points de vigilance en `SAS` 
 
 
 
@@ -31,7 +31,7 @@
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Sans objet en R
 ```
 
 
@@ -46,13 +46,16 @@
   %let reponse = oui;
 %mend test;
 %test;
+
 /* 1. Erreur car &reponse. n'est défini que dans le cas d'un environnement local */ 
 %put &reponse.;
+
 /* 2. Défini auparavant dans un environnement global, elle change de valeur à l'appel de la fonction */
 %let reponse = non;
 %put Reponse : &reponse.;
 %test;
 %put Reponse après la macro : &reponse.;
+
 /* 3. Problème corrigé, en imposant la variable à local dans la macro */
 %macro test2;
   %local reponse;
@@ -81,7 +84,7 @@
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Sans objet en R
 ```
 
 
