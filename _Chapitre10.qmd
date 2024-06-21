@@ -89,7 +89,8 @@ donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 
 :::
 
-## Numéro de contrat par individu 
+## Numéro de contrat par individu
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
