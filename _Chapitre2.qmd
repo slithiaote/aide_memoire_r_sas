@@ -141,7 +141,6 @@ donnees_tidyverse <- tibble(
            "Ouvrier"),
   Sexef = c("Femme", "Femme", "Femme", "Femme", "Homme", "Homme", "Femme", "Femme", "Femme", "Homme", "Femme", "Homme", "Femme", "Homme", "Homme", "Homme", "Femme", "Femme",
             "Homme", "Homme", "Homme", "Femme", "Femme", "Homme", "Homme", "Homme", "Homme")
-  
 )
 
 # Mise en forme des données
