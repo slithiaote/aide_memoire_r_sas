@@ -157,8 +157,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 # On convertit certaines variables au format date
 # On récupère d'abord les variables dont le nom débute par le mot "date"
-enDate <- names(donnees_tidyverse)[grepl("date", tolower(names(donnees_tidyverse)))]
+enDate <- names(donnees_tidyverse)[grepl("^date", tolower(names(donnees_tidyverse)))]
 
+# Conversion proprement dite
 donnees_tidyverse <- donnees_tidyverse %>%  
   mutate_at(enNumerique, as.integer) %>% 
   mutate(poids_sondage = as.numeric(poids_sondage)) %>% 
