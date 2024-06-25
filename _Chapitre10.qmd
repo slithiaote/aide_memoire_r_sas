@@ -994,11 +994,12 @@ nb <- donnees_tidyverse %>%
   count(cspf, sexef) %>% 
   spread(sexef, n)
 
-# On transpose le tableau
+# On transpose le tableau (on fait passer sexef en ligne et cspf en colonne)
 nb_transpose <- nb %>% 
-  rownames_to_column() %>% 
-  gather(variable, value, -rowname) %>%  
-  spread(rowname, value)
+  # Créer les combinaisons de cspf et sexef en ligne
+  pivot_longer(cols = -cspf, names_to = "sexef") %>% 
+  # Mettre sexef en ligne et cspf en colonne
+  pivot_wider(names_from = cspf, values_from = value, values_fill = 0)
 
 # Autre solution avec les packages janitor et sjmisc
 library(janitor)
