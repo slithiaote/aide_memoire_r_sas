@@ -1003,12 +1003,11 @@ nb_transpose <- nb %>%
 
 # Autre solution avec les packages janitor et sjmisc
 library(janitor)
+library(sjmisc)
 nb <- donnees_tidyverse %>%
   janitor::tabyl(cspf, sexef) %>% 
   # colonne cspf comme nom de ligne
   column_to_rownames(var="cspf")
-
-library(sjmisc)
 nb_transpose <- nb %>%
   sjmisc::rotate_df()
 ```
