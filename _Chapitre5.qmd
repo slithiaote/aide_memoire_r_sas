@@ -135,10 +135,3 @@ requete_duckdb %>%
   select(enNumerique, enDate) %>% print(n=5)
 ```
 :::
-
-
-
-
-
-
-

@@ -91,10 +91,7 @@ donnees_rbase <- data.frame(
 # Mise en forme des données
 
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
-# Renommer les colonnes de la base
 colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
-# Autre possibilité
-setNames(donnees_rbase, tolower(names(donnees_rbase)))
 
 # On a importé toutes les variables en format caractère
 # On convertit certaines variables en format numérique
@@ -146,11 +143,7 @@ donnees_tidyverse <- tibble(
 # Mise en forme des données
 
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
-# Renommer les colonnes de la base en minuscule
 donnees_tidyverse <- donnees_tidyverse %>% rename_with(tolower)
-# Autre solution
-donnees_tidyverse <- donnees_tidyverse %>% 
-  magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
 
 # On a importé toutes les variables en format caractère
 # On convertit certaines variables en format numérique
@@ -161,9 +154,9 @@ enDate <- names(donnees_tidyverse)[grepl("^date", tolower(names(donnees_tidyvers
 
 # Conversion proprement dite
 donnees_tidyverse <- donnees_tidyverse %>%  
-  mutate_at(enNumerique, as.integer) %>% 
+  mutate(across(all_of(enNumerique), as.integer)) %>% 
   mutate(poids_sondage = as.numeric(poids_sondage)) %>% 
-  mutate_at(enDate, lubridate::dmy)
+  mutate(across(all_of(enDate), lubridate::dmy))
 
 # Date de sortie du dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -202,13 +195,11 @@ donnees_datatable <- data.table(
 
 # Mise en forme des données
 
-# Extraire les noms des variables de la base
 # R est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule
-nomCol <- tolower(colnames(donnees_datatable))
-# Renommer les colonnes de la base
 colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
 
-# On convertit certaines variables en format 'numeric'
+# On a importé toutes les variables en format caractère
+# On convertit certaines variables en format numérique
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 # Ne pas oublier le . devant SDcols !!!!
 donnees_datatable[, lapply(.SD, as.integer), .SDcols = enNumerique]
@@ -267,9 +258,7 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-```
+Sans objet pour `SAS`.
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -288,7 +277,7 @@ class(donnees_rbase)
 is_tibble(donnees_tidyverse)
 
 # Transformation en tibble, le format de Tidyverse
-donnees_tidyverse <- tibble::as_tibble(donnees_tidyverse)
+donnees_tidyverse <- as_tibble(donnees_tidyverse)
 
 # Format de la base
 class(donnees_tidyverse)
@@ -336,15 +325,15 @@ Importer des données extérieures dans `SAS` ou `R` est sans doute la première
 Pour importer des fichiers :
 
 -   plats (.csv, .tsv, .txt) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html>
--   SAS : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tables_sas.html>
+-   `SAS` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tables_sas.html>
 -   issus de tableurs (Excel, Calc) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tableurs.html>
 -   parquet : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_parquet.html>
 
 Quelques éléments additionnels non couverts dans Utilit'R sont présentés ici.
 
-### La fonction ReadLines() en `R`
+### La fonction ReadLines() de `R`
 
-La fonction readLines() de `R` peut s'avérer utile lors de l'import de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
+La fonction readLines() de `R` peut s'avérer utile lors de l'importation de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, sans importer l'ensemble de la base, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
 
 Les options de la fonction utiles sont :
 

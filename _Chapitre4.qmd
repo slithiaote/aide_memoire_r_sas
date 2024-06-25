@@ -7,6 +7,7 @@
 ``` sas
 /* Statistiques globales sur les variables numériques */
 proc means data = donnees_sas n mean median min p10 p25 median p75 p90 max;var _numeric_;run;
+
 /* Statistiques globales sur les variables caractères */
 proc freq data = donnees_sas;tables _character_ / missing;run;
 ```
@@ -15,10 +16,12 @@ proc freq data = donnees_sas;tables _character_ / missing;run;
 ```{r, warning=FALSE, message=FALSE}
 # Informations sur les variables
 str(donnees_rbase)
+
 # Statistiques descriptives des variables de la base
 summary(donnees_rbase)
 library(Hmisc)
 Hmisc::describe(donnees_rbase)
+
 # Visualiser la base de données
 View(donnees_rbase)
 ```
@@ -28,8 +31,10 @@ View(donnees_rbase)
 # Informations sur les variables
 donnees_tidyverse %>% str()
 donnees_tidyverse %>% glimpse()
+
 # Statistiques descriptives des variables de la base
 donnees_tidyverse %>% summary()
+
 # Visualiser la base de données
 donnees_tidyverse %>% View()
 ```
@@ -38,8 +43,10 @@ donnees_tidyverse %>% View()
 ```{r, warning=FALSE, message=FALSE}
 # Informations sur les variables
 str(donnees_datatable)
+
 # Statistiques descriptives des variables de la base
 summary(donnees_datatable)
+
 # Visualiser la base de données
 View(donnees_datatable)
 ```
@@ -162,22 +169,24 @@ nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ## `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
+x <- 10
 donnees_tidyverse %>% 
-  slice( (n()-10) : n())
+  slice( (n() - x) : n())
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, last(.SD, 10)]
-last(donnees_datatable, 10)
-tail(donnees_datatable, 10)
+x <- 10
+donnees_datatable[, last(.SD, x)]
+last(donnees_datatable, x)
+tail(donnees_datatable, x)
 ```
 
 Alternativement
 
 ```{r, warning=FALSE, message=FALSE, echo = FALSE}
-donnees_datatable[, tail(.SD, 10)]
+donnees_datatable[, tail(.SD, x)]
 ```
 
 
@@ -204,8 +213,10 @@ proc sql;
   select count(*) as Nb_Lignes, count(distinct identifiant) as Nb_Identifiants
   from donnees_sas;
 quit;
+
 /* Liste des variables de la base dans la base Var */
 proc contents data = donnees_sas out = Var noprint;run;
+
 /* Nombre de colonnes */
 proc sql;select count(*) as Nb_Colonnes from Var;run;
 ```
@@ -222,6 +233,7 @@ sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", nrow(donnees_rbase), 
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d",
         donnees_tidyverse %>% nrow(),
         donnees_tidyverse %>% ncol())
+
 # Nombre de lignes
 donnees_tidyverse %>% nrow()
 # Nombre de colonnes
@@ -252,6 +264,8 @@ requete_duckdb %>%  ncol()
 ```
 
 :::
+
+
 ## Liste des variables de la base
 ::: {.panel-tabset group="language"}
 
@@ -285,6 +299,7 @@ sort(colnames(donnees_rbase))
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Liste des variables par ordre d'apparition dans la base
+donnees_tidyverse %>% names()
 donnees_tidyverse %>% colnames()
 # Liste des variables par ordre alphabétique
 donnees_tidyverse %>% colnames() %>% sort()
@@ -293,6 +308,7 @@ donnees_tidyverse %>% colnames() %>% sort()
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Liste des variables par ordre d'apparition dans la base
+names(donnees_datatable)
 colnames(donnees_datatable)
 # Liste des variables par ordre alphabétique
 sort(colnames(donnees_datatable))
@@ -306,9 +322,42 @@ requete_duckdb %>% colnames()
 :::
 
 
+## Mettre les noms des variables en minuscule
+`R` est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule.
+
+::: {.panel-tabset group="language"}
+## `SAS` {.unnumbered .unlisted}
+Sans objet, `SAS` n'est pas sensible à la casse.
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
+# Autre possibilité
+setNames(donnees_rbase, tolower(names(donnees_rbase)))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% rename_with(tolower)
+# Autre solution
+donnees_tidyverse <- donnees_tidyverse %>% 
+  magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
 
 
-## Nombre d'identifiants uniques et nombre de lignes dans la base 
+## Nombre d'identifiants uniques et de lignes dans la base 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

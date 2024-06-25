@@ -11,6 +11,7 @@
 dm "log; clear; ";
 /* On récupère déjà l'identifiant de l'utilisateur (systèmes Windows) */
 %let user = &sysuserid;
+
 /* Chemin proprement dit */
 %let bureau = C:\Users\&user.\Desktop;
 libname bur "&bureau.";
@@ -20,6 +21,7 @@ libname bur "&bureau.";
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+
 # Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
@@ -28,6 +30,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+
 # Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
@@ -36,6 +39,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
+
 # Chemin proprement dit
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
@@ -56,9 +60,11 @@ chemin <- file.path("C:/Users", user, "Desktop")
 %let an = %sysfunc(year(%sysfunc(today())));
 /* & (esperluette) indique à SAS qu'il doit remplacer an par sa valeur définie par le %let */
 %put Année : &an.;
+
 /* Autre possibilité */
 data _null_;call symput('annee', strip(year(today())));run;
 %put Année (autre méthode) : &annee.;
+
 /* Année passée */
 %put Année passée : %eval(&an. - 1);
 ```
@@ -69,9 +75,13 @@ data _null_;call symput('annee', strip(year(today())));run;
 annee <- lubridate::year(Sys.Date())
 sprintf("Année : %04d", annee)
 print(paste0("Année : ", annee))
+
+# Autre possibilité
+print(paste0("Année : ", format(Sys.Date(), "%Y")))
+
 # Année passée
 annee_1 <- annee - 1
-paste0("Année passée: ", annee_1)
+paste0("Année passée : ", annee_1)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -80,9 +90,13 @@ paste0("Année passée: ", annee_1)
 annee <- lubridate::year(Sys.Date())
 sprintf("Année : %04d", annee)
 print(paste0("Année : ", annee))
+
+# Autre possibilité
+print(paste0("Année : ", format(Sys.Date(), "%Y")))
+
 # Année passée
 annee_1 <- annee - 1
-paste0("Année passée: ", annee_1)
+paste0("Année passée : ", annee_1)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -91,9 +105,13 @@ paste0("Année passée: ", annee_1)
 annee <- lubridate::year(Sys.Date())
 sprintf("Année : %04d", annee)
 print(paste0("Année : ", annee))
+
+# Autre possibilité
+print(paste0("Année : ", format(Sys.Date(), "%Y")))
+
 # Année passée
 annee_1 <- annee - 1
-paste0("Année passée: ", annee_1)
+paste0("Année passée : ", annee_1)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -124,7 +142,8 @@ paste0("Année passée: ", annee_1)
 #else {
 #  print("Nous sommes avant 2024")
 #}
-## Construction correcte ! Le else doit être sur la même ligne que le {
+
+# Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
   print("Nous sommes en 2024 ou après")
 } else {
@@ -141,7 +160,8 @@ if (annee >= 2024) {
 #else {
 #  print("Nous sommes avant 2024")
 #}
-## Construction correcte ! Le else doit être sur la même ligne que le {
+
+# Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
   print("Nous sommes en 2024 ou après")
 } else {
@@ -158,7 +178,8 @@ if (annee >= 2024) {
 #else {
 #  print("Nous sommes avant 2024")
 #}
-## Construction correcte ! Le else doit être sur la même ligne que le {
+
+# Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
   print("Nous sommes en 2024 ou après")
 } else {
@@ -185,7 +206,7 @@ proc sql;
   select path from dictionary.libnames where libname = "WORK";
 quit;
 /* Définir le répertoire de travail, si besoin */
-/* libname "nom du répertoire";
+/* libname "nom du répertoire"; */
 ```
 
 ## `R base` {.unnumbered .unlisted}
@@ -194,7 +215,7 @@ quit;
 getwd()
 
 # Définir le répertoire de travail, si besoin
-#setwd(dir="nom du répertoire")
+#setwd(dir = "nom du répertoire")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -203,7 +224,7 @@ getwd()
 getwd()
 
 # Définir le répertoire de travail, si besoin
-#setwd(dir="nom du répertoire")
+#setwd(dir = "nom du répertoire")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -212,7 +233,7 @@ getwd()
 getwd()
 
 # Définir le répertoire de travail, si besoin
-#setwd(dir="nom du répertoire")
+#setwd(dir = "nom du répertoire")
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -226,35 +247,34 @@ getwd()
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Mise en garde : certains codes SAS pourraient aussi avec profit être écrits en langage SAS IML (Interactive Matrix Language).
-   Cet aide-mémoire n'ayant pas vocation à être un dictionnaire SAS, cette méthode d'écriture n'est pas proposée ici. */
-```
+Mise en garde : certains codes `SAS` pourraient aussi avec profit être écrits en langage SAS IML (Interactive Matrix Language).
+Cet aide-mémoire n'ayant pas vocation à être un dictionnaire `SAS`, cette méthode d'écriture n'est pas proposée ici.
+
 
 ## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Le pipe peut aussi être utilisé avec R-Base et data.table
-# Le pipe permet d'enchaîner des opérations sur une même base
-1:10 |> sum()
 
-# R-Base est réputé plus lent que ses concurrents, ce qui est souvent vrai.
-# Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
+`R base` est réputé plus lent que ses concurrents, ce qui est souvent vrai.
+Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Le pipe permet d'enchaîner des opérations sur une même base.
+# Il n'est pas réservé au tidyverse, et peut être utilisé avec R-Base et data.table.
+1:10 |> sum()
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# tidyverse promeut l'utilisation du pipe (%>%), qui permet d'enchaîner des opérations sur une même base modifiée successivement.
-# 2 types de pipes existent, le pipe de magrittr (%>%) et le pipe de R-Base (|>, à partir de la version 4.1)
-# Les fonctionnalités simples des deux opérateurs sont identiques, mais il existe des différences.
-# Dans cet aide-mémoire, le pipe de magrittr (%>%) est privilégié.
+`tidyverse` promeut l'utilisation du pipe (%>%), qui permet d'enchaîner des opérations sur une même base modifiée successivement.
+2 types de pipes existent, le pipe de magrittr (%>%) et le pipe de R-Base (|>, à partir de la version 4.1)
+Les fonctionnalités simples des deux opérateurs sont identiques, mais il existe des différences.
+Dans cet aide-mémoire, le pipe de magrittr (%>%) est privilégié.
 
-# Le tidyverse peut s'utiliser sans pipe, mais le pipe simplifie la gestion des programmes.
-# Les autres environnements (R-Base, data.table) peuvent aussi se présenter avec le pipe.
-```
+Le tidyverse peut s'utiliser sans pipe, mais le pipe simplifie la gestion des programmes.
+Les autres environnements (`R base`, `data.table`) peuvent aussi se présenter avec le pipe.
+
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Principe de base de data.table
+#Principe de base de data.table
 #dt[i, j, by]
 # i : sélection de lignes (instructions )
 # j : sélection et manipulation de colonnes
