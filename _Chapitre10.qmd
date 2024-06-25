@@ -1052,12 +1052,12 @@ proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 wide_rbase <- aggregate(donnees_rbase[, varNotes], donnees_rbase[, "identifiant", drop = FALSE], mean, na.rm = TRUE)
 long_rbase <- reshape(data = wide_rbase,
-                varying = varNotes, 
-                v.names = "notes",
-                timevar = "type_note", 
-                times = varNotes,
-                new.row.names = NULL,
-                direction = "long")
+                      varying = varNotes,
+                      v.names = "notes",
+                      timevar = "type_note",
+                      times = varNotes,
+                      new.row.names = NULL,
+                      direction = "long")
 long_rbase <- long_rbase[order(long_rbase$identifiant), ]
 row.names(long_rbase) <- NULL
 ```
@@ -1128,10 +1128,10 @@ run;
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Passer de long à wide : on souhaite revenir à la situation initiale
-wide_rbase <- reshape(long_rbase, 
-                timevar = "type_note",
-                idvar = c("identifiant", "id"),
-                direction = "wide")
+wide_rbase <- reshape(long_rbase,
+                      timevar = "type_note",
+                      idvar = c("identifiant", "id"),
+                      direction = "wide")
 #https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/
 ```
 
