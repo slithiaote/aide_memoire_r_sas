@@ -1,258 +1,64 @@
-# Les valeurs manquantes
+# Transposer une base
 
-## Repérer les valeurs manquantes (variables Âge et Niveau) 
+## Transposer une base 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data Missing;
-  set donnees_sas;
-  /* 1ère solution */
-  if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
-  /* 2e solution */
-  if age = . or Niveau = '' then missing2 = 1;else missing2 = 0;
-  keep Age Niveau Missing1 Missing2;
-run;
+/* On commence déjà par calculer un tableau croisé comptant les occurrences */
+proc freq data = donnees_sas;table Sexef * cspf / out = Nb;run;
+proc sort data = Nb;by cspf Sexef;run;
+proc print data = Nb;run;
+/* On transpose le tableau */
+proc transpose data = Nb out = transpose;by cspf;var count;id Sexef;run;
+data transpose;set transpose (drop = _name_ _label_);run;
+proc print data = transpose;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$manquant <- ifelse(is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), 1, 0)
-# Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[donnees_rbase$age == NA,  ]
-# Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[is.na(donnees_rbase$age), ]
+# On commence déjà par calculer un tableau croisé comptant les occurrences
+# as.data.frame.matrix est nécessaire, car le résultat de xtabs est un array
+nb <- as.data.frame.matrix(xtabs( ~ cspf + sexef, data = donnees_rbase))
+# On transpose le tableau
+nb_transpose <- as.data.frame(t(nb))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(manquant = ifelse(is.na(age) | is.na(niveau), 1, 0))
+# On commence déjà par calculer un tableau croisé comptant les occurrences
+nb <- donnees_tidyverse %>% 
+  count(cspf, sexef) %>% 
+  spread(sexef, n)
 
-# Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
-  filter(age == NA)
-# Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
-  filter(is.na(age))
+# On transpose le tableau (on fait passer sexef en ligne et cspf en colonne)
+nb_transpose <- nb %>% 
+  # Créer les combinaisons de cspf et sexef en ligne
+  pivot_longer(cols = -cspf, names_to = "sexef") %>% 
+  # Mettre sexef en ligne et cspf en colonne
+  pivot_wider(names_from = cspf, values_from = value, values_fill = 0)
+
+# Autre solution avec les packages janitor et sjmisc
+library(janitor)
+library(sjmisc)
+nb <- donnees_tidyverse %>%
+  janitor::tabyl(cspf, sexef) %>% 
+  # colonne cspf comme nom de ligne
+  column_to_rownames(var="cspf")
+nb_transpose <- nb %>%
+  sjmisc::rotate_df()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, manquant := fifelse(is.na(donnees_datatable$age) | is.na(donnees_datatable$niveau), 1, 0)]
-ageManquant <- donnees_datatable[age == NA] # Faux
-ageManquant <- donnees_datatable[is.na(age)] # Correct
-```
+# Etablissement d'un tableau croisé comptant les occurrences
+nb <- donnees_datatable[, .N, by = list(cspf, sexef)]
+nb <- dcast(nb, cspf ~ sexef, value.var = "N")
 
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Nombre et proportion de valeurs manquantes par variable 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Pour les variables numériques ou date */
-/* Partie "Missing Values" en bas du tableau consacré à la variable */
-proc univariate data = donnees_sas;var _numeric_;run;
-
-/* Pour l'ensemble des variables */
-/* Une solution possible */
-%macro Iteration(base = donnees_sas);
-  %local nbVar;
-  proc contents data = donnees_sas out = ListeVar noprint;run;
-  proc sql noprint;select count(*) into :nbVar from ListeVar;quit;
-  %do i = 1 %to &nbVar.;
-    data _null_;
-      set ListeVar (firstobs = &i. obs = &i.);
-	  call symput('var', name);
-	run;
-    proc sql;
-      select max("&var.") as Variable, sum(missing(&var.)) as Manquants, sum(missing(&var.)) / count(*) * 100 as Prop_Manquants
-      from &base.;
-    quit;
-  %end;
-  proc datasets lib = work nolist;delete ListeVar;run;
-%mend Iteration;
-%Iteration;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-apply(is.na(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))]
-  ), 2, mean) * 100
-# Autres solutions
-sapply(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
-  function(x) mean(is.na(x)) * 100)
-sapply(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
-  function(x) sum(is.na(x)) / length(x) * 100)
-
-# Pour l'ensemble des variables
-colMeans(is.na(donnees_rbase)) * 100
-apply(is.na(donnees_rbase), 2, mean) * 100
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-donnees_tidyverse %>%
-  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
-                   list(~sum(is.na(.x)), ~mean(is.na(.x)))))
-donnees_tidyverse %>%
-  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
-                   list(~sum(is.na(.x)), ~sum(is.na(.x)) / length(.x))))
-
-# Pour l'ensemble des variables
-donnees_tidyverse %>%
-  summarise(across(everything(), ~mean(is.na(.x))))
-# Autres solutions
-donnees_tidyverse %>% map(~ mean(is.na(.)) * 100)
-# Obsolète
-donnees_tidyverse %>% summarise_each(funs(mean(is.na(.)) * 100))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100), .SDcols = function(x) c(lubridate::is.Date(x) | is.numeric(x))]
-# Pour l'ensemble des variables
-donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Incidence des valeurs manquantes 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* En SAS, les valeurs manquantes sont des nombres négatifs faibles */
-data Valeur_Manquante;
-  set donnees_sas;
-  /* Lorsque Age est manquant (missing), Jeune_Correct vaut 0 mais Jeune_Incorrect vaut 1 */
-  /* En effet, pour SAS, un Age manquant est une valeur inférieure à 0, donc bien inférieure à 25.
-     Donc la variable Jeune_Incorrect vaut bien 1 pour les âges inconnus */
-  Jeune_Incorrect = (Age <= 25);
-  Jeune_Correct   = (0 <= Age <= 25);
-run;
-proc print data = Valeur_Manquante (keep  = Age Jeune_Correct Jeune_Incorrect
-                                    where = (missing(Age)));
-run;
-proc freq data = Valeur_Manquante;tables Jeune_Incorrect Jeune_Correct;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-mean(donnees_rbase$note_formateur)
-mean(donnees_rbase$note_formateur, na.rm = TRUE)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% pull(note_formateur) %>% mean()
-donnees_tidyverse %>% pull(note_formateur) %>% mean(na.rm = TRUE)
-# Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
-# NE PAS ECRIRE !
-# donnees_tidyverse %>% mean(note_formateur)
-# donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, mean(note_formateur)]
-donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Remplacer toutes les valeurs numériques manquantes par 0 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On sélectionne toutes les variables numériques */
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;
-  select name into :nom_col separated by " " from Var where format = "";
-run;
-data donnees_sas_sans_missing;
-  set donnees_sas;
-  %macro Missing;
-    %local i var;
-    %do i = 1 %to %sysfunc(countw(&nom_col.));
-	  %let var = %scan(&nom_col., &i);
-	  if missing(&var.) then &var. = 0;
-	%end;
-  %mend Missing;
-  %Missing;
-run;
-proc datasets lib = Work nolist;delete Var;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Dans le cas des dates, la valeur manquante a été remplacée par 1970-01-01
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na[is.na(donnees_rbase_sans_na)] <- 0
-# On remplace seulement les valeurs numériques par 0
-donnees_rbase_sans_na <- donnees_rbase
-varNumeriques <- names(donnees_rbase)[unlist(lapply(donnees_rbase, is.numeric))]
-donnees_rbase_sans_na[, varNumeriques][is.na(donnees_rbase_sans_na[, varNumeriques])] <- 0
-# Autre solution, avec replace
-donnees_rbase_sans_na[, varNumeriques] <- lapply(donnees_rbase_sans_na[, varNumeriques],
-                                                 function(x) {replace(x, is.na(x), 0)})
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On remplace seulement les valeurs numériques par 0
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0)))
-# Autres façons d'écrire les fonctions anonymes
-# La méthode complète
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), function(x) tidyr::replace_na(x, 0)))
-# Une autre façon de raccourcir (depuis R 4.1)
-# \(x) est un raccourci pour function(x)
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), \(x) tidyr::replace_na(x, 0)))
+# On transpose le tableau
+transpose(nb, keep.names = "sexef", make.names = "cspf")
 # Autre solution
-donnees_tidyverse_sans_na <- donnees_tidyverse %>%
-  purrr::modify_if(is.numeric, ~tidyr::replace_na(.x, 0))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable_sans_na <- copy(donnees_datatable)
-setnafill(donnees_datatable[, .SD, .SDcols = is.numeric], fill = 0)
-# Autre solution
-donnees_datatable_sans_na <- copy(donnees_datatable)
-cols <- colnames(donnees_datatable_sans_na[, .SD, .SDcols = is.numeric])
-donnees_datatable_sans_na[, (cols) := lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = cols]
-# Ensemble des colonnes
-donnees_datatable_sans_na <- copy(donnees_datatable)
-donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
+dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -263,52 +69,125 @@ donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
 
 :::
 
-## Remplacer les valeurs manquantes d'une seule variable par 0 
+## Passer d'une base en largeur (wide) à une base en longueur (long) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-%let var = note_contenu;
-data donnees_sas_sans_missing;
-  set donnees_sas;
-  if missing(&var.) then &var. = 0;
-  /* Ou alors */
-  if &var. = . then &var. = 0;
-  /* Ou encore */
-  if note_contenu = . then note_contenu = 0;
+%let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
+proc sort data = donnees_sas;by identifiant;run;
+proc means data = donnees_sas mean noprint;var &notes.;output out = Temp;by identifiant;run;
+data Wide;
+  set Temp (where = (_STAT_ = "MEAN") drop = _TYPE_ _FREQ_);
+  keep identifiant &notes.;
+  drop _STAT_;
+run;
+
+/* On passe de Wide à Long */
+proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On souhaite mettre les notes en ligne et non en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+wide_rbase <- aggregate(donnees_rbase[, varNotes], donnees_rbase[, "identifiant", drop = FALSE], mean, na.rm = TRUE)
+long_rbase <- reshape(data = wide_rbase,
+                      varying = varNotes,
+                      v.names = "notes",
+                      timevar = "type_note",
+                      times = varNotes,
+                      new.row.names = NULL,
+                      direction = "long")
+long_rbase <- long_rbase[order(long_rbase$identifiant), ]
+row.names(long_rbase) <- NULL
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On souhaite mettre les notes en ligne et non en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+wide_tidyverse <- donnees_tidyverse %>% 
+  group_by(identifiant) %>% 
+  summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE)))
+# On l'exprime en format long
+# Mise en garde : ne pas écrire value_to !
+long_tidyverse <- wide_tidyverse %>% 
+  pivot_longer(cols = !identifiant,
+               names_to = "type_note",
+               values_to = "note") %>% 
+  arrange(type_note, identifiant)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On souhaite mettre les notes en ligne et non en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = identifiant, .SDcols = varNotes]
+long_datatable <- melt(wide_datatable,
+                       id.vars = c("identifiant"),
+                       measure.vars = varNotes,
+                       variable.name = "type_note",
+                       value.name = "note")
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Passer d'une base en longueur (long) à une base en largeur (wide) 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On souhaite mettre les notes en ligne et non en colonne */
+/* On commence par calculer les notes moyennes par identifiant */
+%let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
+proc sort data = donnees_sas;by identifiant;run;
+proc means data = donnees_sas mean noprint;var &notes.;output out = Temp;by identifiant;run;
+data Wide;
+  set Temp (where = (_STAT_ = "MEAN") drop = _TYPE_ _FREQ_);
+  keep identifiant &notes.;
+  drop _STAT_;
+run;
+
+/* On passe de Wide à Long */
+proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
+data Long;set Long (rename = (_NAME_ = Type_Note COL1 = Note));run;
+/* On passe de Long à Wide */
+proc transpose data = Long out = Wide;
+  by Identifiant;
+  var Note;
+  id Type_Note;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na[, variable][is.na(donnees_rbase_sans_na[, variable])] <- 0
-donnees_rbase_sans_na[, variable] <- replace(donnees_rbase_sans_na[, variable],
-                                             is.na(donnees_rbase_sans_na[, variable]), 0)
-# Ou alors
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na$note_contenu[is.na(donnees_rbase_sans_na$note_contenu)] <- 0
+# Passer de long à wide : on souhaite revenir à la situation initiale
+wide_rbase <- reshape(long_rbase,
+                      timevar = "type_note",
+                      idvar = c("identifiant", "id"),
+                      direction = "wide")
+#https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(variable,  ~tidyr::replace_na(.x, 0)))
-# Ou alors
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(note_contenu = tidyr::replace_na(note_contenu, 0))
+# Passer de long à wide : on souhaite revenir à la situation initiale
+# Mise en garde : ne pas écrire value_from !
+wide_tidyverse <- pivot_wider(long_tidyverse, 
+                              names_from = type_note,
+                              values_from = note)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = variable]
-donnees_datatable[, lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
-donnees_datatable[, lapply(.SD, \(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
-# Ou alors
-donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
+wide_datatable <- dcast(long_datatable, identifiant ~ type_note, value.var = "note")
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

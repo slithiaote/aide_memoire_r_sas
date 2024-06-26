@@ -3,54 +3,131 @@
 Pour en savoir plus sur le fonctionnement des chaînes de caractères en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_textuelles.html>.
 
 ## Majuscule, minuscule 
+
+### Majuscule
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas;
+  set donnees_sas;
+  CSP_majuscule = upcase(CSPF);
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(csp_maj = toupper(cspf))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, csp_maj := toupper(cspf)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Minuscule
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas;
+  set donnees_sas;
+  CSP_minuscule = lowcase(CSPF);
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(csp_maj = tolower(cspf))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# En minuscule
+donnees_datatable[, csp_min := tolower(cspf)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Première lettre en majuscule
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas;
+  set donnees_sas;
+  Niveau = propcase(Niveau);
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1ère lettre en majuscule, autres lettres en minuscule
+donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1ère lettre en majuscule, autres lettres en minuscule
+donnees_tidyverse <- donnees_tidyverse %>%  
+  mutate(niveau = str_to_title(niveau))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1ère lettre en majuscule, autres lettres en minuscule
+donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(substr(niveau, 2, length(niveau))))]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Nombre de caractères dans une chaîne de caractères
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Fonction tranwrd (TRANslate WoRD) */
 data donnees_sas;
   set donnees_sas;
-  /* En majuscule */
-  CSP_majuscule = upcase(CSPF);
-  /* En minuscule */
-  CSP_minuscule = lowcase(CSPF);
-  /* Première lettre en majuscule */
-  Niveau = propcase(Niveau);
-  /* Nombre de caractères dans une chaîne de caractères */
   taille_id = length(identifiant);
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# En majuscule
-donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
-
-# En minuscule
-donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
-
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
-
-# Nombre de caractères dans une chaîne de caractères
 donnees_rbase$taille_id <- nchar(donnees_rbase$identifiant)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# En majuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = toupper(cspf))
-
-# En minuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = tolower(cspf))
-
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_tidyverse <- donnees_tidyverse %>%  
-  mutate(niveau = str_to_title(niveau))
-
-# Nombre de caractères dans une chaîne de caractères
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(taille_id = nchar(identifiant))
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -60,16 +137,6 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# En majuscule
-donnees_datatable[, csp_maj := toupper(cspf)]
-
-# En minuscule
-donnees_datatable[, csp_min := tolower(cspf)]
-
-# 1ère lettre en majuscule, autres lettres en minuscule
-donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(substr(niveau, 2, length(niveau))))]
-
-# Nombre de caractères dans une chaîne de caractères
 donnees_datatable[, taille_id := nchar(identifiant)]
 ```
 
@@ -151,6 +218,7 @@ data Exemple_chaines;
   set Exemple_chaines;
   
   /* Extraire les 2e, 3e et 4e caractère de Concatener */
+  /* Fonction tranwrd (TRANslate WoRD) */
   /* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
   extrait = substr(Concatener, 2, 3);
   
@@ -271,12 +339,14 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 
 :::
 
-## Découper une chaîne de caractères selon un caractère donné 
+## Découper une chaîne de caractères selon un caractère donné
+
+Découper une phrase selon les espaces pour isoler les mots.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots */
 data Mots;
   delim = " ";
   Texte = "Mon texte va être coupé !";
@@ -301,24 +371,18 @@ proc print data = Mots;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper uen chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
 chaine  <- "Mon texte va être coupé !"
 unlist(strsplit(chaine, split = " "))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper une chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
 chaine  <- "Mon texte va être coupé !"
 str_split(chaine, pattern = " ") %>% unlist()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Découper uen chaîne de caractères selon un caractère donné
-# Afficher tous les mots d'une phrase : découper une phrase selon les espaces pour isoler les mots
 chaine  <- "Mon texte va être coupé !"
 unlist(strsplit(chaine, split = " "))
 ```
