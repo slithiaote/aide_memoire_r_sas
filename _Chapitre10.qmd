@@ -961,7 +961,7 @@ donnees_datatable[, .(date_sortie, date_sortie__1)]
 :::
 
 
-## Transposition de bases bases
+## Transposition de bases
 
 ### Transposer une base 
 ::: {.panel-tabset group="language"}
@@ -1016,8 +1016,12 @@ nb_transpose <- nb %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Etablissement d'un tableau croisé comptant les occurrences
 nb <- donnees_datatable[, .N, by = list(cspf, sexef)]
+nb <- dcast(nb, cspf ~ sexef, value.var = "N")
+
 # On transpose le tableau
-data.table::dcast(nb, cspf ~ sexef, value.var = "N")
+transpose(nb, keep.names = "sexef", make.names = "cspf")
+# Autre solution
+dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
