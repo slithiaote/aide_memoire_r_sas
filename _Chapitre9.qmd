@@ -10,12 +10,12 @@ Pour en savoir plus sur le fonctionnement des chaînes de caractères en `R` : <
 /* Fonction tranwrd (TRANslate WoRD) */
 data donnees_sas;
   set donnees_sas;
-  /* Première lettre en majuscule */
-  Niveau = propcase(Niveau);
   /* En majuscule */
   CSP_majuscule = upcase(CSPF);
   /* En minuscule */
   CSP_minuscule = lowcase(CSPF);
+  /* Première lettre en majuscule */
+  Niveau = propcase(Niveau);
   /* Nombre de caractères dans une chaîne de caractères */
   taille_id = length(identifiant);
 run;
@@ -23,29 +23,33 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# En majuscule
+donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
+
+# En minuscule
+donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
+
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
 
-# En majuscule
-donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
-# En minuscule
-donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
 # Nombre de caractères dans une chaîne de caractères
 donnees_rbase$taille_id <- nchar(donnees_rbase$identifiant)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# En majuscule
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(csp_maj = toupper(cspf))
+
+# En minuscule
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(csp_maj = tolower(cspf))
+
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_tidyverse <- donnees_tidyverse %>%  
   mutate(niveau = str_to_title(niveau))
 
-# En majuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = toupper(cspf))
-# En minuscule
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(csp_maj = tolower(cspf))
 # Nombre de caractères dans une chaîne de caractères
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(taille_id = nchar(identifiant))
@@ -56,13 +60,15 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# En majuscule
+donnees_datatable[, csp_maj := toupper(cspf)]
+
+# En minuscule
+donnees_datatable[, csp_min := tolower(cspf)]
+
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(substr(niveau, 2, length(niveau))))]
 
-# En majuscule
-donnees_datatable[, csp_maj := toupper(cspf)]
-# En minuscule
-donnees_datatable[, csp_min := tolower(cspf)]
 # Nombre de caractères dans une chaîne de caractères
 donnees_datatable[, taille_id := nchar(identifiant)]
 ```
@@ -71,7 +77,6 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 
@@ -127,7 +132,6 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ```
 
-
 :::
 
 ## Manipuler des chaînes de caractères 
@@ -140,28 +144,35 @@ data Exemple_chaines;
   Texte1 = "Je m'appelle";
   Texte2 = "SAS";
   Texte3 = "Phrase à découper";
-  /* Valeur manquante sous forme caractère */
   Texte4 = "";
 run;
+
 data Exemple_chaines;
   set Exemple_chaines;
+  
+  /* Extraire les 2e, 3e et 4e caractère de Concatener */
+  /* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
+  extrait = substr(Concatener, 2, 3);
+  
   /* Enlever les blancs au début et à la fin de la chaîne de caractère */
   Enlever_Blancs_Initiaux = strip(Texte);
+  
   /* Enlever les doubles blancs dans la chaîne de caractères */
   Enlever_Blancs_Entre = compbl(Enlever_Blancs_Initiaux);
+  
   /* Enlever doubles blancs */
   /* REVOIR !!!!! */
   Enlever_Doubles_Blancs = compress(Texte, "  ", "t");
+  
   /* Trois méthodes pour concaténer des chaînes de caractères */
   Concatener  = Texte1||" "||Texte2;
   Concatener2 = Texte1!!" "!!Texte2;
   Concatener3 = catx(" ", Texte1, Texte2);
+  
   /* Effet des valeurs manquantes */
   /* Le séparateur est enlevé lors d'une concaténation avec une chaîne de caractère vide */
   Concatener4 = catx("-", Texte4, Texte3);
-  /* Extraire les 2e, 3e et 4e caractère de Concatener */
-  /* 2 correspond à la position du 1er caractère à récupérer, 3 le nombre total de caractères à partir du point de départ */
-  extrait = substr(Concatener, 2, 3);
+  
   /* Transformer plusieurs caractères différents */
   /* On transforme le é en e, le â en a, le î en i, ... */
   chaine = "éèêëàâçîô";
@@ -176,8 +187,11 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé          
 texte1 <- "Ce texte"
 texte2 <- "va être"
 texte3 <- "concaténé"
-# Valeur manquante sous forme caractère
 texte4 <- ""
+
+# Extraire les 2e, 3e et 4e caractères de Concatener
+# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
+extrait <- substr(concatene, 2, 5)
 
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 # "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
@@ -185,17 +199,12 @@ texte4 <- ""
 # trimws enlève les espaces au début et à la fin d'une chaîne de caractère 
 texte <- gsub("\\s+", " ", trimws(texte))
 
-
 # Concaténer des chaînes de caractères
 concatene <- paste(texte1, texte2, texte3, sep = " ")
 paste0(texte1, texte2, texte3)
 
 # Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
 paste(texte4, texte3, sep = "-")
-
-# Extraire les 2e, 3e et 4e caractères de Concatener
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- substr(concatene, 2, 5)
 
 # Transformer plusieurs caractères différents
 chaine <- "éèêëàâçîô"
@@ -208,8 +217,11 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé          
 texte1 <- "Ce texte"
 texte2 <- "va être"
 texte3 <- "concaténé"
-# Valeur manquante sous forme caractère
 texte4 <- ""
+
+# Extraire les 2e, 3e et 4e caractères de Concatener
+# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
+extrait <- str_sub(concatene, 2, 5)
 
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 # str_squish() supprime les espaces blancs au début et à la fin, et remplace tous les espaces blancs internes par un seul espace
@@ -221,10 +233,6 @@ concatene <- str_flatten(c(texte1, texte2, texte3), collapse = " ")
 # Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
 str_flatten(c(texte4, texte3), collapse = "-")
 
-# Extraire les 2e, 3e et 4e caractères de Concatener
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- str_sub(concatene, 2, 5)
-
 # Transformer plusieurs caractères différents
 chaine <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", chaine)
@@ -235,19 +243,20 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 texte  <- "              Ce   Texte   mériterait   d être   corrigé                  "
 texte1 <- "Je m'appelle"
 texte2 <- "R"
+
+# Extraire les 2e, 3e et 4e caractères de texte
+# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
+extrait <- substr(texte, 2, 5)
+
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 # "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
 # Le gsub remplace 1 ou plusieurs espaces successifs par un seul espace
 # trimws enlève les espaces au début et à la fin d'une chaîne de caractère 
 texte <- gsub("\\s+", " ", trimws(texte))
+
 # Concaténer des chaînes de caractères
 paste(texte1, texte2, sep = " ")
 paste0(texte1, texte2)
-
-
-# Extraire les 2e, 3e et 4e caractères de texte
-# 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
-extrait <- substr(texte, 2, 5)
 
 # Transformer plusieurs caractères différents
 chaine <- "éèêëàâçîô"
@@ -271,6 +280,7 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 data Mots;
   delim = " ";
   Texte = "Mon texte va être coupé !";
+  
   /* Chaque mot dans une variable */
   %macro Decouper;
     %do i = 1 %to %sysfunc(countw(Texte, delim));
@@ -278,6 +288,7 @@ data Mots;
 	%end;
   %mend Decouper;
   %Decouper;
+  
   /* Les mots empilés */
   nb_mots = countw(Texte, delim);
   do nb = 1 to nb_mots;
@@ -316,7 +327,6 @@ unlist(strsplit(chaine, split = " "))
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 

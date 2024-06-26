@@ -31,7 +31,7 @@ run;
 donnees_rbase$num_observation <- row.names(donnees_rbase)
 donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
 
-# Numéro du contrat de chaque individu, contrat trié par date de survenue
+# Numéro du contrat de chaque individu, contrat trié par date d'entrée
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
 donnees_rbase$un <- 1
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
@@ -59,7 +59,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   arrange(identifiant, !is.na(date_entree), date_entree) %>% 
   mutate(num_observation = row_number())
 
-# Numéro du contrat de chaque individu, contrat trié par date de survenue
+# Numéro du contrat de chaque individu, contrat trié par date d'entrée
 # arrange() va permettre de trier les observations par identifiant et date d'entrée 
 donnees_tidyverse <- donnees_tidyverse %>% 
   group_by(identifiant) %>% 
@@ -76,7 +76,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_datatable[, num_observation := .I]
 donnees_datatable[, num_observation := seq_len(.N)]
 
-# Numéro du contrat de chaque individu, contrat trié par date de survenue
+# Numéro du contrat de chaque individu, contrat trié par date d'entrée
 setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
 donnees_datatable[, numero_contrat := rowid(identifiant)]
 donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
