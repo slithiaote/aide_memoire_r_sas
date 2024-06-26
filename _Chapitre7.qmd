@@ -58,11 +58,13 @@ requete_duckdb %>% rename(sexe = sexe_red)
 ``` sas
 data Civilite;
   set donnees_sas;
-  /* 1ère solution */
+  
+  /* 1ère solution (if) */
   format Civilite $20.;
   if      Sexe = 2 then Civilite = "Mme";
   else if Sexe = 1 then Civilite = "Mr";
   else                  Civilite = "Inconnu";
+  
   /* 2e solution (do - end) */
   if      Sexe = 2 then do;
     Civilite2 = "Femme";
@@ -73,13 +75,15 @@ data Civilite;
   else do;
     Civilite2 = "Inconnu";
   end;
-  /* 3e solution */
+  
+  /* 3e solution (select) */
   format Civilite3 $20.;
   select;
     when      (Sexe = 2) Civilite3 = "Femme";
     when      (Sexe = 1) Civilite3 = "Homme";
     otherwise            Civilite3 = "Inconnu";
   end;
+  
   keep Sexe Civilite Civilite2 Civilite3;run;
 run;
 ```
@@ -89,7 +93,8 @@ run;
 donnees_rbase$civilite <- ifelse(donnees_rbase$sexe == "2", "Mme", 
                            ifelse(donnees_rbase$sexe == "1", "M", 
                                   "Inconnu"))
-# Autre solution
+
+# Autre solution (rapide)
 donnees_rbase$civilite <- "Inconnu"
 donnees_rbase$civilite[donnees_rbase$sexe == "1"] <- "M"
 donnees_rbase$civilite[donnees_rbase$sexe == "2"] <- "Mme"
