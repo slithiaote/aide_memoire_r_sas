@@ -1,5 +1,4 @@
-# Sélectionner des lignes et des colonnes 
-
+# Sélectionner des lignes et des colonnes
 
 ## Sélectionner de colonnes par position 
 ::: {.panel-tabset group="language"}
@@ -744,4 +743,5 @@ cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
 requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
 requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
 ```
+
 :::

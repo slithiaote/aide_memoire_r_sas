@@ -1,5 +1,4 @@
-# Importation des données 
-
+# Importation des données
 
 ## Mode d'emploi de l'aide-mémoire
 
@@ -374,11 +373,13 @@ Si cette option est valorisée à TRUE, les valeurs numériques précédées par
 
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
+
 ```
 
 :::

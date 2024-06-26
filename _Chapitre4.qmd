@@ -1,4 +1,4 @@
-# Informations sur la base de données 
+# Informations sur la base de données
 
 ## Avoir une vue d'ensemble des données 
 ::: {.panel-tabset group="language"}
@@ -481,7 +481,4 @@ grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
 
 ```
 
-
 :::
-
-

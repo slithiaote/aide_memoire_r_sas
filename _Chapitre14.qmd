@@ -1,6 +1,4 @@
-# Les doublons 
-
-
+# Les doublons
 
 ## Doublons pour toutes les colonnes 
 ::: {.panel-tabset group="language"}
@@ -367,6 +365,5 @@ uniqueN(donnees_datatable)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

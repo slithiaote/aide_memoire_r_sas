@@ -146,4 +146,5 @@ requete_duckdb %>%
     age >= 50 ~ "3. 50 ans ou plus")) %>% 
   select(age, agef)
 ```
+
 :::

@@ -1,6 +1,4 @@
-# Fin du programme 
-
-
+# Fin du programme
 
 ## Taille des objets en mémoire 
 ::: {.panel-tabset group="language"}
@@ -98,6 +96,5 @@ proc datasets lib = work nolist kill;run;
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

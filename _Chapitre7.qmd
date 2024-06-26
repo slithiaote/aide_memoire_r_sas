@@ -1,4 +1,4 @@
-# Manipuler des lignes et des colonnes 
+# Manipuler des lignes et des colonnes
 
 ## Renommer des variables 
 ::: {.panel-tabset group="language"}

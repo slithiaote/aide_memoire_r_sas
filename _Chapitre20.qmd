@@ -1,6 +1,4 @@
-# Débogage 
-
-
+# Débogage
 
 ## Outils d'aide au débogage 
 ::: {.panel-tabset group="language"}
@@ -61,6 +59,5 @@ options nosymbolgen nomprint nomlogic;
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

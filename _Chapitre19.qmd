@@ -1,6 +1,4 @@
-# Boucles 
-
-
+# Boucles
 
 ## Boucles imbriquées 
 ::: {.panel-tabset group="language"}
@@ -398,6 +396,5 @@ system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = 
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

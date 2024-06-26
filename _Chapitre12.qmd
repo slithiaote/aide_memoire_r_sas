@@ -1,6 +1,4 @@
-# Gestion par rangées de lignes 
-
-
+# Gestion par rangées de lignes
 
 ## Sélectionner les lignes avec au moins une note < 10 
 ::: {.panel-tabset group="language"}
@@ -325,6 +323,5 @@ donnees_datatable[, note_moyenne_pond := rowSums(mapply(FUN = `*`, .SD, ponderat
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

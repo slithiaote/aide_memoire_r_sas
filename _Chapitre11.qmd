@@ -1,6 +1,4 @@
-# Gestion par groupe 
-
-
+# Gestion par groupe
 
 ## Numéroter les lignes 
 ::: {.panel-tabset group="language"}
@@ -1157,6 +1155,5 @@ wide_datatable <- dcast(long_datatable, identifiant ~ type_note, value.var = "no
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

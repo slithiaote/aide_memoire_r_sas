@@ -1,6 +1,4 @@
-# Points de vigilance en `SAS` 
-
-
+# Points de vigilance en `SAS`
 
 ## Emploi des guillemets et double guillemets 
 ::: {.panel-tabset group="language"}
@@ -33,7 +31,6 @@
 ```{r, warning=FALSE, message=FALSE}
 # Sans objet en R
 ```
-
 
 :::
 
@@ -86,6 +83,5 @@
 ```{r, warning=FALSE, message=FALSE}
 # Sans objet en R
 ```
-
 
 :::

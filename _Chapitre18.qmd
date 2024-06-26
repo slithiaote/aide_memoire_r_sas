@@ -1,6 +1,4 @@
-# Statistiques agrégées par groupe 
-
-
+# Statistiques agrégées par groupe
 
 ## Une seule variable de groupement, une seule variable 
 ::: {.panel-tabset group="language"}
@@ -387,6 +385,5 @@ data.table::dcast(donnees_datatable, cspf ~ sexef + niveau, value.var = "note_co
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

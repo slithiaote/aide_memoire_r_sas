@@ -1,6 +1,4 @@
-# Préambule 
-
-
+# Préambule
 
 ## Chemin du bureau de l'utilisateur 
 ::: {.panel-tabset group="language"}
@@ -285,5 +283,5 @@ Les autres environnements (`R base`, `data.table`) peuvent aussi se présenter a
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-:::
 
+:::

@@ -1,6 +1,4 @@
-# Statistiques descriptives 
-
-
+# Statistiques descriptives
 
 ## Moyenne 
 ::: {.panel-tabset group="language"}
@@ -843,6 +841,5 @@ setNames(donnees_datatable[, lapply(methodes,
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

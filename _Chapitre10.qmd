@@ -1,6 +1,4 @@
-# Les tris 
-
-
+# Les tris
 
 ## Trier les colonnes de la base
 
@@ -369,6 +367,5 @@ tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

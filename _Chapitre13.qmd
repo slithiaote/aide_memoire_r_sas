@@ -1,6 +1,4 @@
-# Les valeurs manquantes 
-
-
+# Les valeurs manquantes
 
 ## Repérer les valeurs manquantes (variables Âge et Niveau) 
 ::: {.panel-tabset group="language"}
@@ -317,6 +315,5 @@ donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::

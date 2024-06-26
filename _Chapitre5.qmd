@@ -134,4 +134,5 @@ requete_duckdb %>%
   mutate_at(enDate, ~ as.Date(strptime(.,'%Y-%m-%d'))) %>% # strptime est une fonction duckdb
   select(enNumerique, enDate) %>% print(n=5)
 ```
+
 :::
