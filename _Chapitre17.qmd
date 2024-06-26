@@ -347,7 +347,7 @@ dim(fullJoin)
 
 :::
 
-## Jointure de 3 bases ou plus en une seule opération (inner join) 
+## Jointure de 3 bases ou plus en une seule opération (exemple avec inner join) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -376,7 +376,6 @@ proc sql;select count(*) from Inner_Join4;quit;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Via un inner join
 # Utilisation de la fonction Reduce
 # Elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
 innerJoin2 <- Reduce(function(x, y) merge(x, y, all = FALSE, by.x = "identifiant", by.y = "identifiant"),
@@ -386,7 +385,6 @@ dim(innerJoin2)
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Via un inner join
 # Utilisation de la fonction reduce de purrr
 # Elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
 innerJoin2 <- list(jointure_tidyverse, diplome_tidyverse, entrevue_tidyverse) %>% 
@@ -613,6 +611,7 @@ dim(antiJoin)
 antiJoin <- donnees_tidyverse %>% 
   anti_join(diplome_tidyverse, join_by(identifiant == identifiant))
 dim(antiJoin)
+
 # Autre solution
 antiJoin <- anti_join(donnees_tidyverse, diplome_tidyverse, join_by(identifiant == identifiant))
 dim(antiJoin)
@@ -633,27 +632,202 @@ dim(antiJoin)
 :::
 
 ## Autres fonctions utiles
+
+### Concaténation des identifiants
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Concaténation des identifiants */
   select Identifiant from Jointure union all
   select Identifiant from Diplome order by identifiant;
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# base:: permet de s'assurer que les fonctions proviennent de R base
+# Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
+# Concaténation des identifiants avec les doublons
+sort(c(jointure_rbase$identifiant, diplome_rbase$identifiant))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
+
+# Concaténation des identifiants
+dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
+  sort()
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
+# Concaténation des identifiants
+variable <- "identifiant"
+sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Identifiants uniques des 2 bases
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
   /* Identifiants uniques des 2 bases */
   select distinct Identifiant from
   (select distinct Identifiant from Jointure union select distinct Identifiant from Diplome)
   order by identifiant;
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# base:: permet de s'assurer que les fonctions proviennent de R base
+# Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
+
+# Identifiants uniques des 2 bases
+sort(base::union(jointure_rbase$identifiant, diplome_rbase$identifiant))
+sort(base::unique(c(jointure_rbase$identifiant, diplome_rbase$identifiant)))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
+
+# Identifiants uniques des 2 bases
+unique(dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant)) %>% 
+  sort()
+dplyr::union(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
+  sort()
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
+
+# Identifiants uniques des 2 bases
+sort(unique(c(jointure_datatable[[variable]], diplome_datatable[[variable]])))
+sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Identifiants communs des 2 bases
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
   /* Identifiants communs des 2 bases */
   select Identifiant from Jointure intersect select Identifiant from Diplome
   order by identifiant;
-  /* Identifiants dans jointure mais pas diplome */
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# base:: permet de s'assurer que les fonctions proviennent de R base
+# Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
+
+# Identifiants communs des 2 bases
+sort(base::intersect(jointure_rbase$identifiant, diplome_rbase$identifiant))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
+
+
+# Identifiants communs des 2 bases
+dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
+  sort()
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
+
+# Identifiants communs des 2 bases
+fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Identifiants dans Jointure mais pas Diplome
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
+  /* Identifiants dans Jointure mais pas Diplome */
   select distinct Identifiant from Jointure where
   Identifiant not in (select distinct Identifiant from Diplome)
   order by identifiant;
   select Identifiant from Jointure except select Identifiant from Diplome;
-  /* Identifiants dans diplome mais pas jointure */
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# base:: permet de s'assurer que les fonctions proviennent de R base
+# Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
+
+# Identifiants dans Jointure mais pas Diplome
+sort(base::setdiff(jointure_rbase$identifiant, diplome_rbase$identifiant))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
+
+# Identifiants dans Jointure mais pas Diplome
+dplyr::setdiff(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
+  sort()
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
+
+# Identifiants dans Jointure mais pas Diplome
+fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Identifiants dans Diplome mais pas Jointure
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
+  /* Identifiants dans Diplome mais pas Jointure */
   select distinct Identifiant from Diplome
   where Identifiant not in (select distinct Identifiant from Jointure)
   order by identifiant;
@@ -662,65 +836,33 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# base:: permet de s'assurer que les fonctions proviennent de R-Base
+# base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
-# Concaténation des identifiants avec les doublons
-sort(c(jointure_rbase$identifiant, diplome_rbase$identifiant))
-# Identifiants uniques des 2 bases
-sort(base::union(jointure_rbase$identifiant, diplome_rbase$identifiant))
-sort(base::unique(c(jointure_rbase$identifiant, diplome_rbase$identifiant)))
-# Identifiants communs des 2 bases
-sort(base::intersect(jointure_rbase$identifiant, diplome_rbase$identifiant))
-# Identifiants dans jointure mais pas diplome
-sort(base::setdiff(jointure_rbase$identifiant, diplome_rbase$identifiant))
-# Identifiants dans diplome mais pas jointure
+
+# Identifiants dans Diplome mais pas Jointure
 sort(base::setdiff(diplome_rbase$identifiant, jointure_rbase$identifiant))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
-# Concaténation des identifiants
-dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
-  sort()
-# Identifiants uniques des 2 bases
-unique(dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant)) %>% 
-  sort()
-dplyr::union(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
-  sort()
-# Identifiants communs des 2 bases
-dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
-  sort()
-# Identifiants dans jointure mais pas diplome
-dplyr::setdiff(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
-  sort()
-# Identifiants dans diplome mais pas jointure
+# Identifiants dans Diplome mais pas Jointure
 dplyr::setdiff(diplome_tidyverse$identifiant, jointure_tidyverse$identifiant) %>% 
   sort()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R-Base
+# Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
-# Concaténation des identifiants
-variable <- "identifiant"
-sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
-# Identifiants uniques des 2 bases
-sort(unique(c(jointure_datatable[[variable]], diplome_datatable[[variable]])))
-sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
-# Identifiants communs des 2 bases
-fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
-# Identifiants dans jointure mais pas diplome
-fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
-# Identifiants dans diplome mais pas jointure
+# Identifiants dans Diplome mais pas Jointure
 fsetdiff(diplome_datatable[, ..variable], jointure_datatable[, ..variable])[order(identifiant)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
