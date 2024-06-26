@@ -1,262 +1,109 @@
-# Boucles
+# Statistiques agrégées par groupe
 
-## Boucles imbriquées 
+## Une seule variable de groupement, une seule variable 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data _null_;call symput('annee', strip(year(today())));run;
-/* Ensemble des premiers jours de chaque mois entre 2020 et le 31 décembre de l'année courante */
-%macro Boucles_Imbriquees(an_debut, an_fin);
-  %local i j;
-  %global liste_mois;
-  %let liste_mois = ;
-  %do i = &an_debut. %to &an_fin.;
-    %do j = 1 %to 12;
-	  %let liste_mois = &liste_mois. %sysfunc(putn(%sysfunc(mdy(&j., 1, &i.)), ddmmyy10.));
-	%end;
-  %end;
-%mend Boucles_Imbriquees;
-%let annee = %sysfunc(year(%sysfunc(today())));
-%Boucles_Imbriquees(an_debut = 2020, an_fin = &annee.);
-%put &liste_mois.;
-```
+/* Moyenne de note_contenu et nombre de personnes */
 
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
-annee <- lubridate::year(Sys.Date())
-# 1ère solution avec for (lente, à déconseiller !)
-listeMois <- c()
-for (i in seq(2020, annee)) {
-  for (j in 1:12) {
-    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
-  }
-}
-# 2e  solution : 2 fonctions lapply imbriquées
-listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
-                                   function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
-                     origin = "1970-01-01")
-# 3e solution : expand.grid
-listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
-                                function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
-                          origin = "1970-01-01"))
-# 4e solution, la plus simple !
-seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
-```
+/* 1ère solution */
+proc sort data = donnees_sas;by cspf;run;
+proc means data = donnees_sas mean n;var note_contenu;class cspf;run;
 
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
-annee <- lubridate::year(Sys.Date())
-# 1ère solution : 2 fonctions map imbriquées
-listeMois <- purrr::map(seq(2020, annee), 
-                        function(x) purrr::map(1:12,
-                                               function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y)))) %>% 
-  unlist() %>% 
-  as.Date(, origin = "1970-01-01")
+/* 2e solution */
+proc tabulate data = donnees_sas;
+  var note_contenu;
+  class cspf;
+  table (cspf all = "Total"), note_contenu * (mean n);
+run;
 
-# 2e solution : expand_grid
-listeMois <- tidyr::expand_grid(annee = seq(2020, annee), mois = 1:12) %>% 
-  apply(1, function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))) %>% 
-  as.Date(, origin = "1970-01-01") %>% 
-  sort()
-
-# 3e solution, la plus simple
-seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
-annee <- lubridate::year(Sys.Date())
-# 1ère solution avec for (lente, à déconseiller !)
-listeMois <- c()
-for (i in seq(2020, annee)) {
-  for (j in 1:12) {
-    listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
-  }
-}
-# 2e  solution : 2 fonctions lapply imbriquées
-listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
-                                   function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
-                     origin = "1970-01-01")
-# 3e solution : expand.grid
-listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
-                                function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
-                          origin = "1970-01-01"))
-# 4e solution, la plus simple
-seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Boucles imbriquées (second exemple) 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Itérer sur toutes les années et les trimestres d'une certaine plage */
-/* on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 */
-%macro iteration(debut, fin);
-  %global liste_an;
-  %let liste_an = ;
-  %do i = &debut. %to &fin.;
-    %let liste_an = &liste_an.&i.-;
-  %end;
-%mend iteration;
-%iteration(debut = 2020, fin = %sysfunc(year(%sysfunc(today()))));
-%put &liste_an.;
-%let liste_trim = 1 2 3 4;
-%let liste_niv = max min;
-/* Supposons que nous ayons des noms de fichier suffixés par AXXXX_TY_NZ, avec X l'année, Y le trimestre et
-   Z max ou min. Par exemple, A2010_T2_NMax */
-/* Pour obtenir l'ensemble de ces noms de 2010 à cette année */
-%macro noms_fichiers(base = temp);
-  %global res;
-  %let res = ;
-  %do j = 1 %to %sysfunc(countw(&liste_an., "-"));
-    %let y = %scan(&liste_an., &j., "-"); /* année */
-    %do i = 1 %to 4;
-      %let t = %scan(&liste_trim, &i.); /* trimestre */
-      %do g = 1 %to 2;
-        %let n = %scan(&liste_niv., &g.); /* niveau */
-		%let res = &res. &base._&y._t&t._n&n.;
-	  %end;
-	%end;
-  %end;
-%mend noms_fichiers;
-%noms_fichiers(base = base);
-%put &res.;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Itérer sur toutes les années et les trimestres d'une certaine plage
-# on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
-debut <- 2020
-fin <- lubridate::year(Sys.Date())
-res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y)  sprintf("base_%4d_t%d_n%s", x, 1:4, y))))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Itérer sur toutes les années et les trimestres d'une certaine plage
-# on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
-debut <- 2020
-fin <- lubridate::year(Sys.Date())
-listeMois <- purrr::map(debut:fin, 
-                        function(x) purrr::map(c("max", "min"),
-                                               function(y) sprintf("base_%4d_t%d_n%s", x, 1:4, y))) %>% 
-                          unlist()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Itérer sur toutes les années et les trimestres d'une certaine plage
-# on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
-debut <- 2020
-fin <- lubridate::year(Sys.Date())
-res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y)  sprintf("base_%4d_t%d_n%s", x, 1:4, y))))
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Boucles for 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On va créer une base par année d'entrée */
-proc sql noprint;
-  select year(min(date_entree)), year(max(date_entree)) into :an_min, :an_max
-  from donnees_sas;
+/* 3e solution */
+proc sql;
+  select cspf, mean(note_contenu) as note_contenu_moyenne, count(*) as N
+  from donnees_sas
+  group by cspf
+  order by cspf;
 quit;
-%macro Base_par_mois(debut, fin);
-  /* %local impose que an n'est pas de signification hors de la macro */
-  %local an;
-  /* %global impose que nom_bases peut être utilisé en dehors de la macro */
-  %global nom_bases;
-  /* On initalise la création de la macri-variable nom_bases */
-  %let nom_bases = ;
-  /* On itère entre &debut. et &fin. */
-  %do an = &debut. %to &fin.;
-    data Entree_&an.;
-	  set donnees_sas;
-	  if year(date_entree) = &an.;
-	run;
-	/* On ajoute à la macro-variable le nom de la base */
-	%let nom_bases = &nom_bases. Entree_&an.;
-  %end;
-%mend Base_par_mois;
-%Base_par_mois(debut = &an_min., fin = &an_max.);
-%put &nom_bases.;
 
-/* On va désormais empiler toutes les bases (concaténation par colonne) */
-/* L'instruction set utilisée de cette façon permet cet empilement */
-data concatene;
-  set &nom_bases.;
+/* Avec la pondération */
+proc sort data = donnees_sas;by cspf;run;
+proc means data = donnees_sas mean n;
+  var note_contenu;class cspf;
+  weight poids_sondage;
+run;
+proc tabulate data = donnees_sas;
+  var note_contenu;
+  class cspf;
+  weight poids_sondage;
+  table (cspf all = "Total"), note_contenu * (mean n);
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va créer une base par année d'entrée
-anMin <- min(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
-anMax <- max(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
-for (i in anMin:anMax) {
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(paste("entree", i, sep = "_"), donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == i), ])
-}
-# On va désormais empiler toutes les bases (concaténation par colonne)
-# do.call applique la fonction rbind à l'ensemble des bases issues du lapply
-# get permet de faire le chemin inverse de assign
-concatene <- do.call(rbind, lapply(paste("entree", anMin:anMax, sep = "_"), get))
+# Moyenne de note_contenu et nombre de personnes
+aggregate(note_contenu ~ cspf, donnees_rbase, function(x) c(Moyenne = mean(x, na.rm = TRUE), Nombre = length(x)))
+
+# Moyenne de note_contenu
+# Une seule variable, une seule variable de groupe, une seule fonction
+aggregate(note_contenu ~ cspf, donnees_rbase, mean, na.rm = TRUE)
+
+# rowsum (à ne pas confondre avec rowSums) calcule des sommes, et uniquement des sommes
+rowsum(donnees_rbase$note_contenu, donnees_rbase$cspf, recorder = TRUE, na.rm = TRUE)
+
+# Fonctions tapply et by
+tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
+with(donnees_rbase, tapply(note_contenu, cspf, mean, na.rm = TRUE))
+tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
+by(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
+
+# Avec la pondération : tapply ne fonctionne pas, il faut découper la base en facteurs avec split
+sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) weighted.mean(x$note_contenu, x$poids_sondage, na.rm = TRUE))
+# À FAIRE : autre solution ?
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : problème pour les entrées où la date est manquante
-# On va créer une base par année d'entrée
-anMin <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% min(na.rm = TRUE)
-anMax <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% max(na.rm = TRUE)
-for (i in anMin:anMax) {
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(paste("entree", i, sep = "_"),
-         donnees_tidyverse %>% filter(lubridate::year(date_entree) == as.name(i)))
-}
-# On va désormais empiler toutes les bases (concaténation par colonne)
-# purrr::reduce applique la fonction bind_rows à l'ensemble des bases issues du purrr::map
-# get permet de faire le chemin inverse de assign
-concatene <- purrr::map(paste("entree", anMin:anMax, sep = "_"), get) %>% 
-  purrr::reduce(bind_rows)
+# Moyenne de note_contenu et nombre de personnes
+donnees_tidyverse %>% 
+  group_by(cspf) %>% 
+  summarise(Nombre = n(), Moyenne = mean(note_contenu, na.rm = TRUE))
+# Ou alors :
+summarise(Nombre = n(), Moyenne = mean(note_contenu, na.rm = TRUE), .by = cspf)
+
+# Moyenne de note_contenu
+# Une seule variable, une seule variable de groupe, une seule fonction
+donnees_tidyverse %>% 
+  group_by(cspf) %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE), .by = cspf)
+
+# Avec la pondération
+donnees_tidyverse %>% 
+  group_by(cspf) %>% 
+  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE), .by = cspf)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va créer une base par année d'entrée
-anMin <- min(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
-anMax <- max(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
-for (i in anMin:anMax) {
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(paste("entree", i, sep = "_"), donnees_datatable[lubridate::year(donnees_datatable$date_entree) == i, ])
-}
-# On va désormais empiler toutes les bases (concaténation par colonne)
-# do.call applique la fonction rbind à l'ensemble des bases issues du lapply
-# get permet de faire le chemin inverse de assign
-concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
+# Moyenne de note_contenu et nombre de personnes
+donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), by = cspf]
+donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), keyby = "cspf"]
+
+# Variables définies à part
+varNotes <- "note_contenu"
+var_groupe <- "cspf"
+# À FAIRE : les deux variables sont empilées, pourquoi ??
+donnees_datatable[, lapply(.SD, function(x) list(moyenne = mean(x, na.rm = TRUE), n = length(x))), keyby = var_groupe,
+                  .SDcols = varNotes]
+
+# Avec la pondération
+donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), keyby = var_groupe,
+                  .SDcols = varNotes]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -267,88 +114,94 @@ concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
 
 :::
 
-## Boucles for (second exemple) 
+## Plusieurs variables 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On recherche toutes les valeurs de CSP différentes et on les met dans une variable.
-   On appelle la proc SQL :
-   - utilisation du quit et non run à la fin
-   - on récupère toutes les valeurs différentes de CSP, séparés par un espace (separated by)
-   - s'il y a un espace dans les noms, on le remplace par _ 
-   - on les met dans la macro-variable liste_csp
-   - on trier la liste par valeur de CSP */
-/* On crée une variable de CSP formaté sans les accents et les espaces */
-data donnees_sas;
-  set donnees_sas;
-  /* SAS ne pourra pas créer des bases de données avec des noms accentués */
-  /* On supprime dans le nom les lettres accentués. On le fait avec la fonction Translate */
-  CSPF2 = tranwrd(strip(CSPF), " ", "_");
-  CSPF2 = translate(CSPF2, "eeeeaacio", "éèêëàâçîô");
+%let var_notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
+%let var_groupe = cspf sexef;
+proc sort data = donnees_sas;by &var_groupe.;run;
+proc means data = donnees_sas mean n;
+  class &var_groupe.;
+  var &var_notes.;
+  output out = Resultat;
 run;
 
-/* Boucles et macros en SAS */
-/* Les boucles ne peuvent être utilisées que dans le cadre de macros */
-/* Ouverture de la macro */
-%macro Boucles(base = donnees_sas, var = CSPF2);
-  /* Les modalités de la variable */
-  proc sql noprint;select distinct &var. into :liste separated by " " from &base. order by &var.;quit;
-  /* On affiche la liste de ces modalités */
-  %put &liste.;
-  /* %let permet à SAS d'affecter une valeur à une variable en dehors d'une manipulation de base de données */
-  /* %sysfunc indique à SAS qu'il doit utiliser la fonction countw dans le cadre d'une macro (pas important) */
-  /* countw est une fonction qui compte le nombre de mots (séparés par un espace) d'une chaîne de caractères */
-  /* => on compte le nombre de CSP différentes */
-  %let nb = %sysfunc(countw(&liste.));
-  %put Nombre de modalités différentes : &nb.;
-  /* On itère pour chaque CSP différente ... */
-  %do i = 1 %to &nb.;
-    /* %scan : donne le i-ème mot de &liste. (les mots sont séparés par un espace) */
-    /* => on récupère donc la CSP numéro i */
-    %let j = %scan(&liste., &i.);
-	%put Variable : &j.;
-	/* On crée une base avec seulement les individus de la CSP correspondante */
-	data &var.;set donnees_sas;if &var. = "&j.";run;
+/* Autre solution */
+%macro sel;
+  %global select;
+  %local i j;
+  %let select = ;
+  %do i = 1 %to %sysfunc(countw(&var_notes.));
+    %let j = %scan(&var_notes., &i., %str( ));
+	%let select = &select. mean(&j) as &j._moyenne,;
   %end;
-/* Fermeture de la macro */
-%mend Boucles;
-/* Lancement de la macro */
-%Boucles(base = donnees_sas, var = CSPF2);
+%mend sel;
+%sel;
+
+%let group = %sysfunc(tranwrd(&var_groupe., %str( ), %str(, )));
+proc sql;
+  select &group., &select. count(*) as N
+  from donnees_sas
+  group by &group.
+  order by &group.;
+quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Base par CSP
-for (i in unique(donnees_rbase$cspf)) {
-  # Met en minuscule et enlève les accents
-  nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(nomBase, donnees_rbase[which(donnees_rbase$cspf == i), ])
-}
+# Plusieurs solutions avec aggregate (plutôt lent)
+aggregate(note_contenu ~ cspf + sexef, donnees_rbase, function(x) c(mean = mean(x), n = length(x)))
+aggregate(cbind(note_contenu, note_materiel) ~ cspf + sexef, donnees_rbase, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x)))
+
+# Via les formules
+variable <- c("note_contenu")
+varGroupement <- c("cspf", "sexef")
+formule <- as.formula(paste(variable, paste(varGroupement, collapse = " + "), sep = " ~ "))
+aggregate(formule, donnees_rbase, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x)))
+
+# Avec by
+by(donnees_rbase[, variable], donnees_rbase[, varGroupement], function(x) c(mean = mean(x, na.rm = TRUE), n = length(x)))
+
+# Avec rowsum (à ne pas confondre avec rowSums) : on ne peut calculer que la somme
+rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], sep = "_", lex.order = TRUE))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Base par CSP
-for (i in donnees_tidyverse %>% distinct(cspf) %>% pull()) {
-  # Met en minuscule et enlève les accents
-  nomBase <- chartr("éèêëàâçîô", "eeeeaacio", i) %>% tolower()
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(nomBase, donnees_tidyverse %>% 
-           filter(cspf == as.name(i)))
-}
+donnees_tidyverse %>% 
+  group_by(cspf, sexef) %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE), n = n())
+
+# Autre solution : l'ordre des modalités est modifié
+donnees_tidyverse %>% 
+  summarise(Moyenne = mean(note_contenu, na.rm = TRUE), n = n(), .by = c(cspf, sexef))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Créer une base pour chaque individu d'une certaine CSP
-for (i in unique(donnees_datatable$cspf)) {
-  # Met en minuscule et enlève les accents
-  nomBase <- tolower(chartr("éèêëàâçîô", "eeeeaacio", i))
-  # assign permet de faire passer une chaîne de caractères en variable R
-  assign(nomBase, donnees_datatable[donnees_datatable$cspf == i, ])
-}
+donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), keyby = c("cspf", "sexef")]
+
+# Autre solution
+data.table::dcast(donnees_datatable, cspf + sexef ~ ., value.var = "note_contenu", fun.aggregate = mean, na.rm = TRUE)
+
+# Variables définies à part
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+var_groupe <- c("cspf", "sexef")
+# À FAIRE : les deux variables sont empilées, pourquoi ??
+donnees_datatable[, lapply(.SD, function(x) list(moyenne = mean(x, na.rm = TRUE), n = length(x))),
+                  keyby = var_groupe,
+                  .SDcols = varNotes]
+
+# Nombre de femmes par CSP
+# Il y a un recycling de gender = "M", utile de le mentionner
+donnees_datatable[, .(Femmes = sum(sexef == "Femme", na.rm = TRUE), Hommes = sum(sexef == "Homme", na.rm = TRUE)), by = .(cspf)]
+
+# À FAIRE :
+# Exemple avec les variables dans .SDcols
+# data.table::setDT(DF)[, lapply(.SD, mean, na.rm = TRUE), .SDcols = c("x", "y"), by = list(g, h)]
+# D'autres variations (par exemple, c(x, y) ou list("x", "y") ne fonctionnent pas !)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -359,37 +212,173 @@ for (i in unique(donnees_datatable$cspf)) {
 
 :::
 
-## Autres transcriptions de fonctions SAS vers R 
+## Tableaux croisés à 2 variables de groupement 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* À FAIRE */
+proc tabulate data = donnees_sas;
+  class cspf sexef;
+  var note_contenu;
+  table (cspf all = "Ensemble"), sexef * (note_contenu) * mean;
+run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+# Tableau croisé Cspf par Sexef
+varGroupement <- c("cspf", "sexef")
+variable <- c("note_contenu")
+
+# Solution avec tapply
+tapply(donnees_rbase[, variable], donnees_rbase[varGroupement], function(x) moyenne = mean(x, na.rm = TRUE))
+
+# Solution avec xtabs
+xtabs(note_contenu ~ cspf + sexef, aggregate(note_contenu ~ cspf + sexef, data = donnees_rbase, FUN = mean, na.rm = TRUE))
+# Ou, sous forme de formule
+formule <- as.formula(paste(variable, paste(varGroupement, collapse = " + "), sep = " ~ "))
+xtabs(formule, aggregate(formule, data = donnees_rbase, FUN = mean, na.rm = TRUE))
+
+# Solution avec aggregate, en calculant un tableau "long" et en le transformant en "wide"
+tableau <- aggregate(note_contenu ~ cspf + sexef, data = donnees_rbase, FUN = mean, na.rm = TRUE)
+tableau <- reshape(tableau, 
+        timevar = varGroupement[2],
+        idvar = varGroupement[1],
+        direction = "wide")
+tableau[is.na(tableau)] <- 0
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(donnees_tidyverse <- donnees_tidyverse %>% 
-              arrange(identifiant, date_entree))
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+# Tableau croisé Cspf par Sexef
+varGroupement <- c("cspf", "sexef")
+variable <- c("note_contenu")
+donnees_tidyverse %>% 
+  group_by(across(all_of(varGroupement))) %>% 
+  summarise(across(all_of(variable), ~ mean(.x, na.rm = TRUE), .names = "Moyenne")) %>% 
+  spread(varGroupement[2], Moyenne)
+
+# Autre solution
+donnees_tidyverse %>% 
+  group_by(!!!syms(varGroupement)) %>% 
+  summarise(Moyenne = mean(.data[[variable]], na.rm = TRUE)) %>% 
+  spread(varGroupement[2], Moyenne)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+# Tableau croisé Cspf par Sexef
+varGroupement <- c("cspf", "sexef")
+variable <- "note_contenu"
+data.table::dcast(donnees_datatable, cspf ~ sexef, value.var = "note_contenu", fun.aggregate = mean, na.rm = TRUE)
+
+# Avec références seulement
+data.table::dcast(donnees_datatable, get(varGroupement[1]) ~ get(varGroupement[2]), value.var = variable,
+                  fun.aggregate = mean, na.rm = TRUE)
+
+# Autre solution, plus indirecte
+# À FAIRE : attention, toujours utiliser lapply, même avec une seule variable ! LE DIRE !!!
+tab <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = varGroupement, .SDcols = "note_contenu"]
+data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var = variable)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Tableaux croisés à 3 variables de groupement ou plus : 1 variable en ligne, 2 en colonne 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Notes par croisement de CSP (en ligne) et de Sexe x Niveau */
+%let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
+proc tabulate data = donnees_sas;
+  class cspf sexef;
+  var &notes.;
+  table (cspf all = "Ensemble"), sexef * (&notes.) * mean;
+run;
+
+/* Note_contenu par croisement de CSP (en ligne) et de Sexe x Niveau */
+proc tabulate data = donnees_sas;
+  class cspf sexef Niveau;
+  var note_moyenne;
+  table (cspf all = "Ensemble"), (sexef * Niveau) * (note_moyenne) * mean;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+var_groupe <- c("cspf", "sexef")
+
+tableau <- aggregate(donnees_rbase[, varNotes], donnees_rbase[var_groupe], function(x) moyenne = mean(x, na.rm = TRUE))
+reshape(tableau, 
+        timevar = var_groupe[2],
+        idvar = var_groupe[1],
+        direction = "wide")
+
+# 2e exemple : CSPF en ligne, et croisement Sexe x Qualifié en colonne, note_contenu sommée
+# À FAIRE : proposer une fonction ?
+formule <- as.formula("note_contenu ~ cspf + sexef + niveau")
+tab <- xtabs(formule, aggregate(formule, data = donnees_rbase, FUN = mean, na.rm = TRUE))
+nomsCol <- do.call(paste, c(expand.grid(dimnames(tab)[-1L]), sep = "_"))
+nomsLig <- dimnames(tab)[[1L]]
+# Transformation du tableau de résultats (en format array) vers un format matrix, puis dataframe
+# Permet d'exprimer le array (matrice multidimensionnelle) en un tableau à deux dimensions
+# On transforme le tableau en matrice ayant en nombre de lignes dim(tab)[1], c'est-à-dire le nombre de lignes du array
+# et en nombre de colonnes le reste des variables
+tab <- data.frame(matrix(tab, nrow = dim(tab)[1L]))
+# Renommage des noms des colonnes de la base
+colnames(tab) <- nomsCol
+# Renommage des noms des lignes de la base
+row.names(tab) <- nomsLig
+# On annule les valeurs manquantes
+tab[is.na(tab)] <- 0
+tab
+# À FAIRE : développer autour de cet exemple
+# Avec 3 variables
+xtabs(cbind(note_contenu, note_materiel) ~ cspf + sexef, donnees_rbase)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+var_groupe <- c("cspf", "sexef")
+donnees_tidyverse %>% 
+  group_by(across(all_of(var_groupe))) %>% 
+  summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE))) %>% 
+  pivot_wider(names_from = sexef,
+              values_from = all_of(varNotes))
+
+# 2e exemple : CSPF en ligne, et croisement Sexe x Qualifié en colonne, note_contenu sommée
+varNotes <- c("note_contenu")
+var_groupe <- c("cspf", "sexef", "niveau")
+donnees_tidyverse %>% 
+  group_by(across(all_of(var_groupe))) %>% 
+  summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE))) %>% 
+  pivot_wider(names_from = c(sexef, niveau),
+              values_from = all_of(varNotes),
+              values_fill = 0)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+var_groupe <- c("cspf", "sexef")
+data.table::dcast(donnees_datatable, get(varGroupement[1]) ~ get(varGroupement[2]), value.var = varNotes,
+                  fun.aggregate = mean, na.rm = TRUE)
+
+# 2e exemple : CSPF en ligne, et croisement Sexe x Qualifié en colonne, note_contenu sommée
+data.table::dcast(donnees_datatable, cspf ~ sexef + niveau, value.var = "note_contenu",
+                  fun.aggregate = mean, na.rm = TRUE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

@@ -203,7 +203,7 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ## Manipuler des chaînes de caractères
 
-### Textes qui vont être modifiés
+### Textes sur lesquels les fonctions seront appliquées
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}

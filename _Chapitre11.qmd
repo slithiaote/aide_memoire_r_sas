@@ -871,9 +871,7 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 ```
 
-
 :::
-
 
 ## Variable retardée (lag) 
 ::: {.panel-tabset group="language"}
