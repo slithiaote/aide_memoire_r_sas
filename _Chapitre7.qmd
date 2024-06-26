@@ -1,7 +1,5 @@
 # Manipuler des lignes et des colonnes 
 
-
-
 ## Renommer des variables 
 ::: {.panel-tabset group="language"}
 
@@ -52,6 +50,73 @@ requete_duckdb %>% rename(sexe_red = sexe)
 requete_duckdb %>% rename(sexe = sexe_red)
 ```
 :::
+
+## Créer des variables avec des conditions 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+data Civilite;
+  set donnees_sas;
+  /* 1ère solution */
+  format Civilite $20.;
+  if      Sexe = 2 then Civilite = "Mme";
+  else if Sexe = 1 then Civilite = "Mr";
+  else                  Civilite = "Inconnu";
+  /* 2e solution (do - end) */
+  if      Sexe = 2 then do;
+    Civilite2 = "Femme";
+  end;
+  else if Sexe = 1 then do;
+    Civilite2 = "Homme";
+  end;
+  else do;
+    Civilite2 = "Inconnu";
+  end;
+  /* 3e solution */
+  format Civilite3 $20.;
+  select;
+    when      (Sexe = 2) Civilite3 = "Femme";
+    when      (Sexe = 1) Civilite3 = "Homme";
+    otherwise            Civilite3 = "Inconnu";
+  end;
+  keep Sexe Civilite Civilite2 Civilite3;run;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase$civilite <- ifelse(donnees_rbase$sexe == "2", "Mme", 
+                           ifelse(donnees_rbase$sexe == "1", "M", 
+                                  "Inconnu"))
+# Autre solution
+donnees_rbase$civilite <- "Inconnu"
+donnees_rbase$civilite[donnees_rbase$sexe == "1"] <- "M"
+donnees_rbase$civilite[donnees_rbase$sexe == "2"] <- "Mme"
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(civilite = case_when(sexe == "2" ~ "Mme",
+                              sexe == "1" ~ "M",
+                              TRUE        ~ "Inconnu")
+)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
+                                      sexe == "1", "M.",
+                                      is.na(sexe), "Inconnu")]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+:::
+
 ## Formater les modalités des valeurs 
 ::: {.panel-tabset group="language"}
 
@@ -118,7 +183,11 @@ requete_duckdb %>%
 ```
 
 :::
-## Utiliser les formats 
+
+## Utiliser les formats
+
+Nécessite le lancement des formats à l'étape précédente.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -184,6 +253,7 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 
 ```
 :::
+
 ## Transformer le format d'une variable
 ::: {.panel-tabset group="language"}
 
@@ -253,7 +323,8 @@ donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 ```
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
-## Création et suppressions de plusieurs variables 
+
+## Créer, et supprimer plusieurs variables 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -354,6 +425,7 @@ requete_duckdb %>%
 
 ```
 :::
+
 ## On souhaite réexprimer toutes les notes sur 100 et non sur 20 
 ::: {.panel-tabset group="language"}
 
@@ -432,71 +504,7 @@ requete_duckdb %>%
   select(starts_with("note"))
 ```
 :::
-## Création de variables avec des conditions 
-::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
-``` sas
-data Civilite;
-  set donnees_sas;
-  /* 1ère solution */
-  format Civilite $20.;
-  if      Sexe = 2 then Civilite = "Mme";
-  else if Sexe = 1 then Civilite = "Mr";
-  else                  Civilite = "Inconnu";
-  /* 2e solution (do - end) */
-  if      Sexe = 2 then do;
-    Civilite2 = "Femme";
-  end;
-  else if Sexe = 1 then do;
-    Civilite2 = "Homme";
-  end;
-  else do;
-    Civilite2 = "Inconnu";
-  end;
-  /* 3e solution */
-  format Civilite3 $20.;
-  select;
-    when      (Sexe = 2) Civilite3 = "Femme";
-    when      (Sexe = 1) Civilite3 = "Homme";
-    otherwise            Civilite3 = "Inconnu";
-  end;
-  keep Sexe Civilite Civilite2 Civilite3;run;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$civilite <- ifelse(donnees_rbase$sexe == "2", "Mme", 
-                           ifelse(donnees_rbase$sexe == "1", "M", 
-                                  "Inconnu"))
-# Autre solution
-donnees_rbase$civilite <- "Inconnu"
-donnees_rbase$civilite[donnees_rbase$sexe == "1"] <- "M"
-donnees_rbase$civilite[donnees_rbase$sexe == "2"] <- "Mme"
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>%
-  mutate(civilite = case_when(sexe == "2" ~ "Mme",
-                              sexe == "1" ~ "M",
-                              TRUE        ~ "Inconnu")
-)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
-                                      sexe == "1", "M.",
-                                      is.na(sexe), "Inconnu")]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-:::
 ## Manipuler les dates 
 ::: {.panel-tabset group="language"}
 
@@ -574,7 +582,6 @@ donnees_tidyverse <- donnees_tidyverse %>%
     age >= 50            ~ "3. 50 ans ou plus")
     )
 
-
 # Manipuler les dates
 sixmois <- 365.25/2
 # La durée du contrat est-elle inférieure à 6 mois ?
@@ -643,6 +650,7 @@ requete_duckdb %>%
   select(age, agef)
 ```
 :::
+
 ## Mettre un 0 devant un nombre 
 ::: {.panel-tabset group="language"}
 

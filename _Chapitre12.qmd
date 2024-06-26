@@ -1,49 +1,201 @@
-# Les valeurs manquantes 
+# Gestion par rangées de lignes 
 
 
 
-## Repérer les valeurs manquantes (variables Âge et Niveau) 
+## Sélectionner les lignes avec au moins une note < 10 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data Missing;
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data Note_Inferieure_10;
+  set donnees_sas;
+  %macro Inf10;
+    %global temp;
+	%let temp = ;
+    %do i = 1 %to %sysfunc(countw(&notes.));
+      %let j = %scan(&notes., &i.);
+	  &j._inf_10 = (&j. < 10 and not missing(&j.));
+	  %let temp = &temp. &j._inf_10;
+    %end;
+  %mend Inf10;
+  %Inf10;
+  if sum(of &temp.) >= 1;
+  drop &temp.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) any(x < 10, na.rm = TRUE)), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_tidyverse %>%
+  filter(if_any(varNotes, ~ .x < 10))
+# Autre solution
+donnees_tidyverse %>%
+  filter_at(varNotes, any_vars(. < 10))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+note_moins_10 <- donnees_datatable[donnees_datatable[, .I[rowSums(.SD < 10, na.rm = TRUE) >= 1], .SDcols = varNotes]]
+# Autre solution
+# Le Reduce(`|`, ...) permet d'appliquer la condition | (ou) à tous les élements de la ligne, qui sont une vérification d'un nb < 10
+note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `<`, 10)), .SDcols = varNotes]]
+
+# https://arelbundock.com/posts/datatable_rowwise/
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Sélectionner les lignes avec toutes les notes supérieurs à 10 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data Note_Sup_10;
+  set donnees_sas;
+  %macro Inf10;
+    %global temp;
+	%let temp = ;
+    %do i = 1 %to %sysfunc(countw(&notes.));
+      %let j = %scan(&notes., &i.);
+	  &j._sup_10 = (&j. >= 10);
+	  %let temp = &temp. &j._sup_10;
+    %end;
+  %mend Inf10;
+  %Inf10;
+  a = sum(of &temp.);
+  b = %sysfunc(countw(&notes.));
+  if sum(of &temp.) = %sysfunc(countw(&notes.));
+  drop &temp.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+# À FAIRE : REVOIR LE PB DES VALEURS MANQUANTES !!!!
+donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) all(x >= 10, na.rm = TRUE)), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_tidyverse %>%
+  filter(if_all(varNotes, ~ . >= 10))
+# Autre solution
+donnees_tidyverse %>%
+  filter_at(varNotes, all_vars(. >= 10))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+note_sup_10 <- donnees_datatable[
+  donnees_datatable[, .I[rowSums(.SD >= 10, na.rm = TRUE) == length(varNotes)], .SDcols = varNotes]]
+# Autre solution
+note_sup_10 <- donnees_datatable[donnees_datatable[, Reduce(`&`, lapply(.SD, `>=`, 10)), .SDcols = varNotes]]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Moyenne par ligne 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data donnees_sas;
   set donnees_sas;
   /* 1ère solution */
-  if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
-  /* 2e solution */
-  if age = . or Niveau = '' then missing2 = 1;else missing2 = 0;
-  keep Age Niveau Missing1 Missing2;
+  Note_moyenne    = mean(of &notes.);
+  /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
+  %macro List_comprehension;
+    Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
+	                      %let j = %scan(&notes., &i.);
+						  &j.
+						 %end;);;
+  %mend List_comprehension;
+  %List_comprehension;
 run;
+/* Note moyenne (moyenne des moyennes), non pondérée et pondérée */
+proc means data = donnees_sas mean;var Note_moyenne;run;
+proc means data = donnees_sas mean;var Note_moyenne;weight poids_sondage;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$manquant <- ifelse(is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), 1, 0)
-# Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[donnees_rbase$age == NA,  ]
-# Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[is.na(donnees_rbase$age), ]
+# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
+varNotes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+# apply permet d'appliquer une fonctions aux lignes (1) ou colonnes (2) d'un data.frame
+donnees_rbase$note_moyenne <- apply(donnees_rbase[, varNotes], 1, mean, na.rm = TRUE)
+# Autre possibilité
+donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, varNotes], na.rm = TRUE)
+# Note moyenne (moyenne des moyennes), non pondérée et pondérée
+mean(donnees_rbase$note_moyenne, na.rm = TRUE)
+weighted.mean(donnees_rbase$note_moyenne, donnees_rbase$poids_sondage, na.rm = TRUE)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
+varNotes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+# Codes à privilégier
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(note_moyenne = rowMeans(pick(all_of(varNotes)), na.rm = TRUE))
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
+# Alternative très lente !
+# Noter l'utilisation de c_across pour traiter automatiquement plusieurs variables
 donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(manquant = ifelse(is.na(age) | is.na(niveau), 1, 0))
+  rowwise() %>% 
+  mutate(note_moyenne = mean(c_across(all_of(varNotes)), na.rm = TRUE)) %>% 
+  ungroup()
 
-# Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
-  filter(age == NA)
-# Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
-  filter(is.na(age))
+
+# Note moyenne (moyenne des moyennes) non pondérée
+donnees_tidyverse %>% pull(note_moyenne) %>% mean(na.rm = TRUE)
+donnees_tidyverse %>% summarise(Moyenne = mean(note_moyenne, na.rm = TRUE))
+# Note moyenne (moyenne des moyennes) pondérée
+donnees_tidyverse %>% summarise(Moyenne_ponderee = weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, manquant := fifelse(is.na(donnees_datatable$age) | is.na(donnees_datatable$niveau), 1, 0)]
-ageManquant <- donnees_datatable[age == NA] # Faux
-ageManquant <- donnees_datatable[is.na(age)] # Correct
+# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
+varNotes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
+# On souhaite moyenner les notes par formation
+donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNotes]
+# Manière alternative, qui ne semble pas fonctionner
+#donnees_datatable[, note_moyenne := Reduce(function(...) sum(..., na.rm = TRUE), .SD),
+#                  .SDcols = varNotes,
+#                  by = 1:nrow(donnees_datatable)]
+#donnees_datatable[, do.call(function(x, y) sum(x, y, na.rm = TRUE), .SD), .SDcols = varNotes, by = 1:nrow(donnees_datatable)]
+
+# Note moyenne (moyenne des moyennes), non pondérée et pondérée
+donnees_datatable[, mean(note_moyenne, na.rm = TRUE)]
+donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -54,80 +206,40 @@ ageManquant <- donnees_datatable[is.na(age)] # Correct
 
 :::
 
-## Nombre et proportion de valeurs manquantes par variable 
+## La note donnée est-elle supérieure à la moyenne ? 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Pour les variables numériques ou date */
-/* Partie "Missing Values" en bas du tableau consacré à la variable */
-proc univariate data = donnees_sas;var _numeric_;run;
-
-/* Pour l'ensemble des variables */
-/* Une solution possible */
-%macro Iteration(base = donnees_sas);
-  %local nbVar;
-  proc contents data = donnees_sas out = ListeVar noprint;run;
-  proc sql noprint;select count(*) into :nbVar from ListeVar;quit;
-  %do i = 1 %to &nbVar.;
-    data _null_;
-      set ListeVar (firstobs = &i. obs = &i.);
-	  call symput('var', name);
-	run;
-    proc sql;
-      select max("&var.") as Variable, sum(missing(&var.)) as Manquants, sum(missing(&var.)) / count(*) * 100 as Prop_Manquants
-      from &base.;
-    quit;
-  %end;
-  proc datasets lib = work nolist;delete ListeVar;run;
-%mend Iteration;
-%Iteration;
+/* On crée une macro-variable SAS à partir de la valeur de la moyenne */
+proc sql noprint;select mean(Note_moyenne) into :moyenne from donnees_sas;quit;
+data donnees_sas;
+  set donnees_sas;
+  Note_Superieure_Moyenne = (Note_moyenne > &moyenne.);
+run;
+proc freq data = donnees_sas;tables Note_Superieure_Moyenne;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-apply(is.na(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))]
-  ), 2, mean) * 100
-# Autres solutions
-sapply(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
-  function(x) mean(is.na(x)) * 100)
-sapply(
-  donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))],
-  function(x) sum(is.na(x)) / length(x) * 100)
-
-# Pour l'ensemble des variables
-colMeans(is.na(donnees_rbase)) * 100
-apply(is.na(donnees_rbase), 2, mean) * 100
+moyenne <- mean(donnees_rbase$note_moyenne, na.rm = TRUE)
+donnees_rbase$note_superieure_moyenne <- ifelse(donnees_rbase$note_moyenne > moyenne, 1, 0)
+table(donnees_rbase$note_superieure_moyenne, useNA = "always")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-donnees_tidyverse %>%
-  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
-                   list(~sum(is.na(.x)), ~mean(is.na(.x)))))
-donnees_tidyverse %>%
-  summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
-                   list(~sum(is.na(.x)), ~sum(is.na(.x)) / length(.x))))
-
-# Pour l'ensemble des variables
-donnees_tidyverse %>%
-  summarise(across(everything(), ~mean(is.na(.x))))
-# Autres solutions
-donnees_tidyverse %>% map(~ mean(is.na(.)) * 100)
-# Obsolète
-donnees_tidyverse %>% summarise_each(funs(mean(is.na(.)) * 100))
+moyenne <- donnees_tidyverse %>% pull(note_moyenne) %>% mean(na.rm = TRUE)
+donnees_tidyverse <- donnees_tidyverse %>% mutate(note_superieure_moyenne = ifelse(note_moyenne > moyenne, 1, 0))
+donnees_tidyverse %>% pull(note_superieure_moyenne) %>% table(useNA = "always")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour les variables numériques ou date
-donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100), .SDcols = function(x) c(lubridate::is.Date(x) | is.numeric(x))]
-# Pour l'ensemble des variables
-donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
+moyenne <- donnees_datatable[, mean(note_moyenne, na.rm = TRUE)]
+donnees_datatable[, note_superieure_moyenne := fcase(note_moyenne >= moyenne, 1,
+                                                     note_moyenne <  moyenne, 0)]
+table(donnees_datatable$note_superieure_moyenne, useNA = "always")
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -138,179 +250,75 @@ donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
 
 :::
 
-## Incidence des valeurs manquantes 
+## Moyenne par ligne 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* En SAS, les valeurs manquantes sont des nombres négatifs faibles */
-data Valeur_Manquante;
+/* On souhaite affecter les pondérations suivantes aux notes :
+Note_Contenu : 30%, Note_Formateur : 20%, Note_Moyens : 25%, Note_Accompagnement : 15%, Note_Materiel : 10% */
+/* Voici une solution possible. Une alternative intéressante serait de passer par IML (non traité ici) */
+%let ponderation = 0.3 0.2 0.25 0.15 0.10;
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data donnees_sas;
   set donnees_sas;
-  /* Lorsque Age est manquant (missing), Jeune_Correct vaut 0 mais Jeune_Incorrect vaut 1 */
-  /* En effet, pour SAS, un Age manquant est une valeur inférieure à 0, donc bien inférieure à 25.
-     Donc la variable Jeune_Incorrect vaut bien 1 pour les âges inconnus */
-  Jeune_Incorrect = (Age <= 25);
-  Jeune_Correct   = (0 <= Age <= 25);
-run;
-proc print data = Valeur_Manquante (keep  = Age Jeune_Correct Jeune_Incorrect
-                                    where = (missing(Age)));
-run;
-proc freq data = Valeur_Manquante;tables Jeune_Incorrect Jeune_Correct;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-mean(donnees_rbase$note_formateur)
-mean(donnees_rbase$note_formateur, na.rm = TRUE)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% pull(note_formateur) %>% mean()
-donnees_tidyverse %>% pull(note_formateur) %>% mean(na.rm = TRUE)
-# Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
-# NE PAS ECRIRE !
-# donnees_tidyverse %>% mean(note_formateur)
-# donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, mean(note_formateur)]
-donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Remplacer toutes les valeurs numériques manquantes par 0 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On sélectionne toutes les variables numériques */
-proc contents data = donnees_sas out = Var noprint;run;
-proc sql noprint;
-  select name into :nom_col separated by " " from Var where format = "";
-run;
-data donnees_sas_sans_missing;
-  set donnees_sas;
-  %macro Missing;
-    %local i var;
-    %do i = 1 %to %sysfunc(countw(&nom_col.));
-	  %let var = %scan(&nom_col., &i);
-	  if missing(&var.) then &var. = 0;
+  %macro Somme_pond;
+    %global temp;
+	%let temp = ;
+    %do i = 1 %to %sysfunc(countw(&notes.));
+      %let k = %scan(&notes., &i.);
+	  %let l = %scan(&ponderation., &i., %str( ));
+	  &k._pond = &k. * &l.;
+	  %let temp = &temp. &k._pond;
 	%end;
-  %mend Missing;
-  %Missing;
+  %mend Somme_pond;
+  %Somme_pond;
+  Note_moyenne_pond = sum(of &temp.);
+  drop &temp.;
 run;
-proc datasets lib = Work nolist;delete Var;run;
+proc means data = donnees_sas mean;var Note_moyenne_pond;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Dans le cas des dates, la valeur manquante a été remplacée par 1970-01-01
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na[is.na(donnees_rbase_sans_na)] <- 0
-# On remplace seulement les valeurs numériques par 0
-donnees_rbase_sans_na <- donnees_rbase
-varNumeriques <- names(donnees_rbase)[unlist(lapply(donnees_rbase, is.numeric))]
-donnees_rbase_sans_na[, varNumeriques][is.na(donnees_rbase_sans_na[, varNumeriques])] <- 0
-# Autre solution, avec replace
-donnees_rbase_sans_na[, varNumeriques] <- lapply(donnees_rbase_sans_na[, varNumeriques],
-                                                 function(x) {replace(x, is.na(x), 0)})
+# On calcule de nouveau cette moyenne, mais en pondérant
+# On souhaite affecter les pondérations suivantes aux notes :
+# note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
+notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
+sum(ponderation)
+donnees_rbase$note_moyennepond <- apply(donnees_rbase[, notes], 1, function(x) weighted.mean(x, ponderation, na.rm = TRUE))
+# Autre manière, en exploitant le calcul matriciel
+# Ne fonctionne pas, du fait des NA
+as.matrix(donnees_rbase[, notes]) %*% as.matrix(ponderation)
+# Produit élément par élément
+# On peut procéder par produit matriciel
+as.matrix(donnees_rbase[, notes]) * matrix(t(as.matrix(ponderation)), nrow(donnees_rbase), 5)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On remplace seulement les valeurs numériques par 0
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), ~tidyr::replace_na(.x, 0)))
-# Autres façons d'écrire les fonctions anonymes
-# La méthode complète
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), function(x) tidyr::replace_na(x, 0)))
-# Une autre façon de raccourcir (depuis R 4.1)
-# \(x) est un raccourci pour function(x)
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(where(is.numeric), \(x) tidyr::replace_na(x, 0)))
-# Autre solution
-donnees_tidyverse_sans_na <- donnees_tidyverse %>%
-  purrr::modify_if(is.numeric, ~tidyr::replace_na(.x, 0))
+# On calcule de nouveau cette moyenne, mais en pondérant
+# On souhaite affecter les pondérations suivantes aux notes :
+# note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
+# La fonction RowMeans ne fonctionne plus, cette fois !
+notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
+sum(ponderation)
+# Noter l'utilisation de c_across pour traiter automatiquement plusieurs variables
+donnees_tidyverse <- donnees_tidyverse %>%
+  rowwise() %>%
+  mutate(note_moyenne = weighted.mean(c_across(varNotes), ponderation, na.rm = TRUE)) %>% 
+  ungroup()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable_sans_na <- copy(donnees_datatable)
-setnafill(donnees_datatable[, .SD, .SDcols = is.numeric], fill = 0)
-# Autre solution
-donnees_datatable_sans_na <- copy(donnees_datatable)
-cols <- colnames(donnees_datatable_sans_na[, .SD, .SDcols = is.numeric])
-donnees_datatable_sans_na[, (cols) := lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = cols]
-# Ensemble des colonnes
-donnees_datatable_sans_na <- copy(donnees_datatable)
-donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Remplacer les valeurs manquantes d'une seule variable par 0 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let var = note_contenu;
-data donnees_sas_sans_missing;
-  set donnees_sas;
-  if missing(&var.) then &var. = 0;
-  /* Ou alors */
-  if &var. = . then &var. = 0;
-  /* Ou encore */
-  if note_contenu = . then note_contenu = 0;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na[, variable][is.na(donnees_rbase_sans_na[, variable])] <- 0
-donnees_rbase_sans_na[, variable] <- replace(donnees_rbase_sans_na[, variable],
-                                             is.na(donnees_rbase_sans_na[, variable]), 0)
-# Ou alors
-donnees_rbase_sans_na <- donnees_rbase
-donnees_rbase_sans_na$note_contenu[is.na(donnees_rbase_sans_na$note_contenu)] <- 0
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(across(variable,  ~tidyr::replace_na(.x, 0)))
-# Ou alors
-donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
-  mutate(note_contenu = tidyr::replace_na(note_contenu, 0))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "note_contenu"
-donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = variable]
-donnees_datatable[, lapply(.SD, function(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
-donnees_datatable[, lapply(.SD, \(x) fifelse(is.na(x), 0, x)), .SDcols = variable]
-# Ou alors
-donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
+## On souhaite affecter les pondérations suivantes aux notes :
+## note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
+notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
+donnees_datatable[, note_moyenne_pond := rowSums(mapply(FUN = `*`, .SD, ponderation), na.rm = TRUE), .SDcols = names(ponderation)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
