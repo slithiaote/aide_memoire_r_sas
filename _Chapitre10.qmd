@@ -2,14 +2,12 @@
 
 ## Trier les colonnes de la base
 
-
 ### Mettre identifiant et date_entree au début de la base
 
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Mettre les variables identifiant et date_entree au début de la base */
 %let colTri = identifiant date_entree;
 data donnees_sas;
   retain &colTri.;
@@ -27,7 +25,6 @@ quit;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre les variables identifiant et date_entree au début de la base
 colTri <- c("identifiant", "date_entree")
 donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
 
@@ -38,7 +35,6 @@ donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(do
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre les variables identifiant et date_entree au début de la base
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(identifiant, date_entree)
 
@@ -52,7 +48,6 @@ donnees_tidyverse_tri <- donnees_tidyverse %>%
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre les variables identifiant et date_entree au début de la base
 colTri <- c("identifiant", "date_entree")
 tri <- union(colTri, colnames(donnees_datatable))
 donnees_datatable <- donnees_datatable[, ..tri]
@@ -64,7 +59,6 @@ setcolorder(donnees_datatable, colTri)
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-# Mettre les variables identifiant et date_entree au début de la base
 requete_duckdb %>% 
   mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
   select(identifiant, date_entree, everything())
@@ -337,7 +331,7 @@ requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! 
 
 :::
 
-## Trier par ordre croissant par toutes les variables de la base 
+## Trier par ordre croissant de toutes les variables de la base 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
