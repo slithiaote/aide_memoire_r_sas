@@ -107,11 +107,7 @@ setcolorder(donnees_datatable, union("poids_sondage", colnames(donnees_datatable
 ```{r, warning=FALSE, message=FALSE}
 ```
 
-
 :::
-
-
-
 
 ### Mettre la variable poids_sondage à la fin de la base
 
@@ -154,13 +150,11 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 ```{r, warning=FALSE, message=FALSE}
 ```
 
-
 :::
-
 
 ## Trier les lignes
 
-### Tri par ordre croissant
+### Tri par ordre croissant d'identifiant et date_entree
 
 ::: {.panel-tabset group="language"}
 
@@ -208,9 +202,7 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ```
 
-
 :::
-
 
 ### Tri par ordre décroissant
 
@@ -256,9 +248,7 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ```
 
-
 :::
-
 
 ## Incidence des valeurs manquantes dans les tris 
 ::: {.panel-tabset group="language"}
@@ -327,7 +317,6 @@ requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, No
 # Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
 requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
 ```
-
 
 :::
 
