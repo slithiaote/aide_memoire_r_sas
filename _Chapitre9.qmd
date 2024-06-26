@@ -336,7 +336,6 @@ chartr("éèêëàâçîô", "eeeeaacio", chaine)
 
 ```
 
-
 :::
 
 ## Découper une chaîne de caractères selon un caractère donné

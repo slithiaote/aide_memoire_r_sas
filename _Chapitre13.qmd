@@ -9,6 +9,7 @@
 proc freq data = donnees_sas;table Sexef * cspf / out = Nb;run;
 proc sort data = Nb;by cspf Sexef;run;
 proc print data = Nb;run;
+
 /* On transpose le tableau */
 proc transpose data = Nb out = transpose;by cspf;var count;id Sexef;run;
 data transpose;set transpose (drop = _name_ _label_);run;
@@ -20,6 +21,7 @@ proc print data = transpose;run;
 # On commence déjà par calculer un tableau croisé comptant les occurrences
 # as.data.frame.matrix est nécessaire, car le résultat de xtabs est un array
 nb <- as.data.frame.matrix(xtabs( ~ cspf + sexef, data = donnees_rbase))
+
 # On transpose le tableau
 nb_transpose <- as.data.frame(t(nb))
 ```
@@ -92,6 +94,7 @@ proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 wide_rbase <- aggregate(donnees_rbase[, varNotes], donnees_rbase[, "identifiant", drop = FALSE], mean, na.rm = TRUE)
+
 long_rbase <- reshape(data = wide_rbase,
                       varying = varNotes,
                       v.names = "notes",
@@ -110,6 +113,7 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 wide_tidyverse <- donnees_tidyverse %>% 
   group_by(identifiant) %>% 
   summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE)))
+
 # On l'exprime en format long
 # Mise en garde : ne pas écrire value_to !
 long_tidyverse <- wide_tidyverse %>% 
@@ -124,6 +128,7 @@ long_tidyverse <- wide_tidyverse %>%
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = identifiant, .SDcols = varNotes]
+
 long_datatable <- melt(wide_datatable,
                        id.vars = c("identifiant"),
                        measure.vars = varNotes,
@@ -135,7 +140,6 @@ long_datatable <- melt(wide_datatable,
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 
@@ -158,6 +162,7 @@ run;
 /* On passe de Wide à Long */
 proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 data Long;set Long (rename = (_NAME_ = Type_Note COL1 = Note));run;
+
 /* On passe de Long à Wide */
 proc transpose data = Long out = Wide;
   by Identifiant;
