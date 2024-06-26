@@ -1,568 +1,504 @@
-# Tableaux de fréquence (proc freq de `SAS`)
+# Statistiques descriptives
 
-## Tableaux de fréquence (proc freq) pour 1 variable 
+## Moyenne 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-proc freq data = donnees_sas;
-  tables Sexe CSP;
-  format Sexe sexef. CSP $cspf.;
+proc means data = donnees_sas mean;var note_contenu;run;
+proc sql;select mean(note_contenu) from donnees_sas;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Importance du na.rm = TRUE
+mean(donnees_rbase$note_contenu)
+mean(donnees_rbase$note_contenu, na.rm = TRUE)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Importance du na.rm = TRUE
+donnees_tidyverse %>% pull(note_contenu) %>% mean()
+donnees_tidyverse %>% pull(note_contenu) %>% mean(na.rm = TRUE)
+
+# Autres solutions
+# Le chiffre est arrondi lorsqu'il est affiché, du fait des propriétés des tibbles
+donnees_tidyverse %>% summarise(mean(note_contenu, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(across(note_contenu, ~mean(., na.rm = TRUE)))
+
+# Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
+# donnees_tidyverse %>% mean(note_formateur)
+# donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Importance du na.rm = TRUE
+donnees_datatable[, mean(note_contenu)]
+donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Moyenne par sélection 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Ici pour les seules femmes */
+proc means data = donnees_sas mean;
+  var note_contenu;
+  where sexef = "Femme";
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableaux de fréquence (proc freq) (sans les valeurs manquantes)
-table(donnees_rbase$cspf)
-table(donnees_rbase$sexef)
-# Autre syntaxe, donnant une mise en forme différente
-ftable(donnees_rbase$cspf)
-# Pour enlever les "donnees_rbase$", on peut utiliser with pour se placer dans l'environnement de donnees_rbase
-with(donnees_rbase, table(cspf))
-# Pour les proportions
-prop.table(table(donnees_rbase$cspf)) * 100
-# Devient plus difficile si l'on souhaite plus (sommes et proportions cumulées par exemple)
-freq <- setNames(as.data.frame(table(donnees_rbase$cspf)), c("cspf", "Freq"))
-freq <- transform(freq, Prop = Freq / sum(Freq) * 100)
-freq <- transform(freq,
-                  Freq_cum = cumsum(Freq),
-                  Prop_cum = cumsum(Prop))
-freq
+# Ici, pour les seules femmes
+with(subset(donnees_rbase, sexef == "Femme"), mean(note_contenu, na.rm = TRUE))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ici, pour les seules femmes
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>% 
+  pull(note_contenu) %>%
+  mean(na.rm = TRUE)
+
+# Autres solutions
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>% 
+  summarise(moyenne = mean(note_contenu, na.rm = TRUE))
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>% 
+  summarise(across(note_contenu, ~ mean(., na.rm = TRUE)))
+# Attention, syntaxe qui ne fonctionne qu'avec %>%, pas avec %>% !
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>% 
+  {mean(.$note_contenu, na.rm = TRUE)}
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ici, pour les seules femmes
+donnees_datatable[sexef == "Femme", mean(note_contenu, na.rm = TRUE)]
+donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = "note_contenu"]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Moyenne pondérée 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Ensemble des données */
+proc means data = donnees_sas mean;
+  var note_contenu;
+  weight poids_sondage;
+run;
+/* Par sélection (ici pour les seules femmes) */
+proc means data = donnees_sas mean;
+  var note_contenu;
+  where sexef = "Femme";
+  weight poids_sondage;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ensemble des données
+weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = TRUE)
+# Autre méthode, mais attention aux NA !!
+with(donnees_rbase, sum(note_contenu * poids_sondage, na.rm = TRUE) / sum((!is.na(note_contenu)) * poids_sondage, na.rm = TRUE))
+# Par sélection (ici pour les seules femmes)
+with(subset(donnees_rbase, sexef == "Femme"), sum(note_contenu * poids_sondage, na.rm = TRUE) / sum(poids_sondage, na.rm = TRUE))
+# On peut aussi utiliser la fonction crossprod
+# Mais ne fonctionne pas dans ce cas, car elle ne prend pas en compte les na.rm = TRUE
+# Ne pas confondre cumprod et crossprod !!!!
+with(subset(donnees_rbase, sexef == "Femme"), crossprod(note_contenu, poids_sondage) / sum(poids_sondage, na.rm = TRUE))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ensemble des données
+donnees_tidyverse %>%
+  summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
+# Par sélection
+donnees_tidyverse %>%
+  filter(sexef == "Femme") %>%
+  summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ensemble des données
+donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
+# Par sélection (ici pour les seules femmes)
+donnees_datatable[sexef == "Femme", weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
+donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)),
+                  .SDcols = "note_contenu"]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Moyenne de plusieurs variables 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+proc means data = donnees_sas mean;
+  var &notes.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+# Plusieurs solutions
+# Sous forme de liste
+lapply(donnees_rbase[, notes], mean, na.rm = TRUE)
+# Sous forme de vecteur
+sapply(donnees_rbase[, notes], mean, na.rm = TRUE)
+apply(donnees_rbase[, notes], 2, mean, na.rm = TRUE)
+# Si l'on souhaite renommer les colonnes
+moyennes <- sapply(donnees_rbase[, notes], mean, na.rm = TRUE)
+names(moyennes) <- paste("Moyenne", names(moyennes), sep = "_")
+moyennes
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+donnees_tidyverse %>%
+  summarise_at(notes, mean, na.rm = TRUE)
+# Autres solutions
+donnees_tidyverse %>%
+  summarise(across(all_of(notes), ~ mean(.x, na.rm = TRUE)))
+# Obsolète
+donnees_tidyverse %>%  
+  select(starts_with("Note") & !ends_with("_100")) %>% 
+  summarise_all(.funs = ~ mean(., na.rm = TRUE), .vars = notes)
+# Si l'on souhaite renommer les colonnes
+moyennes <- donnees_tidyverse %>%
+  summarise_at(notes, mean, na.rm = TRUE) %>% 
+  rename_with(~ paste("Moyenne", ., sep = "_"))
+moyennes <- donnees_tidyverse %>%
+  summarise(across(all_of(notes), ~ mean(.x, na.rm = TRUE), .names = "Moyenne_{.col}"))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+moyennes <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = notes]
+# Si l'on souhaite renommer les colonnes
+setnames(moyennes, notes, paste("Moyenne", notes, sep = "_"))
+moyennes
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Moyenne pondérée de plusieurs variables 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+proc means data = donnees_sas mean;
+  var &notes.;
+  weight poids_sondage;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+with(donnees_rbase, sapply(donnees_rbase[, notes], function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+donnees_tidyverse %>%
+  summarise(across(notes, ~ weighted.mean(.x, poids_sondage, na.rm = TRUE)))
+# Autre solution
+donnees_tidyverse %>%
+  summarise_at(notes, ~ weighted.mean(.x, poids_sondage, na.rm = TRUE))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+moyennes <- donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), .SDcols = notes]
+moyennes
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Nombreuses statistiques (somme, moyenne, médiane, mode, etc.) 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes */
+/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
+   nombre de données manquantes (nmiss), intervalle, mode */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+/* Par la proc means, en un seul tableau */
+proc means data = donnees_sas sum mean median min max var std n nmiss range mode;
+  var &notes.;
+run;
+/* Par la proc univariate, variable par variable */
+proc univariate data = donnees_sas;
+  var &notes.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes),
+# Nombre de valeurs manquantes, Intervalle
+# Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
+# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+library(collapse)
+sapply(donnees_rbase[, notes], function(x) c("Somme"      = sum(x, na.rm = TRUE),
+                                             "Moyenne"    = mean(x, na.rm = TRUE),
+                                             "Médiane"    = median(x, na.rm = TRUE),
+                                             "Min"        = min(x, na.rm = TRUE),
+                                             "Max"        = max(x, na.rm = TRUE),
+                                             # Pour la variance, la somme des carrés est divisée par n - 1, où n est le nombre de données
+                                             "Variance"   = var(x, na.rm = TRUE),
+                                             "Ecart-type" = sd(x, na.rm = TRUE),
+                                             "N"          = length(x),
+                                             "NMiss"      = sum(is.na(x)),
+                                             "Intervalle" = max(x, na.rm = TRUE) - min(x, na.rm = TRUE),
+                                             "Mode"       = collapse::fmode(x)
+))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
+# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+library(collapse)
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+StatsDesc_tidyverse <- function(x) {
+  c(
+    Somme      = sum(x, na.rm = TRUE),
+    Moyenne    = mean(x, na.rm = TRUE),
+    Mediane    = median(x, na.rm = TRUE),
+    Min        = min(x, na.rm = TRUE),
+    Max        = max(x, na.rm = TRUE),
+    Variance   = var(x, na.rm = TRUE),
+    Ecart_type = sd(x, na.rm = TRUE),
+    N          = length(x),
+    NMiss      = sum(is.na(x)),
+    Intervalle = max(x, na.rm = TRUE) - min(x, na.rm = TRUE),
+    Mode       = collapse::fmode(x)
+    )
+}
+# 1ère solution avec les notes en ligne et les statistiques en colonnes
 donnees_tidyverse %>% 
-  count(cspf) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop))
-donnees_tidyverse %>% 
-  count(sexef) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop))
-# Ou alors
-donnees_tidyverse %>% 
-  group_by(cspf) %>% 
-  summarise(n = n()) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop)
+  select(all_of(notes)) %>% 
+  map(~ StatsDesc_tidyverse(.x)) %>% 
+  bind_rows() %>% 
+  bind_cols(tibble(Note = c(notes))) %>% 
+  relocate(Note)
+# 2e solution avec les notes en colonne
+donnees_tidyverse %>%
+  reframe(across(notes, ~ StatsDesc_tidyverse(.x))) %>% 
+  bind_cols(tibble(Indicateur = c("Somme", "Moyenne", "Mediane", "Min", "Max", "Variance",
+                                  "Ecart_type", "N", "NMiss", "Intervalle", "Mode"))) %>% 
+  relocate(Indicateur)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+library(collapse)
+moyennes <- donnees_datatable[, lapply(.SD, function(x) c(sum(x, na.rm = TRUE),
+                                                          mean(x, na.rm = TRUE),
+                                                          median(x, na.rm = TRUE),
+                                                          min(x, na.rm = TRUE),
+                                                          max(x, na.rm = TRUE),
+                                                          var(x, na.rm = TRUE),
+                                                          sd(x, na.rm = TRUE),
+                                                          .N,
+                                                          sum(is.na(x)),
+                                                          max(x, na.rm = TRUE) - min(x, na.rm = TRUE),
+                                                          collapse::fmode(x)
+                                                          )),
+                              .SDcols = notes]
+cbind(data.table(Nom = c("Somme", "Moyenne", "Médiane", "Min", "Max", "Variance", "Ecart_type", "N", "NMiss", "Intervalle", "Mode")), moyennes)
+# Autre solution
+StatsDesc <- function(x) {
+  list(
+    Variable   = names(x),
+    Somme      = lapply(x, sum, na.rm = TRUE),
+    Moyenne    = lapply(x, mean, na.rm = TRUE),
+    Mediane    = lapply(x, median, na.rm = TRUE),
+    Min        = lapply(x, min, na.rm = TRUE),
+    Max        = lapply(x, max, na.rm = TRUE),
+    Variance   = lapply(x, var, na.rm = TRUE),
+    Ecart_type = lapply(x, sd, na.rm = TRUE),
+    N          = lapply(x, function(x) length(x)),
+    NMiss      = lapply(x, function(x) sum(is.na(x))),
+    Intervalle = lapply(x, function(x) max(x, na.rm = TRUE) - min(x, na.rm = TRUE)),
+    Mode       = lapply(x, collapse::fmode)
+    )
+}
+donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Nombreuses statistiques pondérées (somme, moyenne, médiane, mode, etc.) 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
+   nombre de données manquantes (nmiss), intervalle, mode */
+/* Par la proc means, en un seul tableau */
+/* L'option vardef = wgt permet de diviser la variable par la somme des poids et non le nombre de données, pour être cohérent
+   avec R */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+/* Par la proc means, en un seul tableau */
+proc means data = donnees_sas sum mean median min max var std n nmiss range mode vardef = wgt;
+  var &notes.;
+  weight poids_sondage;
+run;
+/* Par la proc univariate, variable par variable */
+proc univariate data = donnees_sas;
+  var &notes.;
+  weight poids_sondage;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
+# L'option na.rm est par défaut à TRUE dans le package
+library(collapse)
+sapply(donnees_rbase[, notes], function(x) c("Somme"      = collapse::fsum(x, w = donnees_rbase$poids_sondage),
+                                             "Moyenne"    = collapse::fmean(x, w = donnees_rbase$poids_sondage),
+                                             "Médiane"    = collapse::fmedian(x, w = donnees_rbase$poids_sondage),
+                                             "Min"        = collapse::fmin(x),
+                                             "Max"        = collapse::fmax(x),
+                                             # Pour la variance, la somme des carrés est divisée par n - 1, où n est le nombre de données
+                                             "Variance"   = collapse::fvar(x, w = donnees_rbase$poids_sondage),
+                                             "Ecart-type" = collapse::fsd(x, w = donnees_rbase$poids_sondage),
+                                             "N"          = collapse::fnobs(x),
+                                             "NMiss"      = collapse::fnobs(is.na(x)),
+                                             "Intervalle" = collapse::fmax(x) - collapse::fmin(x),
+                                             "Mode"       = collapse::fmode(x, w = donnees_rbase$poids_sondage)
+))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
+# L'option na.rm est par défaut à TRUE dans le package
+library(collapse)
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+StatsDescPond_tidyverse <- function(x, w) {
+  c(
+    Somme      = collapse::fsum(x, w),
+    Moyenne    = collapse::fmean(x, w),
+    Mediane    = collapse::fmedian(x, w),
+    Min        = collapse::fmin(x),
+    Max        = collapse::fmax(x),
+    Variance   = collapse::fvar(x, w),
+    Ecart_type = collapse::fsd(x, w),
+    N          = collapse::fnobs(x),
+    NMiss      = collapse::fnobs(is.na(x)),
+    Intervalle = collapse::fmax(x) - collapse::fmin(x),
+    Mode       = collapse::fmode(x, w)
   )
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableaux de fréquence (proc freq) (avec les valeurs manquantes)
-donnees_datatable[, table(cspf) ]
-donnees_datatable[, table(sexef) ]
-# Pour les proportions
-donnees_datatable[, prop.table(table(cspf)) ] * 100
-donnees_datatable[, .(Nombre = .N,
-                      Pourcentage = .N / length(donnees_datatable[, cspf]) * 100),
-                  keyby = cspf]
-donnees_datatable[, {tot = .N; .SD[, .(frac = .N / tot * 100), keyby = cspf]} ]
-# Autre façon d'utiliser les méthodes de data.table, avec les fréquences et proportions cumulés
-tab <- data.table::dcast(donnees_datatable, cspf ~ ., fun = length)
-colnames(tab)[colnames(tab) == "."] <- "Nombre"
-tab[, Prop := lapply(.SD, function(col) col / sum(col) * 100), .SDcols = is.numeric]
-tab[, c("Freq_cum", "Prop_cum") := list(cumsum(Nombre), cumsum(Prop))]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tableaux de fréquence avec les valeurs manquantes 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas;
-  tables Sexe CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableaux de fréquence (proc freq) (avec les valeurs manquantes)
-table(donnees_rbase$cspf, useNA = "always")
-prop.table(table(donnees_rbase$cspf, useNA = "always")) * 100
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableaux de fréquence (proc freq) (avec les valeurs manquantes)
-table(donnees_rbase$cspf, useNA = "always")
-prop.table(table(donnees_rbase$cspf, useNA = "always")) * 100
-donnees_tidyverse %>% 
-  count(cspf) %>% 
-  mutate(prop = n / sum(n) * 100)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, table(cspf, useNA = "always") ]
-donnees_datatable[, prop.table(table(cspf, useNA = "always"))] * 100
-donnees_datatable[, .(Nombre = .N,
-                      Pourcentage = .N / length(donnees_datatable[, cspf]) * 100),
-                  keyby = cspf]
-donnees_datatable[, {tot = .N; .SD[, .(frac = .N / tot * 100), keyby = cspf]} ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tableaux de fréquence trié par modalité la plus courante 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas order = freq;
-  tables Sexe CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-freq <- setNames(as.data.frame(table(donnees_rbase$cspf)), c("cspf", "Freq"))
-freq <- transform(freq, Prop = Freq / sum(Freq) * 100)
-freq[order(-freq$Freq), ]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  count(cspf) %>% 
-  arrange(desc(n)) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop))
-donnees_tidyverse %>% 
-  count(cspf, sort = TRUE) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, .(Nombre = .N,
-                      Pourcentage = .N / length(donnees_datatable[, cspf]) * 100),
-                  keyby = cspf][order(-Nombre)]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tableaux de fréquence avec la pondération 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas;
-  tables Sexe CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-xtabs(poids_sondage ~ cspf, data = donnees_rbase, addNA = TRUE)
-prop.table(xtabs(poids_sondage ~ cspf, data = donnees_rbase, addNA = TRUE))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  count(cspf, wt = poids_sondage) %>% 
-  mutate(prop = n / sum(n) * 100,
-         n_cum = cumsum(n),
-         prop_cum = cumsum(prop))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, xtabs(poids_sondage ~ cspf, data = donnees_datatable, addNA = TRUE) ]
-donnees_datatable[, prop.table(xtabs(poids_sondage ~ cspf, data = donnees_datatable, addNA = TRUE)) ]
-donnees_datatable[, .(prop = sum(poids_sondage, na.rm = TRUE) / sum(donnees_datatable[, poids_sondage]) * 100), keyby = cspf]
-donnees_datatable[, {tot = sum(poids_sondage, na.rm = TRUE); .SD[, .(prop = sum(poids_sondage, na.rm = TRUE) / tot * 100), by = cspf]} ]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tableaux de contingence (proc freq) pour 2 variables 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-run;
-
-/* Tableau de contingence (tableau croisé) sans les proportions lignes, colonnes et totales */
-proc freq data = donnees_sas;
-  tables CSP * Sexe  / missing nofreq norow nocol;
-  format Sexe sexef. CSP $cspf.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableau simple
-table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always")
-# Tableau avec les sommes
-addmargins(table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always"))
-# Proportions
-tab <- table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always")
-# Proportions par case
-addmargins(prop.table(tab)) * 100
-# Proportions par ligne
-addmargins(prop.table(tab, margin = 1)) * 100
-# Proportions par colonne
-addmargins(prop.table(tab, margin = 2)) * 100
-
-# Solution alternative, sans pondération
-tab <- xtabs(~ cspf + sexef, data = donnees_rbase)
-tab
-addmargins(prop.table(tab)) * 100
-addmargins(prop.table(tab, margin = 1), margin = 2) * 100
-addmargins(prop.table(tab, margin = 2), margin = 1) * 100
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ajouter une une ligne avec les sommes !
-# Tableau de fréquence
-donnees_tidyverse %>% 
-  group_by(cspf, sexef) %>% 
-  summarise(prop = n(), .groups = "drop_last") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>%
-  spread(sexef, prop) %>% 
-  mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
-
-# Proportions par ligne
-donnees_tidyverse %>% 
-  group_by(cspf, sexef) %>% 
-  summarise(prop = n()) %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  spread(sexef, prop)
-
-# Proportions par colonne
-donnees_tidyverse %>% 
-  group_by(sexef, cspf) %>% 
-  summarise(prop = n()) %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  spread(sexef, prop)
-
-
-tab <- donnees_tidyverse %>% 
-  count(cspf, sexef, wt = poids_sondage, name = "prop") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  # À FAIRE : pourrait-on sommer directement avec pivot_wider ? Argument values_fn?
-  # Ne semble pas fonctionner, pourqoi ???
-  pivot_wider(names_from = sexef, values_from = prop) %>% 
-  # Somme par lignes
-  mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
-# Autre solution avec rowwise : bien penser à c_across et non across !
-#rowwise() %>% 
-#mutate(Total = sum(c_across(where(is.numeric)), na.rm = T)) %>% 
-#ungroup()
-# Somme par colonnes
-tab <- bind_rows(tab, tab %>% 
-                   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)),
-                             across(where(is.character), ~"Total"))
-)
-tab
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tableau simple
-donnees_datatable[, table(cspf, sexef, useNA = "always") ]
-# Tableau avec les sommes
-donnees_datatable[, addmargins(table(cspf, sexef, useNA = "always")) ]
-# Proportions
-tab <- donnees_datatable[, table(cspf, sexef, useNA = "always") ]
-# Proportions par case
-addmargins(prop.table(tab)) * 100
-# Proportions par ligne
-addmargins(prop.table(tab, margin = 1)) * 100
-# Proportions par colonne
-addmargins(prop.table(tab, margin = 2)) * 100
-
-# Solution alternative, sans pondération
-tab <- donnees_datatable[, xtabs(~ cspf + sexef, data = donnees_datatable) ]
-tab
-addmargins(prop.table(tab)) * 100
-addmargins(prop.table(tab, margin = 1), margin = 2) * 100
-addmargins(prop.table(tab, margin = 2), margin = 1) * 100
-
-# Autre solution, avec les Grouping sets
-tab <- data.table::cube(donnees_datatable, .(Nb = .N), by = c("cspf", "sexef"))
-tab <- data.table::dcast(tab, cspf ~ sexef, value.var = "Nb")
-# On harmonise le tableau
-tab <- rbind(tab[2:nrow(tab)], tab[1,])
-setcolorder(tab, c(setdiff(names(tab), "NA"), "NA"))
-# On renomme la ligne et la colonne des totaux
-tab[nrow(tab), 1] <- "Total"
-names(tab)[which(names(tab) == "NA")] <- "Total"
-tab
-
-# Autre façon d'utiliser les méthodes de data.table
-tab_prop <- data.table::dcast(donnees_datatable, cspf ~ sexef, fun.aggregate = length)
-# Proportion par ligne
-tab_prop[, .SD / Reduce(`+`, .SD), cspf]
-# Proportion par colonne
-cols <- unique(donnees_datatable[, (sexef)])
-tab_prop[, (lapply(.SD, function(col) col / sum(col))), .SDcols = cols]
-
-# Pour avoir les sommes lignes
-# À FAIRE : ne marche pas, à revoir !
-#tab_prop <- data.table::dcast(donnees_datatable, cspf ~ sexef, fun.aggregate = length)
-#tab_prop[, Total := rowSums(.SD), .SDcols = is.numeric]
-#tab_prop <- rbind(tab_prop, tab_prop[, c(cspf = "Total", lapply(.SD, sum, na.rm = TRUE)),
-#                                     .SDcols = is.numeric],
-#                  fill = TRUE)
-#tab_prop[, (lapply(.SD, function(col) col / sum(col))), .SDcols = -1]
-## Pour avoir les sommes colonnes
-#tab[, sum(.SD), by = 1:nrow(tab), .SDcols = is.numeric]
-#tab[, (lapply(.SD, function(col) col / sum(col))), .SDcols = -1]
-#
-## Autre solution plus pratique avec data.table
-## Manipuler des formules sur R
-#variable <- c("cspf", "sexef")
-#formule <- as.formula(paste(paste(variable, collapse = " + "), ".", sep = " ~ "))
-#tab_prop <- data.table::dcast(donnees_datatable, formule, fun.aggregate = length)
-#colnames(tab_prop)[colnames(tab_prop) == "."] <- "total"
-#tab_prop[, prop := total / sum(total)]
-## Le tableau est remis sous forme croisée
-#tab_prop <- dcast(tab_prop, cspf ~ sexef, value.var = c("prop"), fill = 0)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tableau de contingence avec pondération 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-tab <- xtabs(poids_sondage ~ cspf + sexef, data = donnees_rbase, addNA = TRUE)
-tab
-addmargins(prop.table(tab)) * 100
-addmargins(prop.table(tab, margin = 1), margin = 2) * 100
-addmargins(prop.table(tab, margin = 2), margin = 1) * 100
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Avec la fonction count
-donnees_tidyverse %>% 
-  count(cspf, sexef, wt = poids_sondage, name = "prop") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  spread(sexef, prop)
-# Avec la fonction summarise
-donnees_tidyverse %>% 
-  group_by(cspf, sexef) %>% 
-  summarise(prop = sum(poids_sondage, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  spread(sexef, prop)
-# Avec ajout des sommes par ligne et colonne
-tab <- donnees_tidyverse %>% 
-  count(cspf, sexef, wt = poids_sondage, name = "prop") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  # À FAIRE : pourrait-on sommer directement avec pivot_wider ? Argument values_fn?
-  # Ne semble pas fonctionner, pourqoi ???
-  pivot_wider(names_from = sexef, values_from = prop) %>% 
-  # Somme par lignes
-  mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
-  # Autre solution avec rowwise : bien penser à c_across et non across !
-  #rowwise() %>% 
-  #mutate(Total = sum(c_across(where(is.numeric)), na.rm = T)) %>% 
-  #ungroup()
-# Somme par colonnes
-tab <- bind_rows(tab, tab %>% 
-                   summarise(across(where(is.numeric), sum, na.rm = TRUE),
-                             across(where(is.character), ~"Total"))
-            )
-tab
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-tab <- donnees_datatable[, xtabs(poids_sondage ~ cspf + sexef, data = donnees_datatable, addNA = TRUE) ]
-tab
-addmargins(prop.table(tab)) * 100
-addmargins(prop.table(tab, margin = 1), margin = 2) * 100
-addmargins(prop.table(tab, margin = 2), margin = 1) * 100
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Copier-coller le tableau dans un tableur (Excel, etc.) 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Copier-coller le résultat sur la fenêtre html "Results Viewer" */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing chisq;
-  format Sexe sexef. CSP $cspf.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On utilise les packages knitr et kableExtra
-library(knitr)
-library(kableExtra)
-# Création d'un tableau
-tab <- xtabs(~ cspf + sexef, data = donnees_rbase)
-tab <- addmargins(prop.table(tab)) * 100
-
-# Afficher de façon plus jolie un tableau
-knitr::kable(tab)
-
-# Copier-coller le résultat vers Excel
-# Il suffit d'appliquer ce code ....
-kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
-# ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On utilise les packages knitr et kableExtra
-library(knitr)
-library(kableExtra)
-# Création d'un tableau
-tab <- donnees_tidyverse %>% 
-  group_by(cspf, sexef) %>% 
-  summarise(prop = n(), .groups = "drop_last") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  spread(sexef, prop)
-
-# Afficher de façon plus jolie un tableau
-tab %>% knitr::kable()
-
-# Copier-coller le résultat vers Excel
-# Il suffit d'appliquer ce code ....
-tab %>% 
-  knitr::kable() %>% 
-  kableExtra::kable_paper("hover", full_width = F)
-# ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On utilise les packages knitr et kableExtra
-library(knitr)
-library(kableExtra)
-# Création d'un tableau
-tab <- donnees_datatable[, xtabs(poids_sondage ~ cspf + sexef, data = donnees_datatable, addNA = TRUE) ]
-tab <- 
-addmargins(prop.table(tab)) * 100
-
-# Afficher de façon plus jolie un tableau
-knitr::kable(tab)
-
-# Copier-coller le résultat vers Excel
-# Il suffit d'appliquer ce code ....
-kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
-# ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Tests d'associaton (Chi-Deux, etc.) 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing chisq;
-  format Sexe sexef. CSP $cspf.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Test du Khi-Deux
-with(donnees_rbase, chisq.test(cspf, sexef))
-summary(table(donnees_rbase$cspf, donnees_rbase$sexef))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Test du Khi-Deux
+}
+# À FAIRE : Comment faire cela ???
+# Tous les codes suivants ne fonctionnent pas !
 #donnees_tidyverse %>%
-#  summarise(a = chisq.test(sexef, cspf))
-# À FAIRE : fonctionne, mais pas vraiment Tidyverse
-with(donnees_tidyverse, chisq.test(cspf, sexef))
+#  reframe(across(notes, ~ StatsDescPond_tidyverse(.x, 10))) %>% 
+#  bind_cols(tibble(Indicateur = c("Somme", "Moyenne", "Mediane", "Min", "Max", "Variance",
+#                                  "Ecart_type", "N", "NMiss", "Intervalle", "Mode"))) %>% 
+#  relocate(Indicateur)
+#donnees_tidyverse %>% 
+#  select(all_of(notes), poids_sondage) %>% 
+#  map(all_of(notes), ~ StatsDescPond_tidyverse(.x, poids_sondage)) %>% 
+#  bind_rows() %>% 
+#  bind_cols(tibble(Note = c(notes))) %>% 
+#  relocate(Note)
+#donnees_tidyverse %>% 
+#  select(all_of(notes), poids_sondage) %>% 
+#  map(~StatsDescPond_tidyverse(.x, donnees_tidyverse$poids_sondage) )
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Test du Khi-Deux
-donnees_datatable[, chisq.test(cspf, sexef)]
+# Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
+# L'option na.rm est par défaut à TRUE dans le package
+library(collapse)
+# À FAIRE : y-a-t-il plus simple ???
+# Est-on obligés d'utiliser systématiquement donnees_datatable$poids_sondage ?
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+StatsDescPond <- function(x) {
+  list(
+    Variables  = names(x),
+    Somme      = lapply(x, collapse::fsum, w = donnees_datatable$poids_sondage),
+    Moyenne    = lapply(x, collapse::fmean, w = donnees_datatable$poids_sondage),
+    Mediane    = lapply(x, collapse::fmedian, w = donnees_datatable$poids_sondage),
+    Min        = lapply(x, collapse::fmin),
+    Max        = lapply(x, collapse::fmax),
+    Variance   = lapply(x, collapse::fvar, w = donnees_datatable$poids_sondage),
+    Ecart_type = lapply(x, collapse::fsd, w = donnees_datatable$poids_sondage),
+    N          = lapply(x, collapse::fnobs),
+    NMiss      = lapply(x, function(x) collapse::fnobs(is.na(x))),
+    Intervalle = lapply(x, function(x) collapse::fmax(x) - collapse::fmin(x)),
+    Mode       = lapply(x, collapse::fmode, w = donnees_datatable$poids_sondage)
+  )
+}
+donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -573,445 +509,332 @@ donnees_datatable[, chisq.test(cspf, sexef)]
 
 :::
 
-## Solutions avec package R permettant de pondérer 
-
-Des informations sur l'usage des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html>.
-
-::: {.panel-tabset group="language"}
-
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# 5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Package descr 
+## Calcul d'une variance pondérée 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
+proc means data = donnees_sas var vardef = wgt;
+  var note_contenu;
   weight poids_sondage;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(descr)
-# Non pondéré
-with(donnees_rbase, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Pondéré
-with(donnees_rbase, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Sans les proportions par ligne et colonne
-with(donnees_rbase, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
+library(collapse)
+with(donnees_rbase, collapse::fvar(note_contenu, w = poids_sondage))
+# On la calcule "manuellement" pour confirmer le résultat
+# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
+x_2 <- with(donnees_rbase,
+            sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+x_m <- with(donnees_rbase,
+            sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+p <- with(donnees_rbase,
+          sum(poids_sondage * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+x_2 / p - (x_m / p) ** 2
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : est-il possible d'appliquer le pipe ???
-library(descr)
-# Non pondéré
-with(donnees_tidyverse, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Pondéré
-with(donnees_tidyverse, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Sans les proportions par ligne et colonne
-with(donnees_tidyverse, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(descr)
-# Non pondéré
-with(donnees_datatable, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Pondéré
-with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
-# Sans les proportions par ligne et colonne
-with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Package flextable 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(flextable)
-# Non pondéré
-flextable::proc_freq(donnees_rbase, "cspf", "sexef")
-# Pondéré
-flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage")
-# Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : est-il possible d'appliquer le pipe ???
-library(flextable)
-# Non pondéré
-flextable::proc_freq(donnees_tidyverse, "cspf", "sexef")
-# Pondéré
-flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage")
-# Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(flextable)
-# Non pondéré
-flextable::proc_freq(donnees_datatable, "cspf", "sexef")
-# Pondéré
-flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage")
-# Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Package questionr 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans pondération
-library(questionr)
-# Tableau croisé
-# Sans pondération
-tab <- with(donnees_rbase, questionr::wtd.table(cspf, sexef, useNA = "ifany"), na.rm = TRUE)
-# Avec pondération
-tab <- with(donnees_rbase, questionr::wtd.table(cspf, sexef, weights = poids_sondage, useNA = "ifany"), na.rm = TRUE)
-tab
-# Proportions
-questionr::prop(tab)
-# Proportions colonnes
-questionr::cprop(tab)
-# Proportions lignes
-questionr::rprop(tab)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans pondération
-library(questionr)
-# Tableau croisé
-# Sans pondération
-tab <- with(donnees_tidyverse, questionr::wtd.table(cspf, sexef, useNA = "ifany"), na.rm = TRUE)
-# Avec pondération
-tab <- with(donnees_tidyverse, questionr::wtd.table(cspf, sexef, weights = poids_sondage, useNA = "ifany"), na.rm = TRUE)
-tab
-# Proportions
-questionr::prop(tab)
-# Proportions colonnes
-questionr::cprop(tab)
-# Proportions lignes
-questionr::rprop(tab)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans pondération
-library(questionr)
-# Tableau croisé
-# Sans pondération
-tab <- with(donnees_datatable, questionr::wtd.table(cspf, sexef, useNA = "ifany"), na.rm = TRUE)
-# Avec pondération
-tab <- with(donnees_datatable, questionr::wtd.table(cspf, sexef, weights = poids_sondage, useNA = "ifany"), na.rm = TRUE)
-tab
-# Proportions
-questionr::prop(tab)
-# Proportions colonnes
-questionr::cprop(tab)
-# Proportions lignes
-questionr::rprop(tab)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Package survey 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ne fonctionne pas
-library(survey)
-tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_rbase)
-survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# La syntaxe avec pipe n'est pas compatible avec le package survey
-library(survey)
-tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_tidyverse)
-survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ne fonctionne pas
-library(survey)
-tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_datatable)
-survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Package procs 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(procs)
-procs::proc_freq(donnees_rbase, tables = cspf * sexef, options = v(missing))
-# Ne fonctionne pas avec le poids !!!
-#procs::proc_freq(donnees_rbase, tables = cspf * sexef, weight = poids_sondage, options = v(missing))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(procs)
-procs::proc_freq(donnees_tidyverse, tables = cspf * sexef, options = v(missing))
-# Ne fonctionne pas avec le poids !!!
-#procs::proc_freq(donnees_tidyverse, tables = cspf * sexef, weight = poids_sondage, options = v(missing))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-library(procs)
-# Il semble nécessaire de convertire l'objet en data.frame
-procs::proc_freq(setDF(donnees_datatable), tables = cspf * sexef, options = v(missing))
-# Ne fonctionne pas avec le poids !!!
-#procs::proc_freq(setDF(donnees_datatable), tables = cspf * sexef, weight = poids_sondage, options = v(missing))
-# On reconvertit en data.table
-setDT(donnees_datatable)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Solutions avec package R ne permettant apparemment pas de pondérer 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet pour SAS */
-proc freq data = donnees_sas;
-  tables Sexe * CSP / missing;
-  format Sexe sexef. CSP $cspf.;
-  weight poids_sondage;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# Autres packages, qui semblent quasi-inutiles, car ils ne permettent apparemment pas de pondérer
-
-# Package janitor
-library(janitor)
-# Attention, la fonction tabyl ne permet pas de pondérer
-tab <- janitor::tabyl(donnees_rbase, cspf, sexef)
-tab
-janitor::adorn_totals(tab, c("row", "col"))
-# Pourcentages
-janitor::adorn_percentages(tab, denominator = "all", na.rm = TRUE)
-# Pourcentages lignes
-janitor::adorn_percentages(tab, denominator = "row", na.rm = TRUE)
-# Pourcentages colonnes
-janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
-
-# Package crosstable
-library(crosstable)
-crosstable::crosstable(donnees_rbase, cspf, by = sexef, showNA = "always", percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
-
-# Package gmodels
-library(gmodels)
-gmodels::CrossTable(donnees_rbase$cspf, donnees_rbase$sexef)
-
-# Package gtsummary
-library(gtsummary)
-# Pourcentages par case, colonne, ligne
-gtsummary::tbl_cross(data = donnees_rbase, row = cspf, col = sexef, percent = c("cell"),   margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_rbase, row = cspf, col = sexef, percent = c("column"), margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_rbase, row = cspf, col = sexef, percent = c("row"),    margin = c("column", "row"), missing = c("always"))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# Autres packages, qui semblent quasi-inutiles, car ils ne permettent apparemment pas de pondérer
-
-# Package janitor
-library(janitor)
-# Attention, la fonction tabyl ne permet pas de pondérer
-tab <- donnees_tidyverse %>% 
-  janitor::tabyl(cspf, sexef) %>% 
-  janitor::adorn_totals(c("row", "col"))
-tab
-# Pourcentages
-tab %>% janitor::adorn_percentages(denominator = "all", na.rm = TRUE)
-# Pourcentages lignes
-tab %>% janitor::adorn_percentages(denominator = "row", na.rm = TRUE)
-# Pourcentages colonnes
-tab %>% janitor::adorn_percentages(denominator = "col", na.rm = TRUE)
-
-# Package crosstable
-library(crosstable)
-crosstable::crosstable(donnees_tidyverse, cspf, by = sexef, showNA = "always",
-                       percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
-
-# Package gmodels
-library(gmodels)
+library(collapse)
 donnees_tidyverse %>% 
-  summarise(gmodels::CrossTable(cspf, sexef))
-
-# Package gtsummary
-library(gtsummary)
-# Pourcentages par case, colonne, ligne
-gtsummary::tbl_cross(data = donnees_tidyverse, row = cspf, col = sexef, percent = c("cell"),   margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_tidyverse, row = cspf, col = sexef, percent = c("column"), margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_tidyverse, row = cspf, col = sexef, percent = c("row"),    margin = c("column", "row"), missing = c("always"))
+  summarise(var = collapse::fvar(note_contenu, w = poids_sondage))
+# On la calcule "manuellement" pour confirmer le résultat
+# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
+x_2 <- with(donnees_tidyverse,
+            sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+x_m <- with(donnees_tidyverse,
+            sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+p <- with(donnees_tidyverse,
+          sum(poids_sondage * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+x_2 / p - (x_m / p) ** 2
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Autre possibilité, avec packages, pour avoir la même présentation que la proc freq de SAS
-# Autres packages, qui semblent quasi-inutiles, car ils ne permettent apparemment pas de pondérer
+library(collapse)
+donnees_datatable[, collapse::fvar(note_contenu, w = poids_sondage)]
+# On la calcule "manuellement" pour confirmer le résultat
+# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
+x_2 <- donnees_datatable[, sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage),
+                               na.rm = TRUE)]
+x_m <- donnees_datatable[, sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage),
+                               na.rm = TRUE)]
+p <- donnees_datatable[, sum(poids_sondage * complete.cases(note_contenu, poids_sondage), na.rm = TRUE)]
+x_2 / p - (x_m / p) ** 2
+```
 
-# Package janitor
-library(janitor)
-# Attention, la fonction tabyl ne permet pas de pondérer
-tab <- janitor::tabyl(donnees_datatable, cspf, sexef)
-tab
-janitor::adorn_totals(tab, c("row", "col"))
-# Pourcentages
-janitor::adorn_percentages(tab, denominator = "all", na.rm = TRUE)
-# Pourcentages lignes
-janitor::adorn_percentages(tab, denominator = "row", na.rm = TRUE)
-# Pourcentages colonnes
-janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
 
-# Package crosstable : lui non plus ne permet pas de pondérer, apparemment ...
-library(crosstable)
-crosstable::crosstable(donnees_datatable, cspf, by = sexef, showNA = "always",
-                       percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
+```
 
-# Package gmodels : ne permet pas de pondérer, apparemment
-library(gmodels)
-gmodels::CrossTable(donnees_datatable$cspf, donnees_datatable$sexef)
 
-# Package gtsummary : ne permet pas de pondérer, apparemment
-library(gtsummary)
-# Pourcentages par case, colonne, ligne
-gtsummary::tbl_cross(data = donnees_datatable, row = cspf, col = sexef, percent = c("cell"),  
-                     margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_datatable, row = cspf, col = sexef, percent = c("column"),
-                     margin = c("column", "row"), missing = c("always"))
-gtsummary::tbl_cross(data = donnees_datatable, row = cspf, col = sexef, percent = c("row"),   
-                     margin = c("column", "row"), missing = c("always"))
+:::
+
+## Déciles et quartiles 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On calcule déjà la moyenne des notes par individu */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data donnees_sas;
+  set donnees_sas;
+  /* 1ère solution */
+  Note_moyenne    = mean(of &notes.);
+  /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
+  %macro List_comprehension;
+    Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
+	                          %let j = %scan(&notes., &i.);
+						      &j.
+						    %end;);;
+  %mend List_comprehension;
+  %List_comprehension;
+run;
+
+/* Déciles et quartiles de la note moyenne */
+/* Par la proc means */
+proc means data = donnees_sas StackODSOutput Min P10 P20 P30 P40 Median P60 P70 Q3 P80 P90 Max Q1 Median Q3 QRANGE;
+  var Note_moyenne;
+  ods output summary = Deciles_proc_means;
+run;
+/* Par la proc univariate */
+proc univariate data = donnees_sas;
+  var Note_moyenne;
+  output out = Deciles_proc_univariate pctlpts=00 to 100 by 10 25 50 75 PCTLPRE=_; 
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# on calcule déjà la moyenne des notes par individu
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
+# Et les quantiles
+quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+# Intervalle inter-quartile
+IQR(donnees_rbase$note_moyenne, na.rm = TRUE)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# on calcule déjà la moyenne des notes par individu
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
+# Et les quantiles
+donnees_tidyverse %>%
+  pull(note_moyenne) %>% 
+  quantile(probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+# Intervalle inter-quartile
+donnees_tidyverse %>%
+  pull(note_moyenne) %>% 
+  IQR(na.rm = TRUE)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# on calcule déjà la moyenne des notes par individu
+notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
+# On souhaite moyenner les notes par formation
+donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
+donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
+# Intervalle inter-quartile
+donnees_datatable[, IQR(note_moyenne, na.rm = TRUE)]
+donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "note_moyenne"]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Déciles et quartiles pondérés 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* On calcule déjà la moyenne des notes par individu */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data donnees_sas;
+  set donnees_sas;
+  Note_moyenne = mean(of &notes.);
+run;
+/* Par la proc means */
+proc means data = donnees_sas StackODSOutput Min P10 P20 P30 P40 Median P60 P70 Q3 P80 P90 Max Q1 Median Q3 QRANGE;
+  var Note_moyenne;
+  ods output summary = Deciles_proc_means;
+  weight poids_sondage;
+run;
+/* Par la proc univariate */
+proc univariate data = donnees_sas;
+  var Note_moyenne;
+  output out = Deciles_proc_univariate pctlpts=00 to 100 by 10 25 50 75 PCTLPRE=_;
+  weight poids_sondage;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
+library(collapse)
+# on calcule déjà la moyenne des notes par individu
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
+# Et les quantiles
+# L'option na.rm est par défaut à TRUE dans le package
+collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
+                    probs = c(seq(0, 1, 0.1)))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
+library(collapse)
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
+# Et les quantiles
+# L'option na.rm est par défaut à TRUE dans le package
+donnees_tidyverse %>%
+  pull(note_moyenne) %>% 
+  collapse::fquantile(probs = c(seq(0, 1, 0.1)), w = donnees_tidyverse$poids_sondage)
+donnees_tidyverse %>%
+  pull(note_moyenne) %>% 
+  collapse::fquantile(probs = c(0, 0.25, 0.5, 0.75, 1), w = donnees_tidyverse$poids_sondage)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
+library(collapse)
+# on calcule déjà la moyenne des notes par individu
+notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
+# On souhaite moyenner les notes par formation
+# L'option na.rm est par défaut à TRUE dans le package
+donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
+donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
+                                                                probs = c(seq(0, 1, 0.1))
+                                                                )),
+                           .SDcols = "note_moyenne"]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Rang de la note 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Ajouter dans la base le rang de la note par ordre décroissant */
+proc rank data = donnees_sas out = donnees_sas descending;
+  var note_moyenne;
+  ranks rang_note_moyenne;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ajouter dans la base le rang de la note par ordre décroissant
+donnees_rbase$rang_note_moyenne <- rank(-donnees_rbase$note_moyenne)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ajouter dans la base le rang de la note par ordre décroissant
+varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE)) %>% 
+  mutate(rang_note_moyenne = rank(-note_moyenne))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ajouter dans la base le rang de la note par ordre décroissant
+# Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
+# On exprime le rang par ordre décroissant, avec le - devant
+donnees_datatable[, rang_note_moyenne := rank(-note_moyenne)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Corrélation linéaire entre deux notes 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Covariance et corrélation linéaire (Kendall, Pearson, Spearman) */
+proc corr data = donnees_sas kendall pearson spearman cov;
+  var note_contenu note_formateur;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Covariance (Kendall, Pearson, Spearman)
+with(donnees_rbase,
+     sapply(c("pearson", "spearman", "kendall"),
+            function(x) cov(note_contenu, note_formateur, method = x, use = "complete.obs")))
+# Corrélation linéaire (Kendall, Pearson, Spearman)
+with(donnees_rbase,
+     sapply(c("pearson", "spearman", "kendall"),
+            function(x) cor(note_contenu, note_formateur, method = x, use = "complete.obs")))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Covariance (Kendall, Pearson, Spearman)
+# À FAIRE : peut-on faire mieux ???
+methodes <- c("pearson", "spearman", "kendall")
+methodes %>% 
+  purrr::map(~ 
+    donnees_tidyverse %>% 
+      summarise(cov = cov(note_contenu, note_formateur, method = .x, use = "complete.obs"))) %>% 
+  setNames(methodes) %>% 
+  as_tibble()
+
+# Corrélation linéaire (Kendall, Pearson, Spearman)
+# À FAIRE : peut-on faire mieux ???
+methodes <- c("pearson", "spearman", "kendall")
+methodes %>% 
+  purrr::map(~ donnees_tidyverse %>% 
+               summarise(cor = cor(note_contenu, note_formateur, method = .x, use = "complete.obs"))) %>% 
+  setNames(methodes) %>% 
+  as_tibble()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Covariance (Kendall, Pearson, Spearman)
+methodes <- c("pearson", "spearman", "kendall")
+setNames(donnees_datatable[, lapply(methodes,
+                           function(x) cov(note_contenu, note_formateur,
+                                           method = x,
+                                           use = "complete.obs"))],
+         methodes)
+# Corrélation linéaire (Kendall, Pearson, Spearman)
+setNames(donnees_datatable[, lapply(methodes,
+                                    function(x) cor(note_contenu, note_formateur,
+                                                    method = x,
+                                                    use = "complete.obs"))],
+         methodes)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

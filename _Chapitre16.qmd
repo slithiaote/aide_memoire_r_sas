@@ -5,7 +5,7 @@
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On extraie tous les doublons, pas la première occurrence */
+/* On extrait tous les doublons, pas la première occurrence */
 
 /* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
 proc contents data = donnees_sas out = Var noprint;run;
@@ -31,6 +31,13 @@ doublons <- donnees_rbase[duplicated(donnees_rbase), ]
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On extraie tous les doublons, pas la première occurrence
+donnees_tidyverse %>% 
+  group_by(across(everything())) %>% 
+  filter(n() > 1) %>% 
+  slice(-1) %>% 
+  ungroup()
+
+# Autre solution
 doublons <- donnees_tidyverse %>%  
   group_by_all() %>% 
   filter(n() > 1) %>%
@@ -200,6 +207,7 @@ sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
 proc sort data = donnees_sas nodupkey;
   by _all_;
 run;
+
 /* 2e méthode, avec first. et last. (cf. infra) */
 /* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
 proc contents data = donnees_sas out = Var noprint;run;
@@ -222,6 +230,7 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase), ]
+
 # Autre solution (équivalente à la solution first. de SAS)
 donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
 donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
@@ -229,25 +238,26 @@ donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>% 
+donnees_tidyverse_sansdoublon <- donnees_tidyverse %>% 
   arrange(pick(everything())) %>% 
   distinct()
-donnees_tidyverse <- donnees_tidyverse %>% 
+
+# Autre solution
+donnees_tidyverse_sansdoublon <- donnees_tidyverse %>% 
   arrange(across(everything())) %>% 
   distinct()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable <- unique(donnees_datatable)
-donnees_datatable <- donnees_datatable[! duplicated(donnees_datatable), ]
+donnees_datatable_sansdoublon <- unique(donnees_datatable)
+donnees_datatable_sansdoublon <- donnees_datatable[! duplicated(donnees_datatable), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 
@@ -293,7 +303,6 @@ sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant"
 
 ```
 
-
 :::
 
 ## Identifiants uniques 
@@ -326,7 +335,6 @@ unique(donnees_datatable[, "identifiant"])
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 

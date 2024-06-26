@@ -1,6 +1,6 @@
 # Les jointures de bases
 
-Pour fonctionner, les codes de cette partie nécessitent l'import des bases de la section "Importation de bases pour la jointure".
+Pour fonctionner, les codes de cette partie nécessitent l'import des bases d'exemple de la section "Importation de bases pour la jointure".
 
 ## Importation de bases pour les jointures 
 ::: {.panel-tabset group="language"}
@@ -60,7 +60,7 @@ jointure_rbase <- donnees_rbase[, c("identifiant", "sexe", "date_entree", "date_
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
-diplome_tidyverse <-tibble(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
+diplome_tidyverse <- tibble(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
                       diplome = c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"))
 # On suppose que l'on dispose d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller
 entrevue_tidyverse <- tibble(identifiant = c("173", "168", "087", "689", "099", "765"),
@@ -107,6 +107,8 @@ data Inner_Join1;
   by identifiant;
   if a and b;
 run;
+
+/* Autre solution */
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Inner_Join2 as
@@ -131,6 +133,7 @@ dim(innerJoin)
 innerJoin <- jointure_tidyverse %>% 
   inner_join(diplome_tidyverse, by = "identifiant")
 dim(innerJoin)
+
 # Autres solutions
 innerJoin <- jointure_tidyverse %>% 
   inner_join(diplome_tidyverse, by = join_by(identifiant == identifiant))
@@ -168,6 +171,8 @@ data Left_Join1;
   by identifiant;
   if a;
 run;
+
+/* Autre solution */
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Left_Join2 as
@@ -192,6 +197,7 @@ dim(leftJoin)
 leftJoin <- jointure_tidyverse %>% 
   left_join(diplome_tidyverse, by = "identifiant")
 dim(leftJoin)
+
 # Autres solutions
 leftJoin <- jointure_tidyverse %>% 
   left_join(diplome_tidyverse, by = join_by(identifiant == identifiant))
@@ -229,6 +235,8 @@ data Right_Join1;
   by identifiant;
   if b;
 run;
+
+/* Autre solution */
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Right_Join2 as
@@ -253,6 +261,7 @@ dim(rightJoin)
 rightJoin <- jointure_tidyverse %>% 
   right_join(diplome_tidyverse, by = "identifiant")
 dim(rightJoin)
+
 # Autre solution
 rightJoin <- jointure_tidyverse %>% 
   right_join(diplome_tidyverse, by = join_by(identifiant == identifiant))
@@ -274,7 +283,6 @@ dim(rightJoin)
 
 ```
 
-
 :::
 
 ## Full join : les identifiants des deux bases 
@@ -290,6 +298,8 @@ data Full_Join1;
   by identifiant;
   if a or b;
 run;
+
+/* Autre solution */
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Full_Join2 as
@@ -315,6 +325,7 @@ dim(fullJoin)
 fullJoin <- jointure_tidyverse %>% 
   full_join(diplome_tidyverse, by = "identifiant")
 dim(fullJoin)
+
 # Autre solution
 fullJoin <- jointure_tidyverse %>% 
   full_join(diplome_tidyverse, by = join_by(identifiant == identifiant))
@@ -334,7 +345,6 @@ dim(fullJoin)
 
 ```
 
-
 :::
 
 ## Jointure de 3 bases ou plus en une seule opération (inner join) 
@@ -350,6 +360,8 @@ data Inner_Join3;
   by identifiant;
   if a and b and c;
 run;
+
+/* Autre solution */
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Inner_Join4 as
@@ -377,7 +389,7 @@ dim(innerJoin2)
 # Via un inner join
 # Utilisation de la fonction reduce de purrr
 # Elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
-innerJoin2 <- list(jointure_tidyverse, diplome_tidyverse, entrevue_tidyverse) %>%
+innerJoin2 <- list(jointure_tidyverse, diplome_tidyverse, entrevue_tidyverse) %>% 
   purrr::reduce(dplyr::inner_join, by = join_by(identifiant == identifiant))
 dim(innerJoin2)
 ```
@@ -395,10 +407,12 @@ dim(innerJoin2)
 
 ```
 
-
 :::
 
-## Jointure sur inégalités 
+## Jointure sur inégalités
+
+On cherche à obtenir les entrevues qui se sont déroulées durant le contrat. On cherche alors à apparier les bases Jointure et Entrevue par identifiant si la date d'entrevue de la base Entrevue est comprise entre la date d'entrée et la date de sortie de la base Jointure.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -427,8 +441,6 @@ dim(innerJoinInegalite)
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ne semble pas natif en R-Base.
-# Une proposition indicative où on applique la sélection après la jointure, ce qui ne doit pas être très efficace ...
 innerJoinInegalite <- jointure_tidyverse %>% 
   inner_join(entrevue_tidyverse, join_by(identifiant == identifiant,
                                          date_entree <= date_entrevue,
@@ -454,10 +466,9 @@ dim(innerJoinInegalite)
 
 ```
 
-
 :::
 
-## Cross join : toutes les combinaisons possibles de CSP, sexe et Diplome 
+## Cross join : toutes les combinaisons possibles de CSP, sexe et diplôme 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -479,6 +490,7 @@ proc sql;select count(*) from CrossJoin;quit;
 crossJoin <- unique(expand.grid(donnees_rbase$cspf, donnees_rbase$sexef, diplome_rbase$diplome))
 colnames(crossJoin) <- c("cspf", "sexef", "diplome")
 dim(crossJoin)
+
 # Autre solution
 crossJoin2 <- unique(merge(donnees_rbase[, c("cspf", "sexef")], diplome_rbase[, "diplome"], by = NULL))
 dim(crossJoin2)
@@ -493,10 +505,12 @@ crossJoin <- donnees_tidyverse %>%
   cross_join(diplome_tidyverse %>% select(diplome)) %>% 
   distinct()
 dim(crossJoin)
+
 # Autre solution
 crossJoin <- cross_join(donnees_tidyverse %>% select(cspf, sexef), diplome_tidyverse %>% select(diplome)) %>% 
   distinct()
 dim(crossJoin)
+
 # Autre solution
 crossJoin <- donnees_tidyverse %>% 
   tidyr::expand(cspf, sexef, diplome_tidyverse$diplome) %>%
@@ -516,225 +530,9 @@ dim(crossJoin)
 
 ```
 
-
 :::
 
-## Juxtaposer côte à côte deux bases de données 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On va ajouter le numéro de la ligne */
-proc sql noprint;select count(*) into :tot from donnees_sas;run;
-data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
-/* Le merge sans by va juxtaposer côte à côte les bases */
-data Concatener;merge Ajout donnees_sas;run;
-/* Si l'une des bases comprend plus de ligne que l'autre, ajout d'une ligne de valeurs manquantes */
-proc sql noprint;select count(*) + 1 into :tot from donnees_sas;run;
-data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
-data Concatener;merge Ajout donnees_sas;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# cbind si les deux bases comprennent le même nombre de lignes
-ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase)))
-concatener <- cbind(ajout, donnees_rbase)
-# Erreur si l'une des bases comprend plus de lignes que l'autre
-ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase) + 1))
-# donnees_rbase_ajout <- cbind(ajout, donnees_rbase)
-# Proposition de solution
-cbind_alt <- function(liste) {
-  # Nombre maximal de colonnes dans la liste de dataframes
-  maxCol <- max(unlist(lapply(liste, nrow)))
-  # Ajout d'une colonne de valeurs manquantes pour toutes les bases ayant moins de ligne que le maximum
-  res <- lapply(liste, function(x) {
-    for (i in seq_len(maxCol - nrow(x))) {
-      x[nrow(x) + i, ] <- NA
-    }
-    return(x)
-  })
-  # On joint les résultats
-  return(do.call(cbind, res))
-}
-concatener <- cbind_alt(list(ajout, donnees_rbase))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# cbind si les deux bases comprennent le même nombre de lignes
-ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
-concatener <- donnees_tidyverse %>% bind_cols(ajout)
-# Ne fonctionne si l'une des bases comprend plus de lignes que l'autre !
-ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse) + 1))
-#concatener <- donnees_tidyverse %>% bind_cols(ajout)
-# cf. solution proposée dans R-Base
-cbind_alt <- function(liste) {
-  # Nombre maximal de colonnes dans la liste de dataframes
-  maxCol <- max(unlist(lapply(liste, nrow)))
-  # Ajout d'une colonne de valeurs manquantes pour toutes les bases ayant moins de ligne que le maximum
-  res <- lapply(liste, function(x) {
-    for (i in seq_len(maxCol - nrow(x))) {
-      x[nrow(x) + i, ] <- NA
-    }
-    return(x)
-  })
-  # On joint les résultats
-  return(bind_cols(res))
-}
-concatener <- cbind_alt(list(ajout, donnees_tidyverse))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# data.frame::cbind si les deux bases comprennent le même nombre de lignes
-ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
-concatener <- cbind(ajout, donnees_datatable)
-# Fonctionne aussi avec des bases comportement un nombre différent de lignes
-# Mais attention, le résultat n'est pas le même que sur SAS, il y a recycling
-ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable) + 1))
-concatener <- cbind(ajout, donnees_datatable)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Empiler deux bases de données 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* On va empiler la somme des notes en dessous de la base des notes */
-%let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
-/* On sélectionne un nombre réduit de variables pour simplifier l'exemple */
-%let var2 = %sysfunc(tranwrd(&var., Identifiant,));
-data Notes;set donnees_sas (keep = &var.);run;
-/* Moyenne des notes par individu */
-proc means data = Notes noprint mean;var &var2.;output out = Ajout mean = &var2.;run;
-/* On concatène avec les données. Valeur manquante si les variables ne correspondent pas */
-/* L'instruction set permet de concaténer les bases */
-data Empiler;set Notes Ajout (drop = _type_ _freq_);run;
-/* Autre solution, proc append */
-data Empiler;set Notes;run;
-proc append base = Empiler data = Ajout force;run;
-/* On renomme la ligne des moyennes ajoutée */
-data Empiler;
-  set Empiler nobs = nobs;
-  if _N_ = nobs then Identifiant = "Moyenne";
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va empiler la somme des notes en dessous de la base des notes
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
-moyennes <- data.frame(t(colMeans(donnees_rbase[, varNotes], na.rm = TRUE)))
-# On sélectionne la base des notes
-notes <- donnees_rbase[, varNotes]
-# rbind lorsque les bases empilées ont le même nombre de colonne
-empiler <- rbind(notes, moyennes)
-# Mais, ne fonctionne plus si l'on concatène des bases de taille différente
-notes <- donnees_rbase[, c("identifiant", varNotes)]
-# Ne fonctionne pas
-#empiler <- rbind(notes, moyennes)
-# Une solution alternative, lorsque le nombre de colonnes diffère entre les deux bases
-# Lorsque les variables ne correspondent pas, on les crée avec des valeurs manquantes, via setdiff
-rbind_alt <- function(x, y) {
-  rbind(data.frame(c(x, sapply(setdiff(names(y), names(x)), function(z) NA))),
-        data.frame(c(y, sapply(setdiff(names(x), names(y)), function(z) NA)))
-  )
-  }
-empiler <- rbind_alt(notes, moyennes)
-# On renomme la ligne des moyennes ajoutée
-empiler[nrow(empiler), "identifiant"] <- "Moyenne"
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va empiler la somme des notes en dessous de la base des notes
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
-moyennes <- donnees_tidyverse %>% 
-  summarise(across(varNotes, ~mean(., na.rm = TRUE)))
-empiler <- donnees_tidyverse %>% 
-  select(all_of(varNotes)) %>% 
-  bind_rows(moyennes)
-# Fonctionne toujours si l'on concatène des bases de taille différente
-empiler <- donnees_tidyverse %>% 
-  select(identifiant, all_of(varNotes)) %>% 
-  bind_rows(moyennes)
-empiler <- empiler %>% 
-  # On renomme la ligne des moyennes ajoutée
-  mutate(identifiant = ifelse(row_number() == nrow(empiler),
-                              "Moyenne",
-                              identifiant))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va empiler la somme des notes en dessous de la base des notes
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
-moyennes <- data.table(donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = varNotes])
-# On sélectionne la base des notes
-notes <- donnees_datatable[, mget(c("identifiant", varNotes))]
-empiler <- rbindlist(list(notes, moyennes), fill = TRUE)
-# On renomme la ligne des moyennes ajoutée
-set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Ajouter une ligne de valeurs manquantes à une base de données 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-data Ajout;run;
-data Ajout_Missing;set Jointure Ajout;run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-ajout_na <- donnees_rbase
-ajout_na[nrow(ajout_na) + 1, ] <- NA
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-ajout_na <- donnees_tidyverse %>%
-  bind_rows(tibble(NA))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-ajout_na <- rbindlist(list(donnees_datatable, data.table(NA)), fill = TRUE)
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Semi join 
+## Semi join
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -782,10 +580,9 @@ dim(semiJoin)
 
 ```
 
-
 :::
 
-## Anti join 
+## Anti join
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -833,10 +630,9 @@ dim(antiJoin)
 
 ```
 
-
 :::
 
-## Autres fonctions utiles 
+## Autres fonctions utiles
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

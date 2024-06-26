@@ -115,3 +115,5 @@ Enfin, si vous souhaitez collaborer à cet aide-mémoire ou nous faire part de v
 {{< include _Chapitre23.qmd >}}
 
 {{< include _Chapitre24.qmd >}}
+
+{{< include _Chapitre25.qmd >}}
