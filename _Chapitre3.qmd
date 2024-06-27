@@ -55,16 +55,16 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Année courante */
-%let an = %sysfunc(year(%sysfunc(today())));
+%let annee = %sysfunc(year(%sysfunc(today())));
 /* & (esperluette) indique à SAS qu'il doit remplacer an par sa valeur définie par le %let */
-%put Année : &an.;
+%put Année : &annee.;
 
 /* Autre possibilité */
 data _null_;call symput('annee', strip(year(today())));run;
 %put Année (autre méthode) : &annee.;
 
 /* Année passée */
-%put Année passée : %eval(&an. - 1);
+%put Année passée : %eval(&annee. - 1);
 ```
 
 ## `R base` {.unnumbered .unlisted}
@@ -128,7 +128,7 @@ paste0("Année passée : ", annee_1)
   %if &an. >= 2024 %then %put Nous sommes en 2024 ou après !;
   %else %put Nous sommes avant 2024 !;
 %mend Annee;
-%Annee(&an.);
+%Annee(&annee.);
 ```
 
 ## `R base` {.unnumbered .unlisted}
