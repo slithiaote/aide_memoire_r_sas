@@ -1,5 +1,7 @@
 # Tableaux de contingence (proc freq de `SAS`) pour 2 variables 
 
+Cette tâche, immédiate en `SAS`, est plus complexe à réaliser en `R`. Plusieurs stratégies, avec et sans packages, sont proposées ici.
+
 ## Tableaux de contingence pour 2 variables
 
 ::: {.panel-tabset group="language"}
@@ -368,6 +370,9 @@ Autre possibilité, avec package `R`, pour avoir la même présentation que la p
 Des informations sur l'usage des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html>.
 
 ### Package descr
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/descr/descr.pdf>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -422,6 +427,12 @@ with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, pro
 :::
 
 ### Package flextable
+
+Lien vers la documentation :
+
+- <https://cran.r-project.org/web/packages/descr/descr.pdf>
+- <https://cran.r-project.org/web/packages/flextable/flextable.pdf>
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -479,6 +490,9 @@ flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage
 :::
 
 ### Package questionr
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/questionr/questionr.pdf>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -553,6 +567,9 @@ questionr::rprop(tab)
 :::
 
 ### Package survey
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/survey/survey.pdf>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -597,6 +614,9 @@ survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 :::
 
 ### Package procs
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/procs/vignettes/procs-freq.html>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -648,6 +668,8 @@ setDT(donnees_datatable)
 Autres packages, qui semblent quasi-inutiles, ne permettant apparemment pas de pondérer.
 
 ### Package Janitor
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/janitor/vignettes/tabyls.html>.
 
 ::: {.panel-tabset group="language"}
 
@@ -716,6 +738,8 @@ janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
 
 ### Package crosstable
 
+Lien vers la documentation : <https://cran.r-project.org/web/packages/crosstable/crosstable.pdf>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -757,6 +781,8 @@ crosstable::crosstable(donnees_datatable, cspf, by = sexef, showNA = "always",
 
 ### Package gmodels
 
+Lien vers la documentation : <https://cran.r-project.org/web/packages/gmodels/gmodels.pdf>.
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -796,6 +822,8 @@ gmodels::CrossTable(donnees_datatable$cspf, donnees_datatable$sexef)
 :::
 
 ### Package gtsummary
+
+Lien vers la documentation : <https://cran.r-project.org/web/packages/gtsummary/gtsummary.pdf>.
 
 ::: {.panel-tabset group="language"}
 
