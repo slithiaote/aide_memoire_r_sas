@@ -50,11 +50,14 @@ data donnees_sas;
   ;
 run;
 
-/* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
+/* Ajout de variables utiles */
 data donnees_sas;
   set donnees_sas;
+  /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
   format date_sortie ddmmyy10.;
   date_sortie = intnx('day', date_entree, duree);
+  /* Âge à l'entrée dans le dispositif */
+Age = intck('year', date_naissance, date_entree);
 run;
 ```
 
@@ -107,6 +110,9 @@ donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
 
 # Date de sortie du dispositif
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
+
+# Âge à l'entrée dans le dispositif
+donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -160,7 +166,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 # Date de sortie du dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(date_sortie = date_entree + lubridate::days(duree))
+  mutate(date_sortie = date_entree + lubridate::days(duree)) %>% 
+  # Âge à l'entrée dans le dispositif
+  mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -221,6 +229,9 @@ donnees_datatable[, (varDates) := lapply(.SD, lubridate::dmy), .SDcols = varDate
 
 # Date de sortie du dispositif
 donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
+
+# Âge à l'entrée dans le dispositif
+donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
