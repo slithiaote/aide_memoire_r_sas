@@ -541,13 +541,50 @@ donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 
 ```
 
+:::
+
+## Variance et variance pondérée
+
+### Variance
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc means data = donnees_sas var;
+  var note_contenu;
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(collapse)
+with(donnees_rbase, var(note_contenu))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>% 
+  summarise(var = var(note_contenu))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, var(note_contenu)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
 
 :::
 
-## Variance et variance pondérée 
+### Variance pondérée
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas var vardef = wgt;
   var note_contenu;
@@ -555,12 +592,54 @@ proc means data = donnees_sas var vardef = wgt;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
 with(donnees_rbase, collapse::fvar(note_contenu, w = poids_sondage))
-# On la calcule "manuellement" pour confirmer le résultat
-# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(collapse)
+donnees_tidyverse %>% 
+  summarise(var = collapse::fvar(note_contenu, w = poids_sondage))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(collapse)
+donnees_datatable[, collapse::fvar(note_contenu, w = poids_sondage)]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Calcul "manuel" de la variance pondérée
+
+La variance pondérée se calcul par la formule :
+$$
+\frac{\sum_i{w_i \times (x_i - \bar{x}) ^2}}{\sum_i{w_i}} = \frac{\sum_i{w_ix_i^2}} {\sum_i{w_i}} - \bar{x}^2
+$$
+
+On la calcule "manuellement" pour confirmer le résultat.
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc means data = donnees_sas var vardef = wgt;
+  var note_contenu;
+  weight poids_sondage;
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library(collapse)
 x_2 <- with(donnees_rbase,
             sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
 x_m <- with(donnees_rbase,
@@ -570,28 +649,22 @@ p <- with(donnees_rbase,
 x_2 / p - (x_m / p) ** 2
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(collapse)
-donnees_tidyverse %>% 
-  summarise(var = collapse::fvar(note_contenu, w = poids_sondage))
-# On la calcule "manuellement" pour confirmer le résultat
-# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
-x_2 <- with(donnees_tidyverse,
-            sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
-x_m <- with(donnees_tidyverse,
-            sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
-p <- with(donnees_tidyverse,
-          sum(poids_sondage * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
+x_2 <- donnees_tidyverse %>%  
+  summarise(sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE)) %>% 
+  pull()
+x_m <- donnees_tidyverse %>%  
+  summarise(sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage), na.rm = TRUE)) %>% 
+  pull()          
+p <- donnees_tidyverse %>% 
+  summarise(sum(poids_sondage * complete.cases(note_contenu, poids_sondage), na.rm = TRUE)) %>% 
+  pull()
 x_2 / p - (x_m / p) ** 2
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(collapse)
-donnees_datatable[, collapse::fvar(note_contenu, w = poids_sondage)]
-# On la calcule "manuellement" pour confirmer le résultat
-# Formule : S_i{w_i * x_i**2} / S_i{w_i} - x_m**2
 x_2 <- donnees_datatable[, sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage),
                                na.rm = TRUE)]
 x_m <- donnees_datatable[, sum(poids_sondage * note_contenu * complete.cases(note_contenu, poids_sondage),
@@ -600,7 +673,7 @@ p <- donnees_datatable[, sum(poids_sondage * complete.cases(note_contenu, poids_
 x_2 / p - (x_m / p) ** 2
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -621,9 +694,9 @@ data donnees_sas;
   /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
   %macro List_comprehension;
     Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
-	                          %let j = %scan(&notes., &i.);
-						      &j.
-						    %end;);;
+	                            %let j = %scan(&notes., &i.);
+						                  &j.
+						                %end;);;
   %mend List_comprehension;
   %List_comprehension;
 run;
@@ -634,6 +707,7 @@ proc means data = donnees_sas StackODSOutput Min P10 P20 P30 P40 Median P60 P70 
   var Note_moyenne;
   ods output summary = Deciles_proc_means;
 run;
+
 /* Par la proc univariate */
 proc univariate data = donnees_sas;
   var Note_moyenne;
@@ -643,11 +717,13 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# on calcule déjà la moyenne des notes par individu
+# On calcule déjà la moyenne des notes par individu
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
+
 # Et les quantiles
 quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+
 # Intervalle inter-quartile
 IQR(donnees_rbase$note_moyenne, na.rm = TRUE)
 ```
@@ -658,10 +734,12 @@ IQR(donnees_rbase$note_moyenne, na.rm = TRUE)
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
+
 # Et les quantiles
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
   quantile(probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+
 # Intervalle inter-quartile
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
@@ -672,9 +750,11 @@ donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # on calcule déjà la moyenne des notes par individu
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
-# On souhaite moyenner les notes par formation
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
+
+# Et les quantiles
 donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
+
 # Intervalle inter-quartile
 donnees_datatable[, IQR(note_moyenne, na.rm = TRUE)]
 donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "note_moyenne"]
@@ -687,7 +767,7 @@ donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "no
 
 :::
 
-## Déciles et quantiles pondérés 
+## Déciles et quantiles pondérés
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -698,12 +778,14 @@ data donnees_sas;
   set donnees_sas;
   Note_moyenne = mean(of &notes.);
 run;
+
 /* Par la proc means */
 proc means data = donnees_sas StackODSOutput Min P10 P20 P30 P40 Median P60 P70 Q3 P80 P90 Max Q1 Median Q3 QRANGE;
   var Note_moyenne;
   ods output summary = Deciles_proc_means;
   weight poids_sondage;
 run;
+
 /* Par la proc univariate */
 proc univariate data = donnees_sas;
   var Note_moyenne;
@@ -715,28 +797,39 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
+# L'option na.rm est par défaut à TRUE dans le package
 library(collapse)
-# on calcule déjà la moyenne des notes par individu
+
+# On calcule déjà la moyenne des notes par individu
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
-# Et les quantiles
-# L'option na.rm est par défaut à TRUE dans le package
+
+# Les déciles
 collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
                     probs = c(seq(0, 1, 0.1)))
+
+# Les quartiles
+collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
+                    probs = c(0, 0.25, 0.5, 0.75, 1))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
+# L'option na.rm est par défaut à TRUE dans le package
 library(collapse)
+
+# On calcule déjà la moyenne des notes par individu
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
-# Et les quantiles
-# L'option na.rm est par défaut à TRUE dans le package
+
+# Les déciles
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
   collapse::fquantile(probs = c(seq(0, 1, 0.1)), w = donnees_tidyverse$poids_sondage)
+
+# Les quartiles
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
   collapse::fquantile(probs = c(0, 0.25, 0.5, 0.75, 1), w = donnees_tidyverse$poids_sondage)
@@ -745,14 +838,22 @@ donnees_tidyverse %>%
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
-library(collapse)
-# on calcule déjà la moyenne des notes par individu
-notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
-# On souhaite moyenner les notes par formation
 # L'option na.rm est par défaut à TRUE dans le package
+library(collapse)
+
+# On calcule déjà la moyenne des notes par individu
+notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
+
+# Les centiles
 donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
                                                                 probs = c(seq(0, 1, 0.1))
+                                                                )),
+                           .SDcols = "note_moyenne"]
+
+# Les quartiles
+donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
+                                                                probs = c(0, 0.25, 0.5, 0.75, 1)
                                                                 )),
                            .SDcols = "note_moyenne"]
 ```
@@ -762,15 +863,23 @@ donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_son
 
 ```
 
-
 :::
 
-## Rang de la note 
+## Rang de la note
+
+Ajouter dans la base le rang de la note par ordre décroissant.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Ajouter dans la base le rang de la note par ordre décroissant */
+/* On calcule déjà la moyenne des notes par individu */
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data donnees_sas;
+  set donnees_sas;
+  Note_moyenne = mean(of &notes.);
+run;
+
 proc rank data = donnees_sas out = donnees_sas descending;
   var note_moyenne;
   ranks rang_note_moyenne;
@@ -779,13 +888,15 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ajouter dans la base le rang de la note par ordre décroissant
+# On calcule déjà la moyenne des notes par individu
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
+
 donnees_rbase$rang_note_moyenne <- rank(-donnees_rbase$note_moyenne)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ajouter dans la base le rang de la note par ordre décroissant
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE)) %>% 
@@ -794,7 +905,10 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ajouter dans la base le rang de la note par ordre décroissant
+# On calcule déjà la moyenne des notes par individu
+notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
+donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
+
 # Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
 # On exprime le rang par ordre décroissant, avec le - devant
 donnees_datatable[, rang_note_moyenne := rank(-note_moyenne)]
@@ -805,13 +919,15 @@ donnees_datatable[, rang_note_moyenne := rank(-note_moyenne)]
 
 ```
 
-
 :::
 
-## Corrélation linéaire entre deux notes 
+
+## Covariance et corrélation linéaire
+
+### Covariance entre deux notes
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Covariance et corrélation linéaire (Kendall, Pearson, Spearman) */
 proc corr data = donnees_sas kendall pearson spearman cov;
@@ -819,22 +935,17 @@ proc corr data = donnees_sas kendall pearson spearman cov;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Covariance (Kendall, Pearson, Spearman)
 with(donnees_rbase,
      sapply(c("pearson", "spearman", "kendall"),
             function(x) cov(note_contenu, note_formateur, method = x, use = "complete.obs")))
-# Corrélation linéaire (Kendall, Pearson, Spearman)
-with(donnees_rbase,
-     sapply(c("pearson", "spearman", "kendall"),
-            function(x) cor(note_contenu, note_formateur, method = x, use = "complete.obs")))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Covariance (Kendall, Pearson, Spearman)
-# À FAIRE : peut-on faire mieux ???
 methodes <- c("pearson", "spearman", "kendall")
 methodes %>% 
   purrr::map(~ 
@@ -842,9 +953,48 @@ methodes %>%
       summarise(cov = cov(note_contenu, note_formateur, method = .x, use = "complete.obs"))) %>% 
   setNames(methodes) %>% 
   as_tibble()
+```
 
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Covariance (Kendall, Pearson, Spearman)
+methodes <- c("pearson", "spearman", "kendall")
+setNames(donnees_datatable[, lapply(methodes,
+                                    function(x) cov(note_contenu, note_formateur,
+                                                    method = x,
+                                                    use = "complete.obs"))],
+         methodes)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Corrélation linéaire entre deux notes
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+/* Corrélation linéaire (Kendall, Pearson, Spearman) */
+proc corr data = donnees_sas kendall pearson spearman cov;
+  var note_contenu note_formateur;
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Corrélation linéaire (Kendall, Pearson, Spearman)
-# À FAIRE : peut-on faire mieux ???
+with(donnees_rbase,
+     sapply(c("pearson", "spearman", "kendall"),
+            function(x) cor(note_contenu, note_formateur, method = x, use = "complete.obs")))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Corrélation linéaire (Kendall, Pearson, Spearman)
 methodes <- c("pearson", "spearman", "kendall")
 methodes %>% 
   purrr::map(~ donnees_tidyverse %>% 
@@ -853,15 +1003,8 @@ methodes %>%
   as_tibble()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Covariance (Kendall, Pearson, Spearman)
-methodes <- c("pearson", "spearman", "kendall")
-setNames(donnees_datatable[, lapply(methodes,
-                           function(x) cov(note_contenu, note_formateur,
-                                           method = x,
-                                           use = "complete.obs"))],
-         methodes)
 # Corrélation linéaire (Kendall, Pearson, Spearman)
 setNames(donnees_datatable[, lapply(methodes,
                                     function(x) cor(note_contenu, note_formateur,
@@ -870,7 +1013,7 @@ setNames(donnees_datatable[, lapply(methodes,
          methodes)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
