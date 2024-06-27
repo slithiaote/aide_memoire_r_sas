@@ -122,7 +122,7 @@ donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
 ```
 :::
 
-## Formater les modalités des valeurs 
+## Formater les modalités des valeurs discrètes ou caractères
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -133,12 +133,6 @@ proc format;
   value sexef
   1 = "Homme"
   2 = "Femme";
-
-  /* Variable continue */
-  value agef
-  low-<26 = "1. De 15 à 25 ans"
-  26<-<50 = "2. De 26 à 49 ans"
-  50-high = "3. 50 ans ou plus";
 
   /* Variable caractère */
   value $ cspf
@@ -189,9 +183,75 @@ requete_duckdb %>%
 
 :::
 
+## Formater les modalités des valeurs continues
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Utilisation des formats */
+proc format;
+  /* Variable continue */
+  value agef
+  low-<26 = "1. De 15 à 25 ans"
+  26<-<50 = "2. De 26 à 49 ans"
+  50-high = "3. 50 ans ou plus";
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+# L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
+agef <- cut(donnees_rbase$age, 
+            breaks = c(0, 25, 49, Inf),
+            right = TRUE,
+            labels = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
+            ordered_result = TRUE)
+
+# Autre solution
+donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
+# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
+donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
+donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(agef = case_when(
+    age < 26             ~ "1. De 15 à 25 ans",
+    age >= 26 & age < 50 ~ "2. De 26 à 49 ans",
+    age >= 50            ~ "3. 50 ans ou plus")
+    )
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+donnees_datatable[, agef := fcase(age < 26,             "1. De 15 à 25 ans",
+                                  26 <= age & age < 50, "2. De 26 à 49 ans",
+                                  age >= 50,            "3. 50 ans ou plus")]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+Préférer `case_match` quand il s'agit de valeurs déterminées.
+
+```{r, warning=FALSE, message=FALSE}
+# Âge formaté
+requete_duckdb %>%
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
+```
+
+:::
+
 ## Utiliser les formats
 
-Nécessite le lancement des formats à l'étape précédente.
+Nécessite le lancement des formats aux étapes précédentes.
 
 ::: {.panel-tabset group="language"}
 
@@ -205,6 +265,8 @@ data donnees_sas;
   /* On exprime la CSP en texte dans une variable CSPF avec le format */
   format CSPF $25.;
   CSPF = put(CSP, $cspf.);
+  /* Âge formaté */
+  Agef = put(Age, agef.);
 run;
 ```
 
@@ -329,7 +391,7 @@ donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 :::
 
-## Créer, et supprimer plusieurs variables 
+## Créer et supprimer plusieurs variables 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
