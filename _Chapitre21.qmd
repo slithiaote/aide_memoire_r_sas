@@ -44,15 +44,19 @@ addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ajouter une ligne avec les sommes !
 # Tableau de fréquence
-donnees_tidyverse %>% 
+tab <- donnees_tidyverse %>% 
   group_by(cspf, sexef) %>% 
   summarise(prop = n(), .groups = "drop_last") %>% 
   ungroup() %>% 
   mutate(prop = prop / sum(prop) * 100) %>%
   spread(sexef, prop) %>% 
   mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
+tab <- bind_rows(tab, tab %>% 
+                   summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)),
+                             across(where(is.character), ~"Total"))
+)
+tab
 
 # Proportions par ligne
 donnees_tidyverse %>% 
@@ -67,26 +71,6 @@ donnees_tidyverse %>%
   summarise(prop = n()) %>% 
   mutate(prop = prop / sum(prop) * 100) %>% 
   spread(sexef, prop)
-
-tab <- donnees_tidyverse %>% 
-  count(cspf, sexef, wt = poids_sondage, name = "prop") %>% 
-  ungroup() %>% 
-  mutate(prop = prop / sum(prop) * 100) %>% 
-  # À FAIRE : pourrait-on sommer directement avec pivot_wider ? Argument values_fn?
-  # Ne semble pas fonctionner, pourqoi ???
-  pivot_wider(names_from = sexef, values_from = prop) %>% 
-  # Somme par ligne
-  mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
-# Autre solution avec rowwise : bien penser à c_across et non across !
-#rowwise() %>% 
-#mutate(Total = sum(c_across(where(is.numeric)), na.rm = T)) %>% 
-#ungroup()
-# Somme par colonne
-tab <- bind_rows(tab, tab %>% 
-                   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)),
-                             across(where(is.character), ~"Total"))
-)
-tab
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -203,15 +187,9 @@ tab <- donnees_tidyverse %>%
   count(cspf, sexef, wt = poids_sondage, name = "prop") %>% 
   ungroup() %>% 
   mutate(prop = prop / sum(prop) * 100) %>% 
-  # À FAIRE : pourrait-on sommer directement avec pivot_wider ? Argument values_fn?
-  # Ne semble pas fonctionner, pourqoi ???
   pivot_wider(names_from = sexef, values_from = prop) %>% 
   # Somme par ligne
   mutate(Total = rowSums(across(where(is.numeric)), na.rm = TRUE))
-  # Autre solution avec rowwise : bien penser à c_across et non across !
-  #rowwise() %>% 
-  #mutate(Total = sum(c_across(where(is.numeric)), na.rm = T)) %>% 
-  #ungroup()
 # Somme par colonne
 tab <- bind_rows(tab, tab %>% 
                    summarise(across(where(is.numeric), sum, na.rm = TRUE),
@@ -234,10 +212,9 @@ addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 
 ```
 
-
 :::
 
-## Copier-coller le tableau dans un tableur (Excel, etc.) 
+## Copier-coller le tableau dans un tableur (Excel, etc.)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -318,10 +295,9 @@ kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
 
 ```
 
-
 :::
 
-## Tests d'associaton (Chi-Deux, etc.) 
+## Tests d'associaton (Chi-Deux, etc.)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -342,10 +318,7 @@ summary(table(donnees_rbase$cspf, donnees_rbase$sexef))
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Test du Khi-Deux
-#donnees_tidyverse %>%
-#  summarise(a = chisq.test(sexef, cspf))
-# À FAIRE : fonctionne, mais pas vraiment Tidyverse
-with(donnees_tidyverse, chisq.test(cspf, sexef))
+chisq.test(donnees_tidyverse |> pull(cspf), donnees_tidyverse |> pull(sexef))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -398,7 +371,6 @@ with(donnees_rbase, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r 
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : est-il possible d'appliquer le pipe ???
 library(descr)
 # Non pondéré
 with(donnees_tidyverse, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
@@ -453,21 +425,18 @@ flextable::proc_freq(donnees_rbase, "cspf", "sexef")
 # Pondéré
 flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage")
 # Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
+flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : est-il possible d'appliquer le pipe ???
 library(flextable)
 # Non pondéré
 flextable::proc_freq(donnees_tidyverse, "cspf", "sexef")
 # Pondéré
 flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage")
 # Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
+flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
 ### `data.table` {.unnumbered .unlisted}
@@ -478,8 +447,7 @@ flextable::proc_freq(donnees_datatable, "cspf", "sexef")
 # Pondéré
 flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage")
 # Sans les proportions par ligne et colonne
-flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE,
-                     include.column_percent = FALSE)
+flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
