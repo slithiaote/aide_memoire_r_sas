@@ -361,8 +361,9 @@ donnees_datatable[, chisq.test(cspf, sexef)]
 
 ## Solutions avec package `R` permettant de pondérer
 
-Autre possibilité, avec package `R`, pour avoir la même présentation que la proc freq de `SAS`
-5 packages paraissent pertinents : descr, flextable, questionr, survey, procs
+Autre possibilité, avec package `R`, pour avoir la même présentation que la proc freq de `SAS`.
+
+5 packages paraissent pertinents : descr, flextable, questionr, survey, procs.
 
 Des informations sur l'usage des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html>.
 
@@ -643,6 +644,8 @@ setDT(donnees_datatable)
 :::
 
 ## Solutions avec package R ne permettant apparemment pas de pondérer
+
+Autres packages, qui semblent quasi-inutiles, ne permettant apparemment pas de pondérer.
 
 ### Package Janitor
 
