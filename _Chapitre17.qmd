@@ -753,7 +753,6 @@ sort(base::intersect(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
-
 # Identifiants communs des 2 bases
 dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>% 
   sort()

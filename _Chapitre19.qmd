@@ -11,14 +11,14 @@ proc sql;select mean(note_contenu) from donnees_sas;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Importance du na.rm = TRUE
+# Importance du na.rm = TRUE en cas de variables manquantes
 mean(donnees_rbase$note_contenu)
 mean(donnees_rbase$note_contenu, na.rm = TRUE)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Importance du na.rm = TRUE
+# Importance du na.rm = TRUE en cas de variables manquantes
 donnees_tidyverse %>% pull(note_contenu) %>% mean()
 donnees_tidyverse %>% pull(note_contenu) %>% mean(na.rm = TRUE)
 
@@ -29,13 +29,13 @@ donnees_tidyverse %>%
   summarise(across(note_contenu, ~mean(., na.rm = TRUE)))
 
 # Attention, en tidyverse, les syntaxes suivantes ne fonctionnent pas !
-# donnees_tidyverse %>% mean(note_formateur)
-# donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
+# donnees_tidyverse %>% mean(note_contenu)
+# donnees_tidyverse %>% mean(note_contenu, na.rm = TRUE)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Importance du na.rm = TRUE
+# Importance du na.rm = TRUE en cas de variables manquantes
 donnees_datatable[, mean(note_contenu)]
 donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
 ```
@@ -107,11 +107,43 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Ensemble des données */
 proc means data = donnees_sas mean;
   var note_contenu;
   weight poids_sondage;
 run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = TRUE)
+
+# Autre méthode, mais attention aux NA !!
+with(donnees_rbase, sum(note_contenu * poids_sondage, na.rm = TRUE) / sum((!is.na(note_contenu)) * poids_sondage, na.rm = TRUE))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>%
+  summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Moyenne pondérée par sélection
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
 /* Par sélection (ici pour les seules femmes) */
 proc means data = donnees_sas mean;
   var note_contenu;
@@ -122,12 +154,9 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des données
-weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = TRUE)
-# Autre méthode, mais attention aux NA !!
-with(donnees_rbase, sum(note_contenu * poids_sondage, na.rm = TRUE) / sum((!is.na(note_contenu)) * poids_sondage, na.rm = TRUE))
 # Par sélection (ici pour les seules femmes)
 with(subset(donnees_rbase, sexef == "Femme"), sum(note_contenu * poids_sondage, na.rm = TRUE) / sum(poids_sondage, na.rm = TRUE))
+
 # On peut aussi utiliser la fonction crossprod
 # Mais ne fonctionne pas dans ce cas, car elle ne prend pas en compte les na.rm = TRUE
 # Ne pas confondre cumprod et crossprod !!!!
@@ -136,9 +165,6 @@ with(subset(donnees_rbase, sexef == "Femme"), crossprod(note_contenu, poids_sond
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des données
-donnees_tidyverse %>%
-  summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
 # Par sélection
 donnees_tidyverse %>%
   filter(sexef == "Femme") %>%
@@ -147,19 +173,15 @@ donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Ensemble des données
-donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
 # Par sélection (ici pour les seules femmes)
 donnees_datatable[sexef == "Femme", weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
-donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)),
-                  .SDcols = "note_contenu"]
+donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), .SDcols = "note_contenu"]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
-
 
 :::
 
@@ -177,12 +199,16 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+
 # Plusieurs solutions
+
 # Sous forme de liste
 lapply(donnees_rbase[, notes], mean, na.rm = TRUE)
+
 # Sous forme de vecteur
 sapply(donnees_rbase[, notes], mean, na.rm = TRUE)
 apply(donnees_rbase[, notes], 2, mean, na.rm = TRUE)
+
 # Si l'on souhaite renommer les colonnes
 moyennes <- sapply(donnees_rbase[, notes], mean, na.rm = TRUE)
 names(moyennes) <- paste("Moyenne", names(moyennes), sep = "_")
@@ -193,11 +219,15 @@ moyennes
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_tidyverse %>%
-  summarise_at(notes, mean, na.rm = TRUE)
-# Autres solutions
-donnees_tidyverse %>%
   summarise(across(all_of(notes), ~ mean(.x, na.rm = TRUE)))
-# Obsolète
+# Si l'on souhaite renommer les colonnes
+moyennes <- donnees_tidyverse %>%
+  summarise(across(all_of(notes), ~ mean(.x, na.rm = TRUE), .names = "Moyenne_{.col}"))
+
+# Autres solutions
+# Obsolètes
+donnees_tidyverse %>%
+  summarise_at(notes, mean, na.rm = TRUE)
 donnees_tidyverse %>%  
   select(starts_with("Note") & !ends_with("_100")) %>% 
   summarise_all(.funs = ~ mean(., na.rm = TRUE), .vars = notes)
@@ -205,14 +235,13 @@ donnees_tidyverse %>%
 moyennes <- donnees_tidyverse %>%
   summarise_at(notes, mean, na.rm = TRUE) %>% 
   rename_with(~ paste("Moyenne", ., sep = "_"))
-moyennes <- donnees_tidyverse %>%
-  summarise(across(all_of(notes), ~ mean(.x, na.rm = TRUE), .names = "Moyenne_{.col}"))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 moyennes <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = notes]
+
 # Si l'on souhaite renommer les colonnes
 setnames(moyennes, notes, paste("Moyenne", notes, sep = "_"))
 moyennes
@@ -223,10 +252,9 @@ moyennes
 
 ```
 
-
 :::
 
-## Moyenne pondérée de plusieurs variables 
+## Moyenne pondérée de plusieurs variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -248,6 +276,7 @@ with(donnees_rbase, sapply(donnees_rbase[, notes], function(x) weighted.mean(x, 
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_tidyverse %>%
   summarise(across(notes, ~ weighted.mean(.x, poids_sondage, na.rm = TRUE)))
+
 # Autre solution
 donnees_tidyverse %>%
   summarise_at(notes, ~ weighted.mean(.x, poids_sondage, na.rm = TRUE))
@@ -264,10 +293,9 @@ moyennes
 
 ```
 
-
 :::
 
-## Nombreuses statistiques (somme, moyenne, médiane, mode, etc.) 
+## Nombreuses statistiques (somme, moyenne, médiane, mode, etc.)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -276,10 +304,12 @@ moyennes
 /* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
    nombre de données manquantes (nmiss), intervalle, mode */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+
 /* Par la proc means, en un seul tableau */
 proc means data = donnees_sas sum mean median min max var std n nmiss range mode;
   var &notes.;
 run;
+
 /* Par la proc univariate, variable par variable */
 proc univariate data = donnees_sas;
   var &notes.;
@@ -291,7 +321,7 @@ run;
 # Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes),
 # Nombre de valeurs manquantes, Intervalle
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
-# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+# Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
 library(collapse)
 sapply(donnees_rbase[, notes], function(x) c("Somme"      = sum(x, na.rm = TRUE),
                                              "Moyenne"    = mean(x, na.rm = TRUE),
@@ -311,7 +341,7 @@ sapply(donnees_rbase[, notes], function(x) c("Somme"      = sum(x, na.rm = TRUE)
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
-# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+# Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
 library(collapse)
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 StatsDesc_tidyverse <- function(x) {
@@ -329,6 +359,7 @@ StatsDesc_tidyverse <- function(x) {
     Mode       = collapse::fmode(x)
     )
 }
+
 # 1ère solution avec les notes en ligne et les statistiques en colonnes
 donnees_tidyverse %>% 
   select(all_of(notes)) %>% 
@@ -336,6 +367,7 @@ donnees_tidyverse %>%
   bind_rows() %>% 
   bind_cols(tibble(Note = c(notes))) %>% 
   relocate(Note)
+
 # 2e solution avec les notes en colonne
 donnees_tidyverse %>%
   reframe(across(notes, ~ StatsDesc_tidyverse(.x))) %>% 
@@ -348,7 +380,7 @@ donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-# Une solution pour obtenir le mode est d'utiliser fmode du package collapse
+# Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
 library(collapse)
 moyennes <- donnees_datatable[, lapply(.SD, function(x) c(sum(x, na.rm = TRUE),
                                                           mean(x, na.rm = TRUE),
@@ -364,6 +396,7 @@ moyennes <- donnees_datatable[, lapply(.SD, function(x) c(sum(x, na.rm = TRUE),
                                                           )),
                               .SDcols = notes]
 cbind(data.table(Nom = c("Somme", "Moyenne", "Médiane", "Min", "Max", "Variance", "Ecart_type", "N", "NMiss", "Intervalle", "Mode")), moyennes)
+
 # Autre solution
 StatsDesc <- function(x) {
   list(
@@ -389,10 +422,9 @@ donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 
 ```
 
-
 :::
 
-## Nombreuses statistiques pondérées (somme, moyenne, médiane, mode, etc.) 
+## Nombreuses statistiques pondérées (somme, moyenne, médiane, mode, etc.)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -403,11 +435,13 @@ donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 /* L'option vardef = wgt permet de diviser la variable par la somme des poids et non le nombre de données, pour être cohérent
    avec R */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+
 /* Par la proc means, en un seul tableau */
 proc means data = donnees_sas sum mean median min max var std n nmiss range mode vardef = wgt;
   var &notes.;
   weight poids_sondage;
 run;
+
 /* Par la proc univariate, variable par variable */
 proc univariate data = donnees_sas;
   var &notes.;
@@ -419,6 +453,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
+# Attention, dans le package, le poids s'indique par la variable w = 
 library(collapse)
 sapply(donnees_rbase[, notes], function(x) c("Somme"      = collapse::fsum(x, w = donnees_rbase$poids_sondage),
                                              "Moyenne"    = collapse::fmean(x, w = donnees_rbase$poids_sondage),
@@ -439,45 +474,45 @@ sapply(donnees_rbase[, notes], function(x) c("Somme"      = collapse::fsum(x, w 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
+# Attention, dans le package, le poids s'indique par la variable w = 
 library(collapse)
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 StatsDescPond_tidyverse <- function(x, w) {
   c(
-    Somme      = collapse::fsum(x, w),
-    Moyenne    = collapse::fmean(x, w),
-    Mediane    = collapse::fmedian(x, w),
+    Somme      = collapse::fsum(x, w = w),
+    Moyenne    = collapse::fmean(x, w = w),
+    Mediane    = collapse::fmedian(x, w = w),
     Min        = collapse::fmin(x),
     Max        = collapse::fmax(x),
-    Variance   = collapse::fvar(x, w),
-    Ecart_type = collapse::fsd(x, w),
+    Variance   = collapse::fvar(x, w = w),
+    Ecart_type = collapse::fsd(x, w = w),
     N          = collapse::fnobs(x),
     NMiss      = collapse::fnobs(is.na(x)),
     Intervalle = collapse::fmax(x) - collapse::fmin(x),
-    Mode       = collapse::fmode(x, w)
+    Mode       = collapse::fmode(x, w = w)
   )
 }
-# À FAIRE : Comment faire cela ???
-# Tous les codes suivants ne fonctionnent pas !
-#donnees_tidyverse %>%
-#  reframe(across(notes, ~ StatsDescPond_tidyverse(.x, 10))) %>% 
-#  bind_cols(tibble(Indicateur = c("Somme", "Moyenne", "Mediane", "Min", "Max", "Variance",
-#                                  "Ecart_type", "N", "NMiss", "Intervalle", "Mode"))) %>% 
-#  relocate(Indicateur)
-#donnees_tidyverse %>% 
-#  select(all_of(notes), poids_sondage) %>% 
-#  map(all_of(notes), ~ StatsDescPond_tidyverse(.x, poids_sondage)) %>% 
-#  bind_rows() %>% 
-#  bind_cols(tibble(Note = c(notes))) %>% 
-#  relocate(Note)
-#donnees_tidyverse %>% 
-#  select(all_of(notes), poids_sondage) %>% 
-#  map(~StatsDescPond_tidyverse(.x, donnees_tidyverse$poids_sondage) )
+donnees_tidyverse %>%
+  reframe(across(notes, ~ StatsDescPond_tidyverse(.x, poids_sondage))) %>% 
+  bind_cols(tibble(Indicateur = c("Somme", "Moyenne", "Mediane", "Min", "Max", "Variance",
+                                  "Ecart_type", "N", "NMiss", "Intervalle", "Mode"))) %>% 
+  relocate(Indicateur)
+
+# Autre solution
+donnees_tidyverse %>% 
+  select(all_of(notes)) %>% 
+  map(~StatsDescPond_tidyverse(.x, donnees_tidyverse$poids_sondage)) %>% 
+  bind_cols()%>% 
+  bind_cols(tibble(Indicateur = c("Somme", "Moyenne", "Mediane", "Min", "Max", "Variance",
+                                  "Ecart_type", "N", "NMiss", "Intervalle", "Mode"))) %>% 
+  relocate(Indicateur)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
+# Attention, dans le package, le poids s'indique par la variable w = 
 library(collapse)
 # À FAIRE : y-a-t-il plus simple ???
 # Est-on obligés d'utiliser systématiquement donnees_datatable$poids_sondage ?
@@ -509,7 +544,7 @@ donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 
 :::
 
-## Calcul d'une variance pondérée 
+## Variance et variance pondérée 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -570,10 +605,9 @@ x_2 / p - (x_m / p) ** 2
 
 ```
 
-
 :::
 
-## Déciles et quartiles 
+## Déciles et quantiles
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -651,10 +685,9 @@ donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "no
 
 ```
 
-
 :::
 
-## Déciles et quartiles pondérés 
+## Déciles et quantiles pondérés 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

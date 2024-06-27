@@ -111,6 +111,7 @@ donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Données fictives sur des formations
 library(tidyverse)
 library(lubridate)
 # Données fictives sur des formations
@@ -164,6 +165,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Données fictives sur des formations
 library(data.table)
 library(lubridate)
 # Données fictives sur des formations
@@ -231,6 +233,7 @@ Au lieu d'accéder directement aux données, il faut passer par un objet _connec
 con <- DBI::dbConnect(duckdb::duckdb()); 
 
 # On "copie" les données dans une table du nom table_duckdb
+# Données fictives sur des formations
 con %>% duckdb::duckdb_register(name = "table_duckdb", df = donnees_tidyverse)
 
 con %>% tbl("table_duckdb")

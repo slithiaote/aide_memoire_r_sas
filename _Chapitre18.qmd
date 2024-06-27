@@ -1,30 +1,68 @@
 # Concaténer et empiler des bases
 
-## Concaténer deux bases de données 
+## Concaténer deux bases de données
+
+On va juxtaposer le numéro de la ligne à la base de données.
+
+### Nombre de colonnes identique dans chaque base
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On va ajouter le numéro de la ligne */
+/* Numéro de la ligne */
 proc sql noprint;select count(*) into :tot from donnees_sas;run;
 data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
 
 /* Le merge sans by va juxtaposer côte à côte les bases */
 data Concatener;merge Ajout donnees_sas;run;
+```
 
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Numéro de la ligne
+ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase)))
+# cbind si les deux bases comprennent le même nombre de lignes
+concatener <- cbind(ajout, donnees_rbase)
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Numéro de la ligne
+ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
+# cbind si les deux bases comprennent le même nombre de lignes
+concatener <- donnees_tidyverse %>% bind_cols(ajout)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Numéro de la ligne
+ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
+# data.frame::cbind si les deux bases comprennent le même nombre de lignes
+concatener <- cbind(ajout, donnees_datatable)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Nombre de colonnes différent dans chaque base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Si l'une des bases comprend plus de ligne que l'autre, ajout d'une ligne de valeurs manquantes */
 proc sql noprint;select count(*) + 1 into :tot from donnees_sas;run;
 data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
 data Concatener;merge Ajout donnees_sas;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# cbind si les deux bases comprennent le même nombre de lignes
-ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase)))
-concatener <- cbind(ajout, donnees_rbase)
-
 # Erreur si l'une des bases comprend plus de lignes que l'autre
 ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase) + 1))
 # donnees_rbase_ajout <- cbind(ajout, donnees_rbase)
@@ -46,13 +84,8 @@ cbind_alt <- function(liste) {
 concatener <- cbind_alt(list(ajout, donnees_rbase))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# cbind si les deux bases comprennent le même nombre de lignes
-ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
-concatener <- donnees_tidyverse %>% bind_cols(ajout)
-
 # Ne fonctionne si l'une des bases comprend plus de lignes que l'autre !
 ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse) + 1))
 #concatener <- donnees_tidyverse %>% bind_cols(ajout)
@@ -74,40 +107,39 @@ cbind_alt <- function(liste) {
 concatener <- cbind_alt(list(ajout, donnees_tidyverse))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On va ajouter le numéro de la ligne
-# data.frame::cbind si les deux bases comprennent le même nombre de lignes
-ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
-concatener <- cbind(ajout, donnees_datatable)
-
 # Fonctionne aussi avec des bases comportement un nombre différent de lignes
 # Mais attention, le résultat n'est pas le même que sur SAS, il y a recycling
 ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable) + 1))
 concatener <- cbind(ajout, donnees_datatable)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 :::
 
+
 ## Empiler deux bases de données
+
+On va empiler la somme des notes en dessous de la base des notes.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On va empiler la somme des notes en dessous de la base des notes */
-%let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 /* On sélectionne un nombre réduit de variables pour simplifier l'exemple */
+%let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 %let var2 = %sysfunc(tranwrd(&var., Identifiant,));
 data Notes;set donnees_sas (keep = &var.);run;
 /* Moyenne des notes par individu */
 proc means data = Notes noprint mean;var &var2.;output out = Ajout mean = &var2.;run;
 
 /* On concatène avec les données. Valeur manquante si les variables ne correspondent pas */
+
 /* L'instruction set permet de concaténer les bases */
 data Empiler;set Notes Ajout (drop = _type_ _freq_);run;
 
