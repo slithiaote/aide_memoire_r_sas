@@ -103,7 +103,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Itérer sur toutes les années et les trimestres d'une certaine plage */
-/* on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 */
+/* On va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 */
 %macro iteration(debut, fin);
   %global liste_an;
   %let liste_an = ;

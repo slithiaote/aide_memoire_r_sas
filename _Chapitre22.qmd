@@ -1,4 +1,4 @@
-# Statistiques agrégées par groupe
+# Tableaux de statistiques
 
 ## Une seule variable de groupement, une seule variable 
 ::: {.panel-tabset group="language"}
