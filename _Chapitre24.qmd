@@ -10,12 +10,8 @@
     var &variables.;
   run;
 %mend CalculMoyenne0;
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Homme")
-
-
+%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu);
+%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum median);
 %CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum, condition = where sexef = "Femme");
 ```
 
@@ -30,7 +26,6 @@ CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Homme")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
