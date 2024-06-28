@@ -1006,6 +1006,7 @@ methodes %>%
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Corrélation linéaire (Kendall, Pearson, Spearman)
+methodes <- c("pearson", "spearman", "kendall")
 setNames(donnees_datatable[, lapply(methodes,
                                     function(x) cor(note_contenu, note_formateur,
                                                     method = x,
