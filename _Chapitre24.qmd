@@ -1,58 +1,46 @@
-# Débogage
+# Fonctions
 
-## Outils d'aide au débogage 
+## Fonction calculant une moyenne 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-options symbolgen mprint mlogic;
-%macro Debogage;
-  %local phrase i j;
-  %let phrase = Voici une phrase;
-  %do i = 1 %to %sysfunc(countw(&phrase.));
-    %let j = %scan(&phrase., &i.);
-	%put Mot n°&i. = &j.;
-  %end;
-%mend Debogage;
-%Debogage;
-options nosymbolgen nomprint nomlogic;
+%macro CalculMoyenne0 (baseDonnees, variables, statistique, condition);
+  proc means data = &baseDonnees. &statistique.;
+    var &variables.;
+  run;
+%mend CalculMoyenne0;
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Homme")
+
+
+%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum, condition = where sexef = "Femme");
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-#phrase <- c("voici", "une", "phrase")
-#options(error=recover)
-#for (i in phrase) print(k)
-#options(error=NULL)
-
-# À FAIRE : autres outils
-#traceback()
-#browser()
+CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
+  baseDonnees <- subset(baseDonnees, ...)
+  moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
+  moyenne <- data.frame(moyenne)
+  return(moyenne)
+}
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Homme")
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : creuser
-#phrase <- c("voici", "une", "phrase")
-#options(error=recover)
-#for (i in phrase) print(k)
-#options(error=NULL)
 
-# À FAIRE : autres outils
-#traceback()
-#browser()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-#phrase <- c("voici", "une", "phrase")
-#options(error=recover)
-#for (i in phrase) print(k)
-#options(error=NULL)
 
-# À FAIRE : autres outils
-#traceback()
-#browser()
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -61,3 +49,5 @@ options nosymbolgen nomprint nomlogic;
 ```
 
 :::
+
+Autres exemples de fonctions possibles : statistiques par groupes et proc freq.
