@@ -1,6 +1,6 @@
 # Gestion par groupe
 
-## Numéroter les lignes 
+## Numéroter les lignes
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -361,9 +361,9 @@ ni_prem_ni_der  <- donnees_datatable[! (!duplicated(identifiant, fromLast = FALS
 
 :::
 
-## Sélection de lignes par identifiant 
+## Sélection de lignes par identifiant
 
-### Les 2 premières lignes de chaque identifiant 
+### Les 2 premières lignes de chaque identifiant
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -416,8 +416,7 @@ deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
 
 :::
 
-
-### Les 2 dernières lignes de chaque identifiant 
+### Les 2 dernières lignes de chaque identifiant
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -470,7 +469,7 @@ deux_dernieres_lignes <- donnees_datatable[, .SD[.N-2:.N], by = identifiant]
 
 :::
 
-### 2e ligne de l'individu (et rien si l'individu a 1 seule ligne) 
+### 2e ligne de l'individu (et rien si l'individu a 1 seule ligne)
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -526,7 +525,7 @@ deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
 
 :::
 
-### L'avant-dernière ligne de l'individu (et rien si l'individu a 1 seul contrat) 
+### L'avant-dernière ligne de l'individu (et rien si l'individu a 1 seul contrat)
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
@@ -564,7 +563,7 @@ donnees_datatable[, .SD[.N-1], by = identifiant]
 
 :::
 
-## Sélection par groupement 
+## Sélection par groupement
 
 ### Personnes qui ont eu au moins une entrée en 2022
 
@@ -740,10 +739,9 @@ donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.r
 
 ```
 
-
 :::
 
-## Ajouter une colonne désignant la note moyenne et la somme de Note_Contenu, par individu 
+## Ajouter une colonne désignant la note moyenne et la somme de Note_Contenu, par individu
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -817,7 +815,51 @@ donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDc
 
 :::
 
-## Ajout d'une variable d'entrée initiale par individu
+## Ajouter le nombre d'observations par CSP
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc sql;
+  create table donnees_sas as
+  select a.*, b.n
+  from donnees_sas a left join
+       (select CSPF, count(*) as n from donnees_sas group by CSPF) b on CSPF = CSPF
+  order by identifiant;
+quit;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
+donnees_rbase <- transform(donnees_rbase, 
+                           n = ave(cspf, cspf, FUN = length))
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% add_count(cspf)
+
+# Autre solution
+donnees_tidyverse <- donnees_tidyverse %>%
+  group_by(cspf) %>%
+  mutate(n = n()) %>% 
+  ungroup()
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, n := .N, by = cspf]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Ajouter une variable d'entrée initiale par individu
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -905,7 +947,7 @@ Exemple à trouver avec Financement publique privé mixte
 
 :::
 
-## Variable retardée (lag) 
+## Variable retardée (lag)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
