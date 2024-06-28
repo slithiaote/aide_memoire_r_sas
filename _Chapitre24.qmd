@@ -1,5 +1,8 @@
 # Fonctions
 
+Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
+<https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
+
 ## Fonction calculant une moyenne 
 ::: {.panel-tabset group="language"}
 
@@ -29,6 +32,7 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
