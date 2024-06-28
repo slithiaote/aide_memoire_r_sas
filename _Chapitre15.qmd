@@ -1,6 +1,6 @@
 # Les valeurs manquantes
 
-## Repérer les valeurs manquantes (variables Âge et Niveau) 
+## Repérer les valeurs manquantes (variables Âge et Niveau)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -159,7 +159,7 @@ donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100)]
 
 :::
 
-## Incidence des valeurs manquantes 
+## Incidence des valeurs manquantes
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -208,9 +208,7 @@ donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
 
 :::
 
-
-
-## Remplacer les valeurs manquantes d'une seule variable par 0 
+## Remplacer les valeurs manquantes d'une seule variable par 0
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -268,7 +266,7 @@ donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 
 :::
 
-## Remplacer toutes les valeurs numériques manquantes par 0 
+## Remplacer toutes les valeurs numériques manquantes par 0
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -342,6 +340,46 @@ donnees_datatable_sans_na[, (cols) := lapply(.SD, function(x) fifelse(is.na(x), 
 # Ensemble des colonnes
 donnees_datatable_sans_na <- copy(donnees_datatable)
 donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Supprimer les lignes ou une variable est manquante
+
+On souhaite supprimer toutes les lignes où la variable age est manquante.
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+data age_non_manquant;
+  set donnees_sas (where = (age ne .));
+  /* Ou alors */
+  /*if age ne .;*/
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+age_non_manquant <- donnees_rbase[complete.cases(donnees_rbase[, "age"]), ]
+age_non_manquant <- donnees_rbase[! is.na(donnees_rbase[, "age"]), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+age_non_manquant <- donnees_tidyverse %>% drop_na(age)
+age_non_manquant <- donnees_tidyverse %>% filter(!is.na(age))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+age_non_manquant <- na.omit(donnees_datatable, cols = c("age"))
+age_non_manquant <- donnees_datatable[! is.na(age), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
