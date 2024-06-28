@@ -911,7 +911,7 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes
 
 # Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
 # On exprime le rang par ordre décroissant, avec le - devant
-donnees_datatable[, rang_note_moyenne := rank(-note_moyenne)]
+donnees_datatable[, rang_note_moyenne := frank(-note_moyenne)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

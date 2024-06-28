@@ -326,7 +326,7 @@ premier_contrat <- donnees_tidyverse %>%
   # Pour trier les données de la même façon que SAS
   arrange(identifiant, !is.na(date_entree), date_entree) %>% 
   group_by(identifiant) %>% 
-  mutate(premier_contrat = ifelse(row_number() == 1, 1, 0)) %>% 
+  filter(row_number() == 1) %>% 
   ungroup()
 
 # Dernier contrat
@@ -334,7 +334,7 @@ dernier_contrat <- donnees_tidyverse %>%
   # Pour trier les données de la même façon que SAS
   arrange(identifiant, !is.na(date_entree), date_entree) %>% 
   group_by(identifiant) %>% 
-  mutate(dernier_contrat = ifelse(row_number() == n(), 1, 0)) %>% 
+  filter(row_number() == n()) %>% 
   ungroup()
 
 # Ni le premier, ni le dernier contrat
@@ -342,7 +342,7 @@ ni_prem_ni_der <- donnees_tidyverse %>%
   # Pour trier les données de la même façon que SAS
   arrange(identifiant, !is.na(date_entree), date_entree) %>% 
   group_by(identifiant) %>% 
-  mutate(ni_prem_ni_der = ifelse( ! (row_number() == n() | row_number() == 1), 1, 0)) %>% 
+  filter(! (row_number() == n() | row_number() == 1)) %>% 
   ungroup()
 ```
 
@@ -870,11 +870,12 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 ```
 
-
 :::
 
-
 ## Changement d'état (rleid) À FAIRE
+
+Exemple à trouver avec Financement publique privé mixte
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

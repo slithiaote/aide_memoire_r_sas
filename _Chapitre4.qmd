@@ -1,6 +1,6 @@
 # Informations sur la base de données
 
-## Avoir une vue d'ensemble des données 
+## Avoir une vue d'ensemble des données
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -65,7 +65,7 @@ requete_duckdb %>% glimpse() # préférer glimpse()
 
 :::
 
-## Extraire les x premières lignes de la base (10 par défaut) 
+## Extraire les x premières lignes de la base (10 par défaut)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -131,9 +131,7 @@ En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne
 
 :::
 
-
-
-## Extraire les x dernières lignes de la base (10 par défaut) 
+## Extraire les x dernières lignes de la base (10 par défaut)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -165,7 +163,6 @@ Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple d
 nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ```
 
-
 ## `tidyverse` {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
@@ -189,7 +186,6 @@ Alternativement
 donnees_datatable[, tail(.SD, x)]
 ```
 
-
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
 Mêmes remarques que pour les premières lignes : il n'y a pas d'ordre a priori en SQL. On conseille `slice_min` ou `slice_max` qui indiquent explicitement l'ordre utilisé, et l'on déconseille `slice` et `tail`.
@@ -200,9 +196,7 @@ requete_duckdb %>% slice_min(duree, n=5, with_ties=FALSE) # with_ties = TRUE ret
 
 :::
 
-
-
-## Nombre de lignes et de colonnes dans la base 
+## Nombre de lignes et de colonnes dans la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -265,7 +259,6 @@ requete_duckdb %>%  ncol()
 
 :::
 
-
 ## Liste des variables de la base
 ::: {.panel-tabset group="language"}
 
@@ -321,7 +314,6 @@ requete_duckdb %>% colnames()
 
 :::
 
-
 ## Mettre les noms des variables en minuscule
 `R` est sensible à la casse, il est pertinent d'harmoniser les noms des variables en minuscule.
 
@@ -356,8 +348,7 @@ colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
 
 :::
 
-
-## Nombre d'identifiants uniques et de lignes dans la base 
+## Nombre d'identifiants uniques et de lignes dans la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -407,7 +398,7 @@ Note : on a vu que `nrow` ne fonctionne pas en DuckDB.
 
 :::
 
-## Quelle est la position de la variable date_entree ? 
+## Quelle est la position de la variable date_entree ?
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -449,7 +440,6 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 :::
-
 
 ## Variables qui débutent par "note"
 ::: {.panel-tabset group="language"}

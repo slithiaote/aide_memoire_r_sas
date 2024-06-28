@@ -466,7 +466,10 @@ dim(innerJoinInegalite)
 
 :::
 
-## Cross join : toutes les combinaisons possibles de CSP, sexe et diplôme 
+## Cross join : toutes les combinaisons possibles de CSP, sexe et diplôme
+
+https://stackoverflow.com/questions/10600060/how-to-do-cross-join-in-r
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

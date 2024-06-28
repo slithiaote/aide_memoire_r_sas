@@ -94,10 +94,9 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 
 ```
 
-
 :::
 
-## Boucles imbriquées (second exemple) 
+## Boucles imbriquées (second exemple)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -171,10 +170,9 @@ res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y) 
 
 ```
 
-
 :::
 
-## Boucles for 
+## Boucles for
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -264,10 +262,9 @@ concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
 
 ```
 
-
 :::
 
-## Boucles for (second exemple) 
+## Boucles for (second exemple)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -356,10 +353,9 @@ for (i in unique(donnees_datatable$cspf)) {
 
 ```
 
-
 :::
 
-## Autres transcriptions de fonctions `SAS` vers `R` 
+## Autres transcriptions de fonctions `SAS` vers `R`
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -388,6 +384,12 @@ system.time(donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mesurer la durée d'exécution d'un programme
 system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
+
+# Autre possibilité
+started.at <- proc.time()
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+timetaken(started.at)
+
 # En SAS : include("chemin")
 # En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```

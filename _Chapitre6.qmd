@@ -109,8 +109,10 @@ id <- donnees_datatable[, identifiant] ; class(id)
 
 # Résultat sous forme de data.table
 id <- donnees_datatable[, "identifiant"] ; class(id)
-id <- donnees_datatable[, .("identifiant")] ; class(id)
-id <- donnees_datatable[, list("identifiant")] ; class(id)
+# Ne fonctionnent pas !
+#id <- donnees_datatable[, .("identifiant")] ; class(id)
+#id <- donnees_datatable[J("identifiant")] ; class(id)
+#id <- donnees_datatable[, list("identifiant")] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -163,9 +165,17 @@ id <- donnees_tidyverse %>% select(all_of(variable))
 # Résultat sous forme de vecteur caractère
 variable <- "identifiant"
 id <- donnees_datatable[[variable]] ; class(id)
+id <- donnees_datatable[, get(variable)] ; class(id)
+
 # Résultat sous forme de data.table
-id <- donnees_datatable[, .(variable)] ; class(id)
-id <- donnees_datatable[, list(variable)] ; class(id)
+id <- donnees_datatable[, ..variable] ; class(id)
+id <- donnees_datatable[, variable, with = FALSE] ; class(id)
+id <- donnees_datatable[, .SD, .SDcols = variable] ; class(id)
+id <- donnees_datatable[, variable, env = list(variable = as.list(variable))] ; class(id)
+
+# Attention, ces syntaxes ne fonctionnent pas ! Il faut nécessairement passer par les syntaxes au-dessus.
+#id <- donnees_datatable[, .(variable)] ; class(id)
+#id <- donnees_datatable[, list(variable)] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -189,9 +199,10 @@ data Colonnes;set donnees_sas (drop = &var.);run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- c("identifiant", "sexe", "note_contenu")
+exclusion_var <- donnees_rbase[, setdiff(names(donnees_rbase), variable)]
+
 # Ne fonctionne pas !
 #exclusion_var <- donnees_rbase[, -c(variable)]
-exclusion_var <- donnees_rbase[, setdiff(names(donnees_rbase), variable)]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
