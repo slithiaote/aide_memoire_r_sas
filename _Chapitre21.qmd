@@ -74,6 +74,9 @@ donnees_tidyverse %>%
 ```
 
 ## `data.table` {.unnumbered .unlisted}
+
+1ère solution
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau simple
 donnees_datatable[, table(cspf, sexef, useNA = "always") ]
@@ -87,14 +90,22 @@ addmargins(prop.table(tab)) * 100
 addmargins(prop.table(tab, margin = 1)) * 100
 # Proportions par colonne
 addmargins(prop.table(tab, margin = 2)) * 100
+```
 
+2e solution
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Solution alternative, sans pondération
 tab <- donnees_datatable[, xtabs(~ cspf + sexef, data = donnees_datatable) ]
 tab
 addmargins(prop.table(tab)) * 100
 addmargins(prop.table(tab, margin = 1), margin = 2) * 100
 addmargins(prop.table(tab, margin = 2), margin = 1) * 100
+```
 
+3e solution
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre solution, avec les Grouping sets
 tab <- data.table::cube(donnees_datatable, .(Nb = .N), by = c("cspf", "sexef"))
 tab <- data.table::dcast(tab, cspf ~ sexef, value.var = "Nb")
@@ -105,7 +116,11 @@ setcolorder(tab, c(setdiff(names(tab), "NA"), "NA"))
 tab[nrow(tab), 1] <- "Total"
 names(tab)[which(names(tab) == "NA")] <- "Total"
 tab
+```
 
+4e solution
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Autre façon d'utiliser les méthodes de data.table
 tab_prop <- data.table::dcast(donnees_datatable, cspf ~ sexef, fun.aggregate = length)
 # Proportion par ligne
@@ -384,11 +399,11 @@ with(donnees_tidyverse, descr::crosstab(cspf, sexef, weight = poids_sondage, pro
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(descr)
 # Non pondéré
-with(donnees_datatable, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
+donnees_datatable[, descr::crosstab(cspf, sexef,                         prop.r = TRUE, prop.c = TRUE, prop.t = TRUE)]
 # Pondéré
-with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = TRUE, prop.c = TRUE, prop.t = TRUE))
+donnees_datatable[, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = TRUE, prop.c = TRUE, prop.t = TRUE)]
 # Sans les proportions par ligne et colonne
-with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
+donnees_datatable[, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE)]
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -514,9 +529,9 @@ questionr::rprop(tab)
 library(questionr)
 # Tableau croisé
 # Sans pondération
-tab <- with(donnees_datatable, questionr::wtd.table(cspf, sexef, useNA = "ifany"), na.rm = TRUE)
+tab <- donnees_datatable[, questionr::wtd.table(cspf, sexef, useNA = "ifany")]
 # Avec pondération
-tab <- with(donnees_datatable, questionr::wtd.table(cspf, sexef, weights = poids_sondage, useNA = "ifany"), na.rm = TRUE)
+tab <- donnees_datatable[, questionr::wtd.table(cspf, sexef, weights = poids_sondage, useNA = "ifany")]
 tab
 # Proportions
 questionr::prop(tab)

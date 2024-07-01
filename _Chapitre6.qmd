@@ -1,6 +1,6 @@
 # Sélection de lignes et de colonnes
 
-## Sélectionner des colonnes par position 
+## Sélectionner des colonnes par position
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -64,7 +64,8 @@ requete_duckdb %>% select(3)
 ```
 
 :::
-## Sélectionner des colonnes par nom 
+
+## Sélectionner des colonnes par nom
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -187,7 +188,7 @@ requete_duckdb %>% select(any_of(variable))
 
 :::
 
-## Sauf certaines variables 
+## Sauf certaines variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -229,7 +230,7 @@ requete_duckdb %>% select(-all_of(variable))
 
 :::
 
-## Sélectionner la 3e colonne 
+## Sélectionner la 3e colonne
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -268,7 +269,7 @@ requete_duckdb %>% select(3)
 
 :::
 
-## Sélectionner plusieurs colonnes 
+## Sélectionner plusieurs colonnes
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -327,7 +328,8 @@ requete_duckdb %>% select({{ cols }})
 requete_duckdb %>% select(!!cols)
 ```
 :::
-## Sélectionner les colonnes qui débutent par le mot Note 
+
+## Sélectionner les colonnes qui débutent par le mot Note
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -372,8 +374,7 @@ requete_duckdb %>% select(starts_with("note"))
 ```
 :::
 
-
-## Sélectionner les colonnes qui ne débutent pas par le mot Note 
+## Sélectionner les colonnes qui ne débutent pas par le mot Note
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -407,7 +408,7 @@ requete_duckdb %>% select(!starts_with("note"))
 ```
 :::
 
-## Sélectionner l'ensemble des variables numériques de la base 
+## Sélectionner l'ensemble des variables numériques de la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -437,7 +438,8 @@ requete_duckdb %>% select_if(is.numeric)
 # requete_duckdb %>% select(where(is.numeric))
 ```
 :::
-## Sélectionner l'ensemble des variables de format "Date" 
+
+## Sélectionner l'ensemble des variables de format "Date"
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -512,7 +514,6 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 
 :::
 
-
 ### 3 premières lignes et 3 premières colonnes
 
 ::: {.panel-tabset group="language"}
@@ -554,7 +555,6 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
 :::
-
 
 ### Entrées en 2023
 
@@ -601,7 +601,7 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 
 :::
 
-## Sélectionner suivant de multiples conditions 
+## Sélectionner suivant de multiples conditions
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -647,7 +647,7 @@ requete_duckdb %>%
 ```
 :::
 
-## Sélectionner des lignes par référence : lignes de l'identifiant 087 
+## Sélectionner des lignes par référence : lignes de l'identifiant 087
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -701,6 +701,7 @@ sel <- "087"
 requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable))
 ```
 :::
+
 ## Sélectionner des lignes et des colonnes
 ::: {.panel-tabset group="language"}
 

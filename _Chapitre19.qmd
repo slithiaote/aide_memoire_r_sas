@@ -519,20 +519,21 @@ library(collapse)
 # À FAIRE : y-a-t-il plus simple ???
 # Est-on obligés d'utiliser systématiquement donnees_datatable$poids_sondage ?
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-StatsDescPond <- function(x) {
+
+StatsDescPond <- function(x, poids = donnees_datatable$poids_sondage) {
   list(
     Variables  = names(x),
-    Somme      = lapply(x, collapse::fsum, w = donnees_datatable$poids_sondage),
-    Moyenne    = lapply(x, collapse::fmean, w = donnees_datatable$poids_sondage),
-    Mediane    = lapply(x, collapse::fmedian, w = donnees_datatable$poids_sondage),
-    Min        = lapply(x, collapse::fmin),
-    Max        = lapply(x, collapse::fmax),
-    Variance   = lapply(x, collapse::fvar, w = donnees_datatable$poids_sondage),
-    Ecart_type = lapply(x, collapse::fsd, w = donnees_datatable$poids_sondage),
-    N          = lapply(x, collapse::fnobs),
-    NMiss      = lapply(x, function(x) collapse::fnobs(is.na(x))),
-    Intervalle = lapply(x, function(x) collapse::fmax(x) - collapse::fmin(x)),
-    Mode       = lapply(x, collapse::fmode, w = donnees_datatable$poids_sondage)
+    Somme      = collapse::fsum(x, w = poids),
+    Moyenne    = collapse::fmean(x, w = poids),
+    Mediane    = collapse::fmedian(x, w = poids),
+    Min        = collapse::fmin(x),
+    Max        = collapse::fmax(x),
+    Variance   = collapse::fvar(x, w = poids),
+    Ecart_type = collapse::fsd(x, w = poids),
+    N          = collapse::fnobs(x),
+    NMiss      = collapse::fnobs(is.na(x)),
+    Intervalle = collapse::fmax(x) - collapse::fmin(x),
+    Mode       = collapse::fmode(x, w = poids)
   )
 }
 donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
@@ -923,7 +924,6 @@ donnees_datatable[, rang_note_moyenne := frank(-note_moyenne)]
 
 :::
 
-
 ## Covariance et corrélation linéaire
 
 ### Covariance entre deux notes
@@ -976,6 +976,7 @@ setNames(donnees_datatable[, lapply(methodes,
 :::
 
 ### Corrélation linéaire entre deux notes
+
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}

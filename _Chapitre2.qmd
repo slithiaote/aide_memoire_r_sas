@@ -327,8 +327,6 @@ class(donnees_datatable)
 
 :::
 
-
-
 ## Importation de données extérieures
 
 Importer des données extérieures dans `SAS` ou `R` est sans doute la première tâche à laquelle est confronté l'utilisateur de ces logiciels. Ce point important est décrit sur le site Utilit'R : <https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>.

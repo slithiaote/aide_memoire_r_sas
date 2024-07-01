@@ -65,6 +65,48 @@ requete_duckdb %>% glimpse() # préférer glimpse()
 
 :::
 
+## Afficher le type des variables
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+
+``` sas
+proc contents data = donnees_sas;run;
+
+/* On supprime la base Var temporaire */
+proc datasets lib = Work nolist;delete Var;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+sapply(donnees_rbase, class)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+purrr::map(donnees_tidyverse, class)
+class(donnees_tidyverse)
+```
+
+## `data.table` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, lapply(.SD, class)]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+On ne peut pas appliquer directement la fonction `class` sur un objet de type `connection`. Cependant, DuckDB affiche le type des variables dans un print. On peut également appliquer la fonction `class` sur un extrait des données (après `collect`).
+
+```{r, warning=FALSE, message=FALSE}
+purrr::map(requete_duckdb %>% select(c(1,2)) %>% head() %>% collect(), class)
+class(requete_duckdb)
+```
+
+:::
+
 ## Extraire les x premières lignes de la base (10 par défaut)
 ::: {.panel-tabset group="language"}
 

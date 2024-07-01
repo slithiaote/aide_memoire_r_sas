@@ -62,6 +62,7 @@ lubridate::ymd(paste0(annee,"-12-31"))
 %put sixmois : &sixmois.;
 data donnees_sas;
   set donnees_sas;
+  /* Durée (en année) entre 2 dates */
   /* Âge à l'entrée dans le dispositif */
   Age = intck('year', date_naissance, date_entree);
   
@@ -70,10 +71,7 @@ data donnees_sas;
   
   /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
   format date_sortie ddmmyy10.;
-  date_sortie = intnx('day', date_entree, duree);  
-  
-  /* La durée du contrat est-elle inférieure à 6 mois ? */
-  Duree_Inf_6_mois = (Duree < &sixmois. & Duree ne .);
+  date_sortie = intnx('day', date_entree, duree);
   
   /* Date 6 mois après la sortie */
   format Date_6mois ddmmyy10.;
@@ -85,14 +83,9 @@ proc freq data = donnees_sas;tables apres_31_decembre;weight poids_sondage;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
 # Âge à l'entrée dans le dispositif
 donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
-
-# Manipuler les dates
-sixmois <- 365.25/2
-
-# La durée du contrat est-elle inférieure à 6 mois ?
-donnees_rbase$duree_inf_6_mois <- ifelse(donnees_rbase$duree < sixmois, 1, 0)
 
 # Date de sortie du dispositif
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
@@ -103,18 +96,10 @@ donnees_rbase$date_6mois <- donnees_rbase$date_sortie + lubridate::month(6)
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
 # Âge à l'entrée dans le dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
-
-# Manipuler les dates
-sixmois <- 365.25/2
-
-# La durée du contrat est-elle inférieure à 6 mois ?
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(duree_inf_6_mois = case_when(duree <  sixmois ~ 1,
-                                      duree >= sixmois ~ 0))
-donnees_tidyverse %>% pull(duree_inf_6_mois) %>% table()
 
 # Date de sortie du dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -127,16 +112,10 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
 # Âge à l'entrée dans le dispositif
 donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
 
-# Manipuler les dates
-sixmois <- 365.25/2
-# La durée du contrat est-elle inférieure à 6 mois ?
-donnees_datatable[, duree_inf_6_mois := ifelse(duree >= sixmois, 1, 0)]
-donnees_datatable[, duree_inf_6_mois := fifelse(duree >= sixmois, 1, 0)]
-donnees_datatable[, duree_inf_6_mois := fcase(duree >= sixmois, 1,
-                                              duree <  sixmois, 0)]
 # Date de sortie du dispositif
 donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 

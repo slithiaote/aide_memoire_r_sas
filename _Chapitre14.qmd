@@ -442,10 +442,14 @@ donnees_rbase$a <- 1L
 donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
 deux_premieres_lignes <- donnees_rbase[which(donnees_rbase$numero_contrat <= 2), ]
 donnees_rbase$a <- NULL
+
 # REVOIR
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
 #donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) seq_along(z) == 2L)]
 #ind <- donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) length(z) == 1L | seq_along(z) == 2L)]
+
+# Version en R Base
+#https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -462,8 +466,10 @@ deux_dernieres_lignes <- donnees_tidyverse %>%
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 deux_dernieres_lignes <- donnees_datatable[, .SD[.N-2:.N], by = identifiant]
-# Version en R Base
-#https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
+
+# À REVOIR : ne fait pas exactement pareil
+# donnees_datatable[, tail(.SD, 2), by = identifiant]
+# Par ailleurs, utiliser rowid ???
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}

@@ -122,7 +122,6 @@ concatener <- data.table::cbind(ajout, donnees_datatable)
 
 :::
 
-
 ## Empiler deux bases de données
 
 On va empiler la somme des notes en dessous de la base des notes.
@@ -227,6 +226,7 @@ set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")
 :::
 
 ## Ajouter une ligne de valeurs manquantes à une base de données
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

@@ -1,6 +1,6 @@
 # Manipulation des lignes et des colonnes
 
-## Renommer des variables 
+## Renommer des variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -51,7 +51,7 @@ requete_duckdb %>% rename(sexe = sexe_red)
 ```
 :::
 
-## Créer des variables avec des conditions 
+## Créer des variables avec des conditions
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -402,12 +402,16 @@ donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 #
 ```
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
+
 :::
 
-## Créer et supprimer plusieurs variables 
+## Créer et supprimer des variables
+
+### 1er exemple
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Manipulation de colonnes par référence */
 data Creation;
@@ -417,7 +421,61 @@ data Creation;
   /* Suppression des variables créées */
   drop note_contenu2 note_formateur2;
 run;
+```
 
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase$note2 <- donnees_rbase$note_contenu / 20 * 5
+# Le with permet de s'affranchir des expressions "donnees_rbase$"
+with(donnees_rbase, note2 <- note_contenu / 20 * 5)
+
+# On ne peut pas utiliser transform pour des variables récemment créées
+#donnees_rbase <- transform(donnees_rbase, note3 = note_contenu ** 2, note3 = log(note3))
+donnees_rbase <- transform(donnees_rbase, note2 = note_contenu / 20 * 5)
+
+# Suppression de variables
+donnees_rbase$note2 <- NULL
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(note2 = note_contenu / 20 * 5)
+
+# Suppression de variables
+donnees_tidyverse <- donnees_tidyverse %>% 
+  select(-note2)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Création de variables
+donnees_datatable[, note2 := note_contenu / 20 * 5]
+
+# Suppression de variables
+donnees_datatable[, note2 := NULL]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# À FAIRE : à compléter !
+# Création de la colonne note2
+requete_duckdb %>% 
+  mutate(note2 = as.integer(Note_Contenu) / 20 * 5) %>% 
+  select(note2)
+
+# Suppression de colonnes
+#requete_duckdb %>% select(- CSP, -contains("Date"), -starts_with("Note"))
+
+```
+:::
+
+### 2e exemple
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
 /* Par nom ou par variable */
 %let var = identifiant Sexe note_contenu;
 data Femmes;
@@ -434,35 +492,18 @@ data Femmes;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$note2 <- donnees_rbase$note_contenu / 20 * 5
-# Le with permet de s'affranchir des expressions "donnees_rbase$"
-with(donnees_rbase, note2 <- note_contenu / 20 * 5)
-
-# On ne peut pas utiliser transform pour des variables récemment créées
-#donnees_rbase <- transform(donnees_rbase, note3 = note_contenu ** 2, note3 = log(note3))
-donnees_rbase <- transform(donnees_rbase, note2 = note_contenu / 20 * 5)
-
-# Suppression de variables
-donnees_rbase$note2 <- NULL
-
 # Création et suppressions de plusieurs variables
 donnees_rbase <- transform(donnees_rbase, note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)
+
 # Suppression des variables créées
 variable <- c("note_contenu2", "note_formateur2")
 donnees_rbase[, variable] <- NULL
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(note2 = note_contenu / 20 * 5)
-
-# Suppression de variables
-donnees_tidyverse <- donnees_tidyverse %>% 
-  select(-note2)
-
 # Création et suppressions de plusieurs variables
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(note_contenu2 = note_contenu / 20 * 5,
@@ -474,14 +515,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
   select(-all_of(variable))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Création de variables
-donnees_datatable[, note2 := note_contenu / 20 * 5]
-
-# Suppression de variables
-donnees_datatable[, note2 := NULL]
-
 # Création et suppressions de plusieurs variables
 donnees_datatable[, c("note_contenu2", "note_formateur2") := list(note_contenu / 20 * 5, note_formateur / 20 * 5)]
 donnees_datatable[, `:=` (note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)]
@@ -493,7 +528,7 @@ donnees_datatable[, `:=` (note_contenu2 = note_contenu / 20 * 5, note_formateur2
 donnees_datatable[, (variable) := NULL]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 # À FAIRE : à compléter !
 # Création de la colonne note2
@@ -505,9 +540,10 @@ requete_duckdb %>%
 #requete_duckdb %>% select(- CSP, -contains("Date"), -starts_with("Note"))
 
 ```
+
 :::
 
-## On souhaite réexprimer toutes les notes sur 100 et non sur 20 
+## On souhaite réexprimer toutes les notes sur 100 et non sur 20
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -595,7 +631,7 @@ requete_duckdb %>%
 ```
 :::
 
-## Mettre un 0 devant un nombre 
+## Mettre un 0 devant un nombre
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -647,7 +683,7 @@ donnees_datatable[, mois := sprintf("%02d", lubridate::month(date_entree))]
 ```
 :::
 
-## Arrondir une valeur numérique 
+## Arrondir une valeur numérique
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
