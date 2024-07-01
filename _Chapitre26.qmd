@@ -1,6 +1,6 @@
 # Points de vigilance en `SAS`
 
-## Emploi des guillemets et double guillemets 
+## Emploi des guillemets et doubles guillemets 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

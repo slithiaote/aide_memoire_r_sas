@@ -6,6 +6,7 @@
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 data _null_;call symput('annee', strip(year(today())));run;
+
 /* Ensemble des premiers jours de chaque mois entre 2020 et le 31 décembre de l'année courante */
 %macro Boucles_Imbriquees(an_debut, an_fin);
   %local i j;
@@ -17,6 +18,7 @@ data _null_;call symput('annee', strip(year(today())));run;
 	%end;
   %end;
 %mend Boucles_Imbriquees;
+
 %let annee = %sysfunc(year(%sysfunc(today())));
 %Boucles_Imbriquees(an_debut = 2020, an_fin = &annee.);
 %put &liste_mois.;
@@ -33,14 +35,17 @@ for (i in seq(2020, annee)) {
     listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
   }
 }
+
 # 2e  solution : 2 fonctions lapply imbriquées
 listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
                                    function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
                      origin = "1970-01-01")
+
 # 3e solution : expand.grid
 listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
                                 function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
                           origin = "1970-01-01"))
+
 # 4e solution, la plus simple !
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
@@ -49,6 +54,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
 annee <- lubridate::year(Sys.Date())
+
 # 1ère solution : 2 fonctions map imbriquées
 listeMois <- purrr::map(seq(2020, annee), 
                         function(x) purrr::map(1:12,
@@ -70,6 +76,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
 annee <- lubridate::year(Sys.Date())
+
 # 1ère solution avec for (lente, à déconseiller !)
 listeMois <- c()
 for (i in seq(2020, annee)) {
@@ -77,14 +84,17 @@ for (i in seq(2020, annee)) {
     listeMois <- as.Date(c(listeMois, lubridate::ymd(sprintf("%02d-%02d-01", i, j))), origin = "1970-01-01")
   }
 }
+
 # 2e  solution : 2 fonctions lapply imbriquées
 listeMois <- as.Date(unlist(lapply(seq(2020, annee), 
                                    function(x) lapply(1:12, function(y) lubridate::ymd(sprintf("%02d-%02d-01", x, y))))),
                      origin = "1970-01-01")
+
 # 3e solution : expand.grid
 listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1, 
                                 function(x) lubridate::ymd(sprintf("%02d-%02d-01", x[1], x[2]))),
                           origin = "1970-01-01"))
+
 # 4e solution, la plus simple
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
@@ -103,6 +113,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ``` sas
 /* Itérer sur toutes les années et les trimestres d'une certaine plage */
 /* On va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 */
+
 %macro iteration(debut, fin);
   %global liste_an;
   %let liste_an = ;
@@ -112,6 +123,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 %mend iteration;
 %iteration(debut = 2020, fin = %sysfunc(year(%sysfunc(today()))));
 %put &liste_an.;
+
 %let liste_trim = 1 2 3 4;
 %let liste_niv = max min;
 /* Supposons que nous ayons des noms de fichier suffixés par AXXXX_TY_NZ, avec X l'année, Y le trimestre et
@@ -131,6 +143,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 	%end;
   %end;
 %mend noms_fichiers;
+
 %noms_fichiers(base = base);
 %put &res.;
 ```
@@ -182,6 +195,7 @@ proc sql noprint;
   select year(min(date_entree)), year(max(date_entree)) into :an_min, :an_max
   from donnees_sas;
 quit;
+
 %macro Base_par_mois(debut, fin);
   /* %local impose que an n'est pas de signification hors de la macro */
   %local an;
@@ -199,6 +213,7 @@ quit;
 	%let nom_bases = &nom_bases. Entree_&an.;
   %end;
 %mend Base_par_mois;
+
 %Base_par_mois(debut = &an_min., fin = &an_max.);
 %put &nom_bases.;
 
@@ -214,10 +229,12 @@ run;
 # On va créer une base par année d'entrée
 anMin <- min(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
 anMax <- max(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
+
 for (i in anMin:anMax) {
   # assign permet de faire passer une chaîne de caractères en variable R
   assign(paste("entree", i, sep = "_"), donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == i), ])
 }
+
 # On va désormais empiler toutes les bases (concaténation par colonne)
 # do.call applique la fonction rbind à l'ensemble des bases issues du lapply
 # get permet de faire le chemin inverse de assign
@@ -230,11 +247,13 @@ concatene <- do.call(rbind, lapply(paste("entree", anMin:anMax, sep = "_"), get)
 # On va créer une base par année d'entrée
 anMin <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% min(na.rm = TRUE)
 anMax <- donnees_tidyverse %>% pull(date_entree) %>% lubridate::year() %>% max(na.rm = TRUE)
+
 for (i in anMin:anMax) {
   # assign permet de faire passer une chaîne de caractères en variable R
   assign(paste("entree", i, sep = "_"),
          donnees_tidyverse %>% filter(lubridate::year(date_entree) == as.name(i)))
 }
+
 # On va désormais empiler toutes les bases (concaténation par colonne)
 # purrr::reduce applique la fonction bind_rows à l'ensemble des bases issues du purrr::map
 # get permet de faire le chemin inverse de assign
@@ -247,10 +266,12 @@ concatene <- purrr::map(paste("entree", anMin:anMax, sep = "_"), get) %>%
 # On va créer une base par année d'entrée
 anMin <- min(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
 anMax <- max(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
+
 for (i in anMin:anMax) {
   # assign permet de faire passer une chaîne de caractères en variable R
   assign(paste("entree", i, sep = "_"), donnees_datatable[lubridate::year(donnees_datatable$date_entree) == i, ])
 }
+
 # On va désormais empiler toutes les bases (concaténation par colonne)
 # do.call applique la fonction rbind à l'ensemble des bases issues du lapply
 # get permet de faire le chemin inverse de assign
@@ -276,6 +297,7 @@ concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
    - s'il y a un espace dans les noms, on le remplace par _ 
    - on les met dans la macro-variable liste_csp
    - on trier la liste par valeur de CSP */
+   
 /* On crée une variable de CSP formaté sans les accents et les espaces */
 data donnees_sas;
   set donnees_sas;
@@ -288,6 +310,7 @@ run;
 /* Boucles et macros en SAS */
 /* Les boucles ne peuvent être utilisées que dans le cadre de macros */
 /* Ouverture de la macro */
+
 %macro Boucles(base = donnees_sas, var = CSPF2);
   /* Les modalités de la variable */
   proc sql noprint;select distinct &var. into :liste separated by " " from &base. order by &var.;quit;
@@ -310,6 +333,7 @@ run;
   %end;
 /* Fermeture de la macro */
 %mend Boucles;
+
 /* Lancement de la macro */
 %Boucles(base = donnees_sas, var = CSPF2);
 ```

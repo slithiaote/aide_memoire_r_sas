@@ -92,10 +92,11 @@ donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, first(.SD, 10)]
-donnees_datatable[, .SD[1:10]]
-first(donnees_datatable, 10)
-head(donnees_datatable, 10)
+x <- 10
+donnees_datatable[, first(.SD, x)]
+donnees_datatable[, .SD[1:x]]
+first(donnees_datatable, x)
+head(donnees_datatable, x)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -176,15 +177,11 @@ donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 x <- 10
 donnees_datatable[, last(.SD, x)]
+donnees_datatable[, tail(.SD, x)]
 last(donnees_datatable, x)
 tail(donnees_datatable, x)
 ```
 
-Alternativement
-
-```{r, warning=FALSE, message=FALSE, echo = FALSE}
-donnees_datatable[, tail(.SD, x)]
-```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -241,7 +238,7 @@ dim(donnees_datatable) ; dim(donnees_datatable)[1] ; dim(donnees_datatable)[2]
 dim(donnees_datatable) ; nrow(donnees_datatable) ; ncol(donnees_datatable)
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable)[1], dim(donnees_datatable)[2])
 
-# Autre solution
+# Autre solution rapide pour les colonnes
 donnees_datatable[, .N]
 ```
 
@@ -284,6 +281,7 @@ proc sql;select name into :nom_col separated by " " from Var;run;
 # Liste des variables par ordre d'apparition dans la base
 names(donnees_rbase)
 colnames(donnees_rbase)
+
 # Liste des variables par ordre alphabétique
 ls(donnees_rbase)
 sort(colnames(donnees_rbase))
@@ -294,6 +292,7 @@ sort(colnames(donnees_rbase))
 # Liste des variables par ordre d'apparition dans la base
 donnees_tidyverse %>% names()
 donnees_tidyverse %>% colnames()
+
 # Liste des variables par ordre alphabétique
 donnees_tidyverse %>% colnames() %>% sort()
 ```
@@ -303,6 +302,7 @@ donnees_tidyverse %>% colnames() %>% sort()
 # Liste des variables par ordre d'apparition dans la base
 names(donnees_datatable)
 colnames(donnees_datatable)
+
 # Liste des variables par ordre alphabétique
 sort(colnames(donnees_datatable))
 ```
@@ -324,6 +324,7 @@ Sans objet, `SAS` n'est pas sensible à la casse.
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 colnames(donnees_rbase) <- tolower(colnames(donnees_rbase))
+
 # Autre possibilité
 setNames(donnees_rbase, tolower(names(donnees_rbase)))
 ```
@@ -331,6 +332,7 @@ setNames(donnees_rbase, tolower(names(donnees_rbase)))
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% rename_with(tolower)
+
 # Autre solution
 donnees_tidyverse <- donnees_tidyverse %>% 
   magrittr::set_colnames(value = casefold(colnames(.), upper = FALSE))
@@ -463,6 +465,41 @@ names(donnees_tidyverse) |> str_subset("^note")
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Variables qui se terminent par "naissance"
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = Variables;run;
+proc sql;
+  select Name from Variables
+  where upcase(substr(NAME, length(Name) - %length(NAISSANCE) + 1, length(name))) = "NAISSANCE";
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+grep("naissance$", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+names(donnees_tidyverse) |> str_subset("naissance$")
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+grep("naissance$", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

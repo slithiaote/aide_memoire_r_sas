@@ -1,4 +1,4 @@
-# Fonctions
+# Créer ses propres fonctions
 
 Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 <https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.

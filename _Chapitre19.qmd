@@ -1,22 +1,24 @@
 # Statistiques descriptives
 
-## Moyenne 
+## Moyenne
+
+### Moyenne
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas mean;var note_contenu;run;
 proc sql;select mean(note_contenu) from donnees_sas;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 mean(donnees_rbase$note_contenu)
 mean(donnees_rbase$note_contenu, na.rm = TRUE)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 donnees_tidyverse %>% pull(note_contenu) %>% mean()
@@ -33,25 +35,24 @@ donnees_tidyverse %>%
 # donnees_tidyverse %>% mean(note_contenu, na.rm = TRUE)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 donnees_datatable[, mean(note_contenu)]
 donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
-
 :::
 
-## Moyenne par sélection 
+### Moyenne par sélection
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Ici pour les seules femmes */
 proc means data = donnees_sas mean;
@@ -60,13 +61,13 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 with(subset(donnees_rbase, sexef == "Femme"), mean(note_contenu, na.rm = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 donnees_tidyverse %>%
@@ -87,25 +88,26 @@ donnees_tidyverse %>%
   {mean(.$note_contenu, na.rm = TRUE)}
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 donnees_datatable[sexef == "Femme", mean(note_contenu, na.rm = TRUE)]
 donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = "note_contenu"]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
-
 :::
 
-## Moyenne pondérée 
+## Moyenne pondérée
+
+### Moyenne pondérée
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas mean;
   var note_contenu;
@@ -113,7 +115,7 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = TRUE)
 
@@ -121,28 +123,28 @@ weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = T
 with(donnees_rbase, sum(note_contenu * poids_sondage, na.rm = TRUE) / sum((!is.na(note_contenu)) * poids_sondage, na.rm = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>%
   summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 :::
 
-## Moyenne pondérée par sélection
+### Moyenne pondérée par sélection
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* Par sélection (ici pour les seules femmes) */
 proc means data = donnees_sas mean;
@@ -152,7 +154,7 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
 with(subset(donnees_rbase, sexef == "Femme"), sum(note_contenu * poids_sondage, na.rm = TRUE) / sum(poids_sondage, na.rm = TRUE))
@@ -163,7 +165,7 @@ with(subset(donnees_rbase, sexef == "Femme"), sum(note_contenu * poids_sondage, 
 with(subset(donnees_rbase, sexef == "Femme"), crossprod(note_contenu, poids_sondage) / sum(poids_sondage, na.rm = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection
 donnees_tidyverse %>%
@@ -171,7 +173,7 @@ donnees_tidyverse %>%
   summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
 donnees_datatable[sexef == "Femme", weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
@@ -185,7 +187,7 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poi
 
 :::
 
-## Moyenne de plusieurs variables 
+## Moyenne de plusieurs variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

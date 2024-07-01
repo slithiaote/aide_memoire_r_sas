@@ -1,4 +1,4 @@
-# Manipuler des chaînes de caractères
+# Manipulation de chaînes de caractères
 
 Pour en savoir plus sur le fonctionnement des chaînes de caractères en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_textuelles.html>.
 

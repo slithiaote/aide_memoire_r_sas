@@ -1,8 +1,11 @@
-# Manipuler des dates
+# Manipulation de dates
 
 Pour en savoir plus sur le fonctionnement des dates en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_temporelles.html>.
 
 ## Créer des dates
+
+Créer le 31 décembre de l'année sous forme de date.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

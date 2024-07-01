@@ -1,4 +1,4 @@
-# Tableaux de fréquence (proc freq de `SAS`) pour 1 variable
+# Tableaux de fréquence (`proc freq` de `SAS`) pour 1 variable
 
 ## Tableaux de fréquence pour 1 variable
 ::: {.panel-tabset group="language"}

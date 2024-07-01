@@ -377,7 +377,7 @@ proc sql;select count(*) from Inner_Join4;quit;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Utilisation de la fonction Reduce
-# Elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
+# Elle applique successivement (et non simultanément, comme do.call) une fonction à tous les éléments d'une liste
 innerJoin2 <- Reduce(function(x, y) merge(x, y, all = FALSE, by.x = "identifiant", by.y = "identifiant"),
                      list(jointure_rbase, diplome_rbase, entrevue_rbase))
 dim(innerJoin2)
@@ -394,7 +394,8 @@ dim(innerJoin2)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Utilisation de la fonction Reduce : elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
+# Utilisation de la fonction Reduce
+# Elle applique successivement (et non simultanément, comme do.call) une fonction à tous les éléments d'une liste
 innerJoin2 <- Reduce(function(x, y) merge(x, y, all = FALSE, by.x = "identifiant", by.y = "identifiant"),
                     list(jointure_datatable, diplome_datatable, entrevue_datatable))
 dim(innerJoin2)
@@ -468,7 +469,7 @@ dim(innerJoinInegalite)
 
 ## Cross join : toutes les combinaisons possibles de CSP, sexe et diplôme
 
-https://stackoverflow.com/questions/10600060/how-to-do-cross-join-in-r
+<https://stackoverflow.com/questions/10600060/how-to-do-cross-join-in-r>
 
 ::: {.panel-tabset group="language"}
 
@@ -521,7 +522,7 @@ dim(crossJoin)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-crossJoin <- data.table::CJ(donnees_datatable$cspf, donnees_datatable$sexef, diplome_datatable$diplome, unique = TRUE)
+crossJoin <- data.table::CJ(donnees_datatable[, cspf], donnees_datatable[, sexef], diplome_datatable[, diplome], unique = TRUE)
 colnames(crossJoin) <- c("cspf", "sexef", "diplome")
 dim(crossJoin)
 ```
@@ -572,7 +573,7 @@ dim(semiJoin)
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui ont un correspondant dans la base de droite
-semiJoin <- donnees_datatable[identifiant %in% diplome_datatable$identifiant, ]
+semiJoin <- donnees_datatable[identifiant %in% diplome_datatable[, identifiant], ]
 dim(semiJoin)
 ```
 
@@ -623,7 +624,7 @@ dim(antiJoin)
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite
-antiJoin <- donnees_datatable[! identifiant %in% diplome_datatable$identifiant, ]
+antiJoin <- donnees_datatable[! identifiant %in% diplome_datatable[, identifiant], ]
 dim(antiJoin)
 ```
 
@@ -652,6 +653,7 @@ quit;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
+
 # Concaténation des identifiants avec les doublons
 sort(c(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```
@@ -668,6 +670,7 @@ dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
+
 # Concaténation des identifiants
 variable <- "identifiant"
 sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))

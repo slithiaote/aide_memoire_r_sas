@@ -1,4 +1,4 @@
-# Manipuler des lignes et des colonnes
+# Manipulation des lignes et des colonnes
 
 ## Renommer des variables 
 ::: {.panel-tabset group="language"}
@@ -107,6 +107,11 @@ donnees_tidyverse <- donnees_tidyverse %>%
                               sexe == "1" ~ "M",
                               TRUE        ~ "Inconnu")
 )
+
+donnees_tidyverse <- donnees_tidyverse %>%
+    mutate(civilite = if_else(sexe == "2", "Mme",
+                              if_else(sexe == "1", "M",
+                                      "Inconnu")))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -183,72 +188,6 @@ requete_duckdb %>%
 
 :::
 
-## Formater les modalités des valeurs continues
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Utilisation des formats */
-proc format;
-  /* Variable continue */
-  value agef
-  low-<26 = "1. De 15 à 25 ans"
-  26<-<50 = "2. De 26 à 49 ans"
-  50-high = "3. 50 ans ou plus";
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Âge formaté
-# L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
-agef <- cut(donnees_rbase$age, 
-            breaks = c(0, 25, 49, Inf),
-            right = TRUE,
-            labels = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
-            ordered_result = TRUE)
-
-# Autre solution
-donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
-# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
-donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
-donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Âge formaté
-donnees_tidyverse <- donnees_tidyverse %>%
-  mutate(agef = case_when(
-    age < 26             ~ "1. De 15 à 25 ans",
-    age >= 26 & age < 50 ~ "2. De 26 à 49 ans",
-    age >= 50            ~ "3. 50 ans ou plus")
-    )
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Âge formaté
-donnees_datatable[, agef := fcase(age < 26,             "1. De 15 à 25 ans",
-                                  26 <= age & age < 50, "2. De 26 à 49 ans",
-                                  age >= 50,            "3. 50 ans ou plus")]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-Préférer `case_match` quand il s'agit de valeurs déterminées.
-
-```{r, warning=FALSE, message=FALSE}
-# Âge formaté
-requete_duckdb %>%
-  mutate(agef = case_when(
-    age < 26 ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
-    age >= 50 ~ "3. 50 ans ou plus")) %>% 
-  select(age, agef)
-```
-
-:::
-
 ## Utiliser les formats
 
 Nécessite le lancement des formats aux étapes précédentes.
@@ -319,6 +258,73 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ```{r, warning=FALSE, message=FALSE}
 
 ```
+
+:::
+
+## Formater les modalités des valeurs continues
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Utilisation des formats */
+proc format;
+  /* Variable continue */
+  value agef
+  low-<26 = "1. De 15 à 25 ans"
+  26<-<50 = "2. De 26 à 49 ans"
+  50-high = "3. 50 ans ou plus";
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+# L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
+agef <- cut(donnees_rbase$age, 
+            breaks = c(0, 25, 49, Inf),
+            right = TRUE,
+            labels = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
+            ordered_result = TRUE)
+
+# Autre solution
+donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
+# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
+donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
+donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(agef = case_when(
+    age < 26             ~ "1. De 15 à 25 ans",
+    age >= 26 & age < 50 ~ "2. De 26 à 49 ans",
+    age >= 50            ~ "3. 50 ans ou plus")
+    )
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge formaté
+donnees_datatable[, agef := fcase(age < 26,             "1. De 15 à 25 ans",
+                                  26 <= age & age < 50, "2. De 26 à 49 ans",
+                                  age >= 50,            "3. 50 ans ou plus")]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+Préférer `case_match` quand il s'agit de valeurs déterminées.
+
+```{r, warning=FALSE, message=FALSE}
+# Âge formaté
+requete_duckdb %>%
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
+```
+
 :::
 
 ## Transformer le format d'une variable
@@ -328,10 +334,13 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ``` sas
 data donnees_sas;
   set donnees_sas;
+  
   /* Transformer la variable Sexe en caractère */
   Sexe_car = put(Sexe, $1.);
+  
   /* Transformer la variable Sexe_car en numérique */
   Sexe_num = input(Sexe_car, 1.);
+  
   /* Transformer une date d'un format caractère à un format Date */
   format date $10.;
   date = "01/01/2000";
@@ -344,8 +353,10 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer la variable sexe en numérique
 donnees_rbase$sexe_numerique <- as.numeric(donnees_rbase$sexe)
+
 # Transformer la variable sexe_numerique en caractère
 donnees_rbase$sexe_caractere <- as.character(donnees_rbase$sexe_numerique)
+
 # Transformer une date d'un format caractère à un format Date
 donnees_rbase$date_r <- lubridate::dmy("01/01/2000")
 ```
@@ -369,8 +380,10 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer la variable sexe en numérique
 donnees_datatable[, sexe_numerique := as.numeric(sexe)]
+
 # Transformer la variable sexe_numerique en caractère
-donnees_datatable[, sexe_caractere := as.numeric(sexe_numerique)]
+donnees_datatable[, sexe_caractere := as.character(sexe_numerique)]
+
 # Transformer une date d'un format caractère à un format Date
 donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 ```
@@ -426,9 +439,10 @@ run;
 donnees_rbase$note2 <- donnees_rbase$note_contenu / 20 * 5
 # Le with permet de s'affranchir des expressions "donnees_rbase$"
 with(donnees_rbase, note2 <- note_contenu / 20 * 5)
-donnees_rbase <- transform(donnees_rbase, note2 = note_contenu / 20 * 5)
+
 # On ne peut pas utiliser transform pour des variables récemment créées
 #donnees_rbase <- transform(donnees_rbase, note3 = note_contenu ** 2, note3 = log(note3))
+donnees_rbase <- transform(donnees_rbase, note2 = note_contenu / 20 * 5)
 
 # Suppression de variables
 donnees_rbase$note2 <- NULL
@@ -559,12 +573,18 @@ notes <- names(donnees_datatable)[grepl("^note", names(donnees_datatable))]
 sur100 <- copy(donnees_datatable)
 sur100 <- sur100[, (notes) := lapply(.SD, function(x) x / 20 * 100), .SDcols = notes]
 sur100 <- sur100[, (notes) := lapply(.SD, function(x) x / 20 * 100), .SD = notes]
+
 # Ou encore, plus simple
 # Dans cet exemple, les notes dans la base donnees_datatable ne sont pas changées
 sur100 <- sur100[, lapply(.SD, function(x) x / 20 * 100), .SDcols = patterns("^note")]
 
 # On  souhaite conserver les notes sur 20 dans d'autres variables, suffixées par _20
 donnees_datatable[, (paste0(notes, "_100")) := lapply(.SD, function(x) x / 20 * 100), .SDcols = notes]
+
+# Autre possibilité en utilisant l'instruction set, très rapide
+for (j in notes) {
+  set(x = donnees_datatable, j = paste0(j, "_100"), value = donnees_datatable[[j]] / 20 * 100)
+}
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -594,17 +614,16 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Obtenir le mois et la date
-donnees_rbase$mois <- lubridate::month(donnees_rbase$date_entree)
-donnees_rbase$annee <- lubridate::year(donnees_rbase$date_entree)
-# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
-donnees_rbase$mois <- sprintf("%02d", donnees_rbase$mois)
+# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9) le mois d'entrée
+donnees_rbase$mois <- sprintf("%02d", lubridate::month(donnees_rbase$date_entree))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9) le mois d'entrée
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(mois = sprintf("%02d", lubridate::month(date_entree)))
+
 # Autre solution
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(mois = lubridate::month(date_entree),
@@ -613,10 +632,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Obtenir le mois et la date
-donnees_datatable[, `:=`(mois = lubridate::month(date_entree), annee = lubridate::year(donnees_datatable$date_entree))]
 # Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
-donnees_datatable[, mois := sprintf("%02d", mois)]
+donnees_datatable[, mois := sprintf("%02d", lubridate::month(date_entree))]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

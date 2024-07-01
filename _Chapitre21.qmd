@@ -1,4 +1,4 @@
-# Tableaux de contingence (proc freq de `SAS`) pour 2 variables 
+# Tableaux de contingence (`proc freq` de `SAS`) pour 2 variables 
 
 Cette tâche, immédiate en `SAS`, est plus complexe à réaliser en `R`. Plusieurs stratégies, avec et sans packages, sont proposées ici.
 
@@ -336,13 +336,13 @@ donnees_datatable[, chisq.test(cspf, sexef)]
 
 ## Solutions avec package `R` permettant de pondérer
 
-Autre possibilité, avec package `R`, pour avoir la même présentation que la proc freq de `SAS`.
+Autre possibilité, avec package `R`, pour avoir la même présentation que la `proc freq` de `SAS`.
 
-5 packages paraissent pertinents : descr, flextable, questionr, survey, procs.
+5 packages paraissent pertinents : `descr`, `flextable`, `questionr`, `survey`, `procs`.
 
 Des informations sur l'usage des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html>.
 
-### Package descr
+### Package `descr`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/descr/descr.pdf>.
 
@@ -398,7 +398,7 @@ with(donnees_datatable, descr::crosstab(cspf, sexef, weight = poids_sondage, pro
 
 :::
 
-### Package flextable
+### Package `flextable`
 
 Lien vers la documentation :
 
@@ -457,7 +457,7 @@ flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage
 
 :::
 
-### Package questionr
+### Package `questionr`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/questionr/questionr.pdf>.
 
@@ -475,7 +475,6 @@ run;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans pondération
 library(questionr)
 # Tableau croisé
 # Sans pondération
@@ -534,7 +533,7 @@ questionr::rprop(tab)
 
 :::
 
-### Package survey
+### Package `survey`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/survey/survey.pdf>.
 
@@ -581,7 +580,7 @@ survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 
 :::
 
-### Package procs
+### Package `procs`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/procs/vignettes/procs-freq.html>.
 
@@ -631,11 +630,11 @@ setDT(donnees_datatable)
 
 :::
 
-## Solutions avec package R ne permettant apparemment pas de pondérer
+## Solutions avec package `R` ne permettant apparemment pas de pondérer
 
-Autres packages, qui semblent quasi-inutiles, ne permettant apparemment pas de pondérer.
+Autres packages, qui semblent peu utiles, ne permettant apparemment pas de pondérer.
 
-### Package Janitor
+### Package `Janitor`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/janitor/vignettes/tabyls.html>.
 
@@ -704,7 +703,7 @@ janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
 
 :::
 
-### Package crosstable
+### Package `crosstable`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/crosstable/crosstable.pdf>.
 
@@ -747,7 +746,7 @@ crosstable::crosstable(donnees_datatable, cspf, by = sexef, showNA = "always",
 
 :::
 
-### Package gmodels
+### Package `gmodels`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/gmodels/gmodels.pdf>.
 
@@ -789,7 +788,7 @@ gmodels::CrossTable(donnees_datatable$cspf, donnees_datatable$sexef)
 
 :::
 
-### Package gtsummary
+### Package `gtsummary`
 
 Lien vers la documentation : <https://cran.r-project.org/web/packages/gtsummary/gtsummary.pdf>.
 

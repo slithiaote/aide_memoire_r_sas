@@ -2,9 +2,9 @@
 
 ## Concaténer deux bases de données
 
-On va juxtaposer le numéro de la ligne à la base de données.
+On va mettre côte à côte le numéro de la ligne à la base de données.
 
-### Nombre de colonnes identique dans chaque base
+### Les deux bases concaténées ont le même nombre de lignes
 
 ::: {.panel-tabset group="language"}
 
@@ -30,7 +30,7 @@ concatener <- cbind(ajout, donnees_rbase)
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de la ligne
 ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
-# cbind si les deux bases comprennent le même nombre de lignes
+# bind_cols si les deux bases comprennent le même nombre de lignes
 concatener <- donnees_tidyverse %>% bind_cols(ajout)
 ```
 
@@ -39,7 +39,7 @@ concatener <- donnees_tidyverse %>% bind_cols(ajout)
 # Numéro de la ligne
 ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
 # data.frame::cbind si les deux bases comprennent le même nombre de lignes
-concatener <- cbind(ajout, donnees_datatable)
+concatener <- data.frame::cbind(ajout, donnees_datatable)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -49,7 +49,7 @@ concatener <- cbind(ajout, donnees_datatable)
 
 :::
 
-### Nombre de colonnes différent dans chaque base
+### Les deux bases concaténées n'ont pas le même nombre de lignes
 
 ::: {.panel-tabset group="language"}
 
@@ -109,10 +109,10 @@ concatener <- cbind_alt(list(ajout, donnees_tidyverse))
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Fonctionne aussi avec des bases comportement un nombre différent de lignes
+# data.table::cbind fonctionne aussi avec des bases comportant un nombre différent de lignes
 # Mais attention, le résultat n'est pas le même que sur SAS, il y a recycling
 ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable) + 1))
-concatener <- cbind(ajout, donnees_datatable)
+concatener <- data.table::cbind(ajout, donnees_datatable)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -135,7 +135,7 @@ On va empiler la somme des notes en dessous de la base des notes.
 %let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 %let var2 = %sysfunc(tranwrd(&var., Identifiant,));
 data Notes;set donnees_sas (keep = &var.);run;
-/* Moyenne des notes par individu */
+/* Moyenne des notes */
 proc means data = Notes noprint mean;var &var2.;output out = Ajout mean = &var2.;run;
 
 /* On concatène avec les données. Valeur manquante si les variables ne correspondent pas */
@@ -157,9 +157,9 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
+# Moyenne des notes
 moyennes <- data.frame(t(colMeans(donnees_rbase[, varNotes], na.rm = TRUE)))
-# On sélectionne la base des notes
+# On crée la base des notes
 notes <- donnees_rbase[, varNotes]
 # rbind lorsque les bases empilées ont le même nombre de colonne
 empiler <- rbind(notes, moyennes)
@@ -168,6 +168,7 @@ empiler <- rbind(notes, moyennes)
 notes <- donnees_rbase[, c("identifiant", varNotes)]
 # Ne fonctionne pas
 #empiler <- rbind(notes, moyennes)
+
 # Une solution alternative, lorsque le nombre de colonnes diffère entre les deux bases
 # Lorsque les variables ne correspondent pas, on les crée avec des valeurs manquantes, via setdiff
 rbind_alt <- function(x, y) {
@@ -184,7 +185,7 @@ empiler[nrow(empiler), "identifiant"] <- "Moyenne"
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
+# Moyenne des notes
 moyennes <- donnees_tidyverse %>% 
   summarise(across(varNotes, ~mean(., na.rm = TRUE)))
 empiler <- donnees_tidyverse %>% 
@@ -206,11 +207,13 @@ empiler <- empiler %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Moyenne des notes par individu
+# Moyenne des notes
 moyennes <- data.table(donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = varNotes])
 
-# On sélectionne la base des notes
+# On crée la base des notes
 notes <- donnees_datatable[, mget(c("identifiant", varNotes))]
+
+# Empilement proprement dit
 empiler <- rbindlist(list(notes, moyennes), fill = TRUE)
 # On renomme la ligne des moyennes ajoutée
 set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")

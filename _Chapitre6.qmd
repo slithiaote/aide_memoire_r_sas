@@ -1,6 +1,6 @@
-# Sélectionner des lignes et des colonnes
+# Sélection de lignes et de colonnes
 
-## Sélectionner de colonnes par position 
+## Sélectionner des colonnes par position 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -302,15 +302,19 @@ colonnes <- donnees_tidyverse %>% select(!!cols)
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 cols <- c("identifiant", "note_contenu", "sexe")
 # Plusieurs écritures possibles
-# Peut-être l'écriture la plus simple, à privilégier
-colonnes <- donnees_datatable[, mget(cols)]
+
 # Ecriture cohérente avec la logique data.table
 colonnes <- donnees_datatable[, .SD, .SDcols = cols]
+
+# Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
+colonnes <- donnees_datatable[, cols, with = FALSE]
+
+# Ecriture avec mget
+colonnes <- donnees_datatable[, mget(cols)]
+
 # Ecriture un peu contre-intuitve. Attention ! L'écriture est bien ..cols, et non ..(cols) !!
 # Les syntaxes donnees_datatable[, ..(cols)] et donnees_datatable[, .(cols)] ne fonctionnent pas
 colonnes <- donnees_datatable[, ..cols]
-# Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
-colonnes <- donnees_datatable[, cols, with = FALSE]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -357,6 +361,7 @@ varNotes <- donnees_tidyverse %>% select(starts_with("note"))
 # 1ère méthode
 cols <- names(donnees_datatable)[substr(names(donnees_datatable), 1, 4) == "note"]
 sel <- donnees_datatable[, .SD, .SDcols = cols]
+
 # 2e méthode
 sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
 ```
@@ -508,7 +513,7 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 :::
 
 
-### Sélectionner les 3 premières lignes et les 3 premières colonnes de la base
+### 3 premières lignes et 3 premières colonnes
 
 ::: {.panel-tabset group="language"}
 
@@ -682,7 +687,7 @@ donnees_tidyverse %>% filter(get(variable) %in% sel) %>% select(all_of(variable)
 variable <- "identifiant"
 sel <- "087"
 donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
-donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
+donnees_datatable[get(variable) %chin% sel, ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

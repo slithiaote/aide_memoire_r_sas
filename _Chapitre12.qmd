@@ -1,196 +1,200 @@
-# Gestion par rangées de lignes
+# Les tris
 
-## Sélectionner les lignes avec au moins une note inférieure à 10 
-::: {.panel-tabset group="language"}
+## Trier les colonnes de la base
 
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
-data Note_Inferieure_10;
-  set donnees_sas;
-  
-  %macro Inf10;
-    %global temp;
-	%let temp = ;
-    %do i = 1 %to %sysfunc(countw(&notes.));
-      %let j = %scan(&notes., &i.);
-	  &j._inf_10 = (&j. < 10 and not missing(&j.));
-	  %let temp = &temp. &j._inf_10;
-    %end;
-  %mend Inf10;
-  %Inf10;
-  
-  if sum(of &temp.) >= 1;
-  drop &temp.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) any(x < 10, na.rm = TRUE)), ]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-donnees_tidyverse %>%
-  filter(if_any(varNotes, ~ .x < 10))
-
-# Autre solution
-donnees_tidyverse %>%
-  filter_at(varNotes, any_vars(. < 10))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-note_moins_10 <- donnees_datatable[donnees_datatable[, .I[rowSums(.SD < 10, na.rm = TRUE) >= 1], .SDcols = varNotes]]
-
-# Autre solution
-# Le Reduce(`|`, ...) permet d'appliquer la condition | (ou) à tous les élements de la ligne, qui sont une vérification d'un nb < 10
-note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `<`, 10)), .SDcols = varNotes]]
-
-# https://arelbundock.com/posts/datatable_rowwise/
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Sélectionner les lignes avec toutes les notes supérieurs à 10 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
-data Note_Sup_10;
-  set donnees_sas;
-  
-  %macro Inf10;
-    %global temp;
-	%let temp = ;
-    %do i = 1 %to %sysfunc(countw(&notes.));
-      %let j = %scan(&notes., &i.);
-	  &j._sup_10 = (&j. >= 10);
-	  %let temp = &temp. &j._sup_10;
-    %end;
-  %mend Inf10;
-  %Inf10;
-  
-  a = sum(of &temp.);
-  b = %sysfunc(countw(&notes.));
-  if sum(of &temp.) = %sysfunc(countw(&notes.));
-  drop &temp.;
-run;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-
-# À FAIRE : REVOIR LE PB DES VALEURS MANQUANTES !!!!
-donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) all(x >= 10, na.rm = TRUE)), ]
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-donnees_tidyverse %>%
-  filter(if_all(varNotes, ~ . >= 10))
-
-# Autre solution
-donnees_tidyverse %>%
-  filter_at(varNotes, all_vars(. >= 10))
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-note_sup_10 <- donnees_datatable[
-  donnees_datatable[, .I[rowSums(.SD >= 10, na.rm = TRUE) == length(varNotes)], .SDcols = varNotes]]
-
-# Autre solution
-note_sup_10 <- donnees_datatable[donnees_datatable[, Reduce(`&`, lapply(.SD, `>=`, 10)), .SDcols = varNotes]]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
-:::
-
-## Moyenne par ligne
-
-### Moyenne par ligne 
+### Mettre identifiant et date_entree au début de la base
 
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne */
-%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+%let colTri = identifiant date_entree;
 data donnees_sas;
+  retain &colTri.;
   set donnees_sas;
-  
-  /* 1ère solution */
-  Note_moyenne    = mean(of &notes.);
-  
-  /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
-  %macro List_comprehension;
-    Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
-	                      %let j = %scan(&notes., &i.);
-						  &j.
-						 %end;);;
-  %mend List_comprehension;
-  %List_comprehension;
+run;
+
+/* Autre solution */
+proc sql;
+  create table donnees_sas as
+  /* Dans la proc SQL, les variables doivent être séparées par des virgules */
+  /* On remplace les blancs entre les mots par des virgules pour la proc SQL */
+  select %sysfunc(tranwrd(&colTri., %str( ), %str(, ))), * from donnees_sas;
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+colTri <- c("identifiant", "date_entree")
+donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
+
+# Autre possibilité, plus longue !
+donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
+donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(identifiant, date_entree)
+
+# Autres solutions
+colTri <- c("identifiant", "date_entree")
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(all_of(colTri))
+donnees_tidyverse_tri <- donnees_tidyverse %>% 
+  select(all_of(colTri), everything())
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+colTri <- c("identifiant", "date_entree")
+tri <- union(colTri, colnames(donnees_datatable))
+donnees_datatable <- donnees_datatable[, ..tri]
+
+# Autre solution, à privilégier
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie. Ceci est plus efficace pour manipuler des données volumineuses.
+setcolorder(donnees_datatable, colTri)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  select(identifiant, date_entree, everything())
+
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  relocate(identifiant, date_entree)
+```
+
+:::
+
+
+### Mettre la variable poids_sondage au début de la base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+/* Mettre la variable poids_sondage au début de la base */
+data donnees_sas;
+  retain poids_sondage;
+  set donnees_sas;
 run;
 ```
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
-varNotes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-
-# apply permet d'appliquer une fonctions aux lignes (1) ou colonnes (2) d'un data.frame
-donnees_rbase$note_moyenne <- apply(donnees_rbase[, varNotes], 1, mean, na.rm = TRUE)
+# Mettre la variable poids_sondage au début de la base
+donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
-varNotes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-# Codes à privilégier
+# Mettre la variable poids_sondage au début de la base
 donnees_tidyverse <- donnees_tidyverse %>%
-  mutate(note_moyenne = rowMeans(pick(all_of(varNotes)), na.rm = TRUE))
-donnees_tidyverse <- donnees_tidyverse %>%
-  mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
+  relocate(poids_sondage)
+```
 
-# Alternative lente
-# Noter l'utilisation de c_across dans ce cas de figure pour traiter automatiquement plusieurs variables
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage au début de la base
+setcolorder(donnees_datatable, "poids_sondage")
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+```
+
+:::
+
+### Mettre la variable poids_sondage à la fin de la base
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+/* Mettre la variable poids_sondage à la fin de la base */
+proc contents data = donnees_sas out = var;run;
+proc sql noprint;
+  select name into :var separated by " " from var
+  where lowcase(name) ne "poids_sondage" order by varnum;
+quit;
+data donnees_sas;
+  retain &var. poids_sondage;
+  set donnees_sas;
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage à la fin de la base
+donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sondage"), "poids_sondage")]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage à la fin de la base
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(poids_sondage, .after = last_col())
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Mettre la variable poids_sondage à la fin de la base
+setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_sondage"), "poids_sondage"))
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+```
+
+:::
+
+## Trier les lignes
+
+### Tri par ordre croissant d'identifiant et date_entree
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+/* 1ère possibilité */
+proc sort data = donnees_sas;by Identifiant Date_entree;run;
+
+/* 2e possibilité */
+proc sql;
+  create table Donnes as select * from donnees_sas
+  order by Identifiant, Date_entree;
+quit;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Tri par ordre croissant
 donnees_tidyverse <- donnees_tidyverse %>% 
-  rowwise() %>% 
-  mutate(note_moyenne = mean(c_across(all_of(varNotes)), na.rm = TRUE)) %>% 
-  ungroup()
+  arrange(identifiant, date_entree)
 ```
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne
-varNotes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
-# On souhaite moyenner les notes par formation
-donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNotes]
+# Tri par ordre croissant
+# L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
+donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
 
-# Manière alternative, qui ne semble pas fonctionner
-#donnees_datatable[, note_moyenne := Reduce(function(...) sum(..., na.rm = TRUE), .SD),
-#                  .SDcols = varNotes,
-#                  by = 1:nrow(donnees_datatable)]
-#donnees_datatable[, do.call(function(x, y) sum(x, y, na.rm = TRUE), .SD), .SDcols = varNotes, by = 1:nrow(donnees_datatable)]
+# En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
+# Ceci est plus efficace pour manipuler des données volumineuses.
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+setorder(donnees_datatable, identifiant, date_entree, na.last = FALSE)
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -200,39 +204,43 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNo
 
 :::
 
-### Moyenne des moyennes ligne 
+### Tri par ordre décroissant
 
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Note moyenne (moyenne des moyennes), non pondérée et pondérée */
-proc means data = donnees_sas mean;var Note_moyenne;run;
-proc means data = donnees_sas mean;var Note_moyenne;weight poids_sondage;run;
+/* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
+proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
+proc sql;
+  create table Donnes as select * from donnees_sas
+  order by Identifiant, Date_entree desc;
+quit;
 ```
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Note moyenne (moyenne des moyennes), non pondérée et pondérée
-mean(donnees_rbase$note_moyenne, na.rm = TRUE)
-weighted.mean(donnees_rbase$note_moyenne, donnees_rbase$poids_sondage, na.rm = TRUE)
+# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
+
+# Autre possibilité : - devant la variable (uniquement pour les variables numériques)
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$duree, na.last = FALSE), ]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Note moyenne (moyenne des moyennes) non pondérée
-donnees_tidyverse %>% pull(note_moyenne) %>% mean(na.rm = TRUE)
-donnees_tidyverse %>% summarise(Moyenne = mean(note_moyenne, na.rm = TRUE))
-
-# Note moyenne (moyenne des moyennes) pondérée
-donnees_tidyverse %>% summarise(Moyenne_ponderee = weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE))
+# Tri par ordre croissant de identifiant et décroissant de date_entree
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
 ```
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Note moyenne (moyenne des moyennes), non pondérée et pondérée
-donnees_datatable[, mean(note_moyenne, na.rm = TRUE)]
-donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
+# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+donnees_datatable <- donnees_datatable[order(identifiant, -date_entree, na.last = FALSE)]
+setorder(donnees_datatable, "identifiant", -"date_entree", na.last = FALSE)
+setorder(donnees_datatable, identifiant, -date_entree, na.last = FALSE)
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -242,130 +250,100 @@ donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
 
 :::
 
-### La moyenne par ligne est est-elle supérieure à la moyenne ? 
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-/* On crée une macro-variable SAS à partir de la valeur de la moyenne */
-proc sql noprint;select mean(Note_moyenne) into :moyenne from donnees_sas;quit;
-data donnees_sas;
-  set donnees_sas;
-  Note_Superieure_Moyenne = (Note_moyenne > &moyenne.);
-run;
-proc freq data = donnees_sas;tables Note_Superieure_Moyenne;run;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-moyenne <- mean(donnees_rbase$note_moyenne, na.rm = TRUE)
-donnees_rbase$note_superieure_moyenne <- ifelse(donnees_rbase$note_moyenne > moyenne, 1, 0)
-table(donnees_rbase$note_superieure_moyenne, useNA = "always")
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-moyenne <- donnees_tidyverse %>% pull(note_moyenne) %>% mean(na.rm = TRUE)
-donnees_tidyverse <- donnees_tidyverse %>% mutate(note_superieure_moyenne = ifelse(note_moyenne > moyenne, 1, 0))
-donnees_tidyverse %>% pull(note_superieure_moyenne) %>% table(useNA = "always")
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-moyenne <- donnees_datatable[, mean(note_moyenne, na.rm = TRUE)]
-donnees_datatable[, note_superieure_moyenne := fcase(note_moyenne >= moyenne, 1,
-                                                     note_moyenne <  moyenne, 0)]
-table(donnees_datatable$note_superieure_moyenne, useNA = "always")
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Moyenne pondérée par ligne 
+## Incidence des valeurs manquantes dans les tris 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On souhaite affecter les pondérations suivantes aux notes :
-Note_Contenu : 30%, Note_Formateur : 20%, Note_Moyens : 25%, Note_Accompagnement : 15%, Note_Materiel : 10% */
-/* Voici une solution possible. Une alternative intéressante serait de passer par IML (non traité ici) */
-%let ponderation = 0.3 0.2 0.25 0.15 0.10;
-%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
-
-data donnees_sas;
-  set donnees_sas;
-  
-  %macro Somme_pond;
-    %global temp;
-	  %let temp = ;
-    %do i = 1 %to %sysfunc(countw(&notes.));
-      %let k = %scan(&notes., &i.);
-	    %let l = %scan(&ponderation., &i., %str( ));
-	    &k._pond = &k. * &l.;
-	    %let temp = &temp. &k._pond;
-	  %end;
-  %mend Somme_pond;
-  %Somme_pond;
-  Note_moyenne_pond = sum(of &temp.);
-  drop &temp.;
-run;
-proc means data = donnees_sas mean;var Note_moyenne_pond;run;
+/* Dans SAS, les valeurs manquantes sont considérées comme des valeurs négatives */
+/* Elles sont donc situées en premier dans un tri par ordre croissant ... */
+proc sort data = donnees_sas;by identifiant date_entree;run;proc print;run;
+/* ... et en dernier dans un tri par ordre décroissant */
+proc sort data = donnees_sas;by identifiant descending date_entree;run;
+proc print;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On calcule de nouveau cette moyenne, mais en pondérant
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
 
-# On souhaite affecter les pondérations suivantes aux notes :
-# note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
-notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
-# On vérifie que la somme des poids vaut 1
-sum(ponderation)
-
-donnees_rbase$note_moyennepond <- apply(donnees_rbase[, notes], 1, function(x) weighted.mean(x, ponderation, na.rm = TRUE))
-
-# Autre manière, en exploitant le calcul matriciel
-# Ne fonctionne pas, du fait des NA
-as.matrix(donnees_rbase[, notes]) %*% as.matrix(ponderation)
-# Produit élément par élément
-# On peut procéder par produit matriciel
-as.matrix(donnees_rbase[, notes]) * matrix(t(as.matrix(ponderation)), nrow(donnees_rbase), 5)
+# SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Pour mimer le tri par ordre croissant en SAS :
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+# Pour mimer le tri par ordre décroissant en SAS :
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree,
+                                     na.last = FALSE,
+                                     decreasing = c(FALSE, TRUE),
+                                     method = "radix"), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On calcule de nouveau cette moyenne, mais en pondérant
-# La fonction RowMeans ne fonctionne plus, cette fois !
+# Attention, avec arrange, les variables manquantes (NA) sont toujours classées en dernier, même avec desc()
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, date_entree)
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
 
-# On souhaite affecter les pondérations suivantes aux notes :
-# note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
-notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
-# On vérifie que la somme des poids vaut 1
-sum(ponderation)
+# Or, SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Elles sont donc classées en premier dans un tri par ordre croissant, et en dernier dans un tri par ordre décroissant
 
-# Noter l'utilisation de c_across dans ce cas de figure pour traiter automatiquement plusieurs variables
-donnees_tidyverse <- donnees_tidyverse %>%
-  rowwise() %>%
-  mutate(note_moyenne = weighted.mean(c_across(varNotes), ponderation, na.rm = TRUE)) %>% 
-  ungroup()
+# Pour mimer le tri par ordre croissant en SAS : les valeurs manquantes de date_entree sont classées en premier
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, !is.na(date_entree), date_entree)
+# Pour mimer le tri par ordre décroissant en SAS
+donnees_tidyverse <- donnees_tidyverse %>% 
+  arrange(identifiant, desc(date_entree))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-## On souhaite affecter les pondérations suivantes aux notes :
-## note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
-notes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-ponderation <- c(note_contenu = 30, note_formateur = 20, note_moyens = 25, note_accompagnement = 15, note_materiel = 10) / 100
-# On vérifie que la somme des poids vaut 1
-sum(ponderation)
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+donnees_datatable <- donnees_datatable[order(identifiant, date_entree)]
+# SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Pour mimer le tri par ordre croissant en SAS :
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+# Pour mimer le tri par ordre décroissant en SAS :
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
+```
 
-donnees_datatable[, note_moyenne_pond := rowSums(mapply(FUN = `*`, .SD, ponderation), na.rm = TRUE), .SDcols = names(ponderation)]
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
+requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
+  
+# Pour mimer le tri SAS, il faut écrire :
+# Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
+requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
+```
+
+:::
+
+## Trier par ordre croissant de toutes les variables de la base 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+proc sort data = donnees_sas;by _all_;run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+tri_toutes_variables <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE)]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+tri_toutes_variables <- donnees_tidyverse %>% 
+  arrange(pick(everything()))
+tri_toutes_variables <- donnees_tidyverse %>% 
+  arrange(across(everything()))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

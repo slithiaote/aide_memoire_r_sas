@@ -1,85 +1,54 @@
-# Gestion par groupe
+# Les doublons
 
-## Numéroter les lignes
+## Doublons pour toutes les colonnes 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data donnees_sas;
+/* On extrait tous les doublons, pas la première occurrence */
+
+/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :derniere_var
+  from Var
+  where varnum = (select max(varnum) from Var);
+quit;
+proc sort data = donnees_sas;by &nom_col.;run;
+data Doublons;
   set donnees_sas;
-  Num_observation = _n_;
-run;
-
-/* Autre solution */
-proc sql noprint;select count(*) into :nbLignes from donnees_sas;quit;
-data numLigne;do Num_observation = 1 to &nbLignes.;output;end;run;
-data _NULL_;
-  set donnees_sas nobs = n;
-  call symputx('nbLignes', n);
-run;
-%put Nombre de lignes : &nbLignes.;
-
-/* Le merge "simple" (sans by) va seulement concaténer les deux bases l'une à côté de l'autre */
-data donnees_sas;
-  merge donnees_sas numLigne;
+  by &nom_col.;
+  if not (first.&derniere_var. and last.&derniere_var.);
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Numéro de l'observation : 2 manières différentes
-donnees_rbase$num_observation <- row.names(donnees_rbase)
-donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
+# On extrait tous les doublons, pas la première occurrence
+doublons <- donnees_rbase[duplicated(donnees_rbase), ]
+```
 
-# Numéro du contrat de chaque individu, contrat trié par date d'entrée
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-donnees_rbase$un <- 1
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase$numero_contrat <- ave(donnees_rbase$un, donnees_rbase$identifiant, FUN = cumsum)
-donnees_rbase$un <- NULL
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# On extrait tous les doublons, pas la première occurrence
+donnees_tidyverse %>% 
+  group_by(across(everything())) %>% 
+  filter(n() > 1) %>% 
+  slice(-1) %>% 
+  ungroup()
 
 # Autre solution
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase$numero_contrat <- as.numeric(ave(donnees_rbase$identifiant, donnees_rbase$identifiant, FUN = seq_along))
-
-# Autre solution : order pour éviter le as.numeric
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase$numero_contrat <- ave(order(donnees_rbase$date_entree), donnees_rbase$identifiant, FUN = seq_along)
-#https://stackoverflow.com/questions/11996135/create-a-sequential-number-counter-for-rows-within-each-group-of-a-dataframe
-#https://stackoverflow.com/questions/13732062/what-are-examples-of-when-seq-along-works-but-seq-produces-unintended-results
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Numéro de l'observation
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  mutate(num_observation = row_number())
-
-# Numéro du contrat de chaque individu, contrat trié par date d'entrée
-# arrange() va permettre de trier les observations par identifiant et date d'entrée 
-donnees_tidyverse <- donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  mutate(numero_contrat = row_number()) %>% 
+doublons <- donnees_tidyverse %>%  
+  group_by_all() %>% 
+  filter(n() > 1) %>%
+  slice(-1) %>%
   ungroup()
-# À FAIRE : Dans group_by, à quoi sert le drop ?
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Numéro de l'observation : 2 manières différentes
-donnees_datatable[, num_observation := .I]
-donnees_datatable[, num_observation := seq_len(.N)]
-
-# Numéro du contrat de chaque individu, contrat trié par date d'entrée
-setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
-donnees_datatable[, numero_contrat := rowid(identifiant)]
-donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
+# On extrait tous les doublons, pas la première occurrence
+doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -87,205 +56,47 @@ donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 
 ```
 
-:::
-
-## Première et dernière ligne par identifiant
-
-### Première ligne par identifiant
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-proc sort data = donnees_sas;by identifiant date_entree;run;
-/* L'instruction options permet de ne pas afficher d'erreur si la variable numero_contrat n'existe pas */
-options dkricond=nowarn dkrocond=nowarn;
-data donnees_sas;
-  set donnees_sas (drop = numero_contrat);
-  by identifiant date_entree;
-  retain numero_contrat 0;
-  if first.identifiant then numero_contrat = 1;
-  else                      numero_contrat = numero_contrat + 1;
-run;
-
-options dkricond=warn dkrocond=warn;
-/* Pour trier les colonnes */
-data donnees_sas;
-  retain identifiant date_entree numero_contrat numero_contrat;
-  set donnees_sas;
-run;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase[!duplicated(donnees_rbase$identifiant), , drop = FALSE]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  filter(row_number() == 1) %>% 
-  ungroup()
-
-# Autres solutions
-donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  slice(1) %>% 
-  ungroup()
-
-donnees_tidyverse %>%  
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  slice_head(n = 1) %>% 
-  ungroup()
-
-donnees_tidyverse %>%  
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  filter(row_number() == nth(row_number(), 1)) %>%
-  ungroup()
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, .SD[1], by = identifiant]
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
-### Dernière ligne par identifiant
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-proc sort data = donnees_sas;by identifiant date_entree;run;
-/* L'instruction options permet de ne pas afficher d'erreur si la variable numero_contrat n'existe pas */
-options dkricond=nowarn dkrocond=nowarn;
-data donnees_sas;
-  set donnees_sas (drop = numero_contrat);
-  by identifiant date_entree;
-  retain numero_contrat 0;
-  if first.identifiant then numero_contrat = 1;
-  else                      numero_contrat = numero_contrat + 1;
-run;
-
-options dkricond=warn dkrocond=warn;
-/* Pour trier les colonnes */
-data donnees_sas;
-  retain identifiant date_entree numero_contrat numero_contrat;
-  set donnees_sas;
-run;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = TRUE), , drop = FALSE]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  filter(row_number() == n()) %>% 
-  ungroup()
-
-# Autres solutions
-donnees_tidyverse %>%  
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  slice(n()) %>% 
-  ungroup()
-
-donnees_tidyverse %>%  
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  filter(row_number() == nth(row_number(), -1)) %>%
-  ungroup()
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, .SD[.N], by = identifiant]
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Le premier contrat, le dernier contrat, ni le premier ni le dernier contrat de chaque individu
+## Doublons pour une ou plusieurs colonnes 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data donnees_sas;
+/* On extrait tous les doublons, pas la première occurrence */
+%let var = identifiant;
+proc sort data = donnees_sas;by &var.;run;
+data doublons;
   set donnees_sas;
-  by identifiant date_entree;
-  Premier_Contrat = (first.identifiant = 1);
-  Dernier_Contrat = (last.identifiant = 1);
-  Ni_Prem_Ni_Der  = (first.identifiant = 0 and last.identifiant = 0);
+  by &var.;
+  if not first.&var.;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-donnees_rbase$premier_contrat <- ifelse(!duplicated(donnees_rbase$identifiant, fromLast = FALSE), 1, 0)
-donnees_rbase$dernier_contrat <- ifelse(!duplicated(donnees_rbase$identifiant, fromLast = TRUE), 1, 0)
-donnees_rbase$ni_prem_ni_der  <- ifelse(! c(!duplicated(donnees_rbase$identifiant, fromLast = FALSE) | !duplicated(donnees_rbase$identifiant, fromLast = TRUE)), 1, 0)
+# On extrait tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_rbase[duplicated(donnees_rbase[, variable]), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Premier contrat
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  mutate(premier_contrat = ifelse(row_number() == 1, 1, 0)) %>% 
-  ungroup()
-
-# Dernier contrat
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  mutate(dernier_contrat = ifelse(row_number() == n(), 1, 0)) %>% 
-  ungroup()
-
-# Ni le premier, ni le dernier contrat
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  mutate(ni_prem_ni_der = ifelse( ! (row_number() == n() | row_number() == 1), 1, 0)) %>% 
+# On extrait tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() > 1) %>%
+  slice(-1) %>%
   ungroup()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
-donnees_datatable[, premier_contrat := fifelse(!duplicated(identifiant, fromLast = FALSE), 1, 0)]
-donnees_datatable[, dernier_contrat := fifelse(!duplicated(identifiant, fromLast = TRUE), 1, 0)]
-donnees_datatable[, ni_prem_ni_der := fifelse(! c(!duplicated(identifiant, fromLast = FALSE) | !duplicated(identifiant, fromLast = TRUE)), 1, 0)]
+# On extrait tous les doublons, pas la première occurrence
+variable <- "identifiant"
+doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -293,65 +104,45 @@ donnees_datatable[, ni_prem_ni_der := fifelse(! c(!duplicated(identifiant, fromL
 
 ```
 
+
 :::
 
-## Créer une base avec les seuls premiers contrats, et une base avec les seuls derniers contrats
+## Récupérer toutes les lignes pour les identifiants en doublon 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-proc sort data = donnees_sas;by identifiant date_entree;run;
-/* Création de 2 bases en une seule étape */
-data Premier_Contrat Dernier_Contrat;
-  set donnees_sas;
-  by identifiant date_entree;
-  if first.identifiant then output Premier_Contrat;
-  if last.identifiant then output Dernier_Contrat;
-run;
+%let var = identifiant;
+/* On groupe par la colonne identifiant, et si on aboutit à strictement plus d'une ligne, c'est un doublon */
+proc sql;
+  create table enDouble as
+  select * from donnees_sas
+  group by &var.
+  having count(*) > 1;
+quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Créer une base avec les seuls premiers contrats, et une base avec les seuls derniers contrats
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-premier_contrat <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = FALSE), ]
-dernier_contrat <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = TRUE), ]
-ni_prem_ni_der  <- donnees_rbase[! (!duplicated(donnees_rbase$identifiant, fromLast = FALSE) | !duplicated(donnees_rbase$identifiant, fromLast = TRUE)), ]
+variable <- "identifiant"
+enDouble <- donnees_rbase[donnees_rbase[, variable] %in%
+                            donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Premier contrat
-premier_contrat <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  filter(row_number() == 1) %>% 
-  ungroup()
-
-# Dernier contrat
-dernier_contrat <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  filter(row_number() == n()) %>% 
-  ungroup()
-
-# Ni le premier, ni le dernier contrat
-ni_prem_ni_der <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  filter(! (row_number() == n() | row_number() == 1)) %>% 
+variable <- "identifiant"
+enDouble <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() > 1) %>%
   ungroup()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
-premier_contrat <- donnees_datatable[!duplicated(identifiant, fromLast = FALSE), ]
-dernier_contrat <- donnees_datatable[!duplicated(identifiant, fromLast = TRUE), ]
-ni_prem_ni_der  <- donnees_datatable[! (!duplicated(identifiant, fromLast = FALSE) | !duplicated(identifiant, fromLast = TRUE)), ]
+variable <- "identifiant"
+enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
+                                donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -359,323 +150,108 @@ ni_prem_ni_der  <- donnees_datatable[! (!duplicated(identifiant, fromLast = FALS
 
 ```
 
-:::
-
-## Sélection de lignes par identifiant
-
-### Les 2 premières lignes de chaque identifiant
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-/* Les 2 premières lignes de chaque identifiant */
-proc sort data = donnees_sas;by identifiant numero_contrat;run;
-proc sql;
-  select * from donnees_sas group by identifiant
-  having numero_contrat <= 2;
-quit;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# 2 premières lignes par identifiant (le premier si une seule ligne)
-# Peut-on le faire en moins d'étapes ??? Avec head ?
-donnees_rbase$a <- 1L
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
-deux_premieres_lignes <- donnees_rbase[which(donnees_rbase$numero_contrat <= 2), ]
-donnees_rbase$a <- NULL
-# REVOIR
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-#donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) seq_along(z) == 2L)]
-#ind <- donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) length(z) == 1L | seq_along(z) == 2L)]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les deux premières lignes
-deux_premieres_lignes <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  slice(1:2) %>% 
-  ungroup()
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
-# Version en R Base
-#https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
 
 :::
 
-### Les 2 dernières lignes de chaque identifiant
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-/* Les 2 dernières lignes de chaque identifiant */
-proc sort data = donnees_sas;by identifiant numero_contrat;run;
-proc sql;
-  select * from donnees_sas group by identifiant
-  having numero_contrat >= count(*) - 1;
-quit;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# 2 premières lignes par identifiant (le premier si une seule ligne)
-# Peut-on le faire en moins d'étapes ??? Avec head ?
-donnees_rbase$a <- 1L
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
-deux_premieres_lignes <- donnees_rbase[which(donnees_rbase$numero_contrat <= 2), ]
-donnees_rbase$a <- NULL
-# REVOIR
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-#donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) seq_along(z) == 2L)]
-#ind <- donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) length(z) == 1L | seq_along(z) == 2L)]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les deux dernières lignes
-deux_dernieres_lignes <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  group_by(identifiant) %>% 
-  slice(n() - 2) %>% 
-  ungroup()
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-deux_dernieres_lignes <- donnees_datatable[, .SD[.N-2:.N], by = identifiant]
-# Version en R Base
-#https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-### 2e ligne de l'individu (et rien si l'individu a 1 seule ligne)
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data donnees_sas;
-  set donnees_sas;
-  by identifiant date_entree;
-  retain numero_contrat 0;
-  if first.identifiant then numero_contrat = 1;
-  else                      numero_contrat = numero_contrat + 1;
-run;
-
-/* 2 stratégies possibles */
-data Deuxieme_Contrat;
-  set donnees_sas;
-  if numero_contrat = 2;
-run;
-
-data Deuxieme_Contrat;
-  set donnees_sas (where = (numero_contrat = 2));
-run;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Avec le numéro de contrat
-deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-# Autre solution
-donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) x[length(x)-(length(x)-1)])), ]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  filter(row_number() == 2) %>% 
-  ungroup()
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-### L'avant-dernière ligne de l'individu (et rien si l'individu a 1 seul contrat)
-::: {.panel-tabset group="language"}
-
-### `SAS` {.unnumbered .unlisted}
-``` sas
-/* Nécessite d'avoir le numéro du contrat */
-proc sql;
-  select * from donnees_sas group by identifiant
-  having numero_contrat = count(*) - 1;
-quit;
-```
-
-### `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) x[length(x)-1])), ]
-```
-
-### `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% 
-  group_by(identifiant) %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  filter(row_number() == nth(row_number(), -2))
-```
-
-### `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, .SD[.N-1], by = identifiant]
-```
-
-### `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Sélection par groupement
-
-### Personnes qui ont eu au moins une entrée en 2022
-
+## Récupérer toutes les lignes pour les identifiants sans doublon 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Personnes qui ont eu au moins une entrée en 2022 */
+%let var = identifiant;
 proc sql;
-  select *
-  from donnees_sas
-  group by identifiant
-  having sum(year(date_entree) = 2022) >= 1;
+  create table sansDouble as
+  select * from donnees_sas
+  group by &var.
+  having count(*) = 1;
 quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont eu au moins une entrée en 2022
-auMoins2022 <- subset(donnees_rbase, identifiant %in% unique(identifiant[lubridate::year(date_entree) %in% c(2022)]))
-
-# Autre solution : ne semble possible que pour une seule variable
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-auMoins2022 <- donnees_rbase[with(donnees_rbase, ave(lubridate::year(date_entree) %in% c(2022), identifiant, FUN = any)), ]
+variable <- "identifiant"
+sansDouble <- donnees_rbase[! donnees_rbase[, variable] %in%
+                              donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont eu au moins une entrée en 2022
-auMoins2022 <- donnees_tidyverse %>% 
-  group_by(identifiant) %>%
-  filter(any(lubridate::year(date_entree) == 2022)) %>% 
+variable <- "identifiant"
+sansDouble <- donnees_tidyverse %>%  
+  group_by(across(variable)) %>% 
+  filter(n() == 1) %>%
   ungroup()
-
-# Ou plus simplement
-auMoins2022 <- donnees_tidyverse %>% 
-  filter(any(lubridate::year(date_entree) == 2022), .by = identifiant)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont eu au moins une entrée en 2022
-auMoins2022 <- donnees_datatable[, if(any(lubridate::year(date_entree) %in% 2022)) .SD, by = identifiant]
+variable <- "identifiant"
+sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
+                                  donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+:::
+
+## Suppression des doublons pour l'ensemble des variables 
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* 1ère méthode */
+proc sort data = donnees_sas nodupkey;
+  by _all_;
+run;
+
+/* 2e méthode, avec first. et last. (cf. infra) */
+/* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :derniere_var from Var
+  where varnum = (select max(varnum) from Var);
+quit;
+proc sql noprint;
+  select name into :nom_col separated by " " from Var order by varnum;
+quit;
+%put Dernière variable de la base : &derniere_var.;
+proc sort data = donnees_sas;by &nom_col.;run;
+data sansDouble;
+  set donnees_sas;
+  by &nom_col.;
+  if first.&derniere_var.;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase), ]
+
+# Autre solution (équivalente à la solution first. de SAS)
+donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse_sansdoublon <- donnees_tidyverse %>% 
+  arrange(pick(everything())) %>% 
+  distinct()
 
 # Autre solution
-auMoins2022 <- donnees_datatable[, if (sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) > 0) .SD, by = identifiant]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-### Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
-
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc sql;
-  create table Qualif_Non_Qualif as
-  select *
-  from donnees_sas
-  group by identifiant
-  having sum(Niveau = "Non qualifie") >= 1 and sum(Niveau = "Non qualifie") >= 1;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-qualif_non_qualif <- subset(
-  transform(donnees_rbase, 
-            qualif     = ave(niveau, identifiant, FUN = function(x) sum(ifelse(x == "Qualifié", 1, 0), na.rm = TRUE)), 
-            non_qualif = ave(niveau, identifiant, FUN = function(x) sum(ifelse(x == "Non Qualifié", 1, 0), na.rm = TRUE))),
-  qualif >= 1 & non_qualif >= 1)
-# https://stackoverflow.com/questions/49669862/how-to-group-by-in-base-r
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
-qualif_non_qualif <- donnees_tidyverse %>% 
-  group_by(identifiant) %>%
-  filter(any(niveau == "Qualifié") & any(niveau == "Non qualifié")) %>% 
-  ungroup()
-
-# Ou plus simplement
-qualif_non_qualif <- donnees_tidyverse %>% 
-  filter(any(niveau == "Qualifié") & any(niveau == "Non qualifié"), .by = identifiant)
+donnees_tidyverse_sansdoublon <- donnees_tidyverse %>% 
+  arrange(across(everything())) %>% 
+  distinct()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
-
-# Méthode la plus simple
-donnees_datatable[, if (sum(niveau == "Qualifié", na.rm = TRUE) > 0 & sum(niveau == "Non qualifié", na.rm = TRUE) > 0) .SD, by = identifiant]
-
-# Autre méthode
-donnees_datatable[, `:=` (qualif = sum(fifelse(niveau == "Qualifié", 1, 0), na.rm = TRUE),
-                          non_qualif = sum(fifelse(niveau == "Non qualifié", 1, 0), na.rm = TRUE)),
-                by = identifiant][qualif > 0 & non_qualif > 0]
-
-# Autre méthode
-donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non_qualif = sum(niveau == "Non qualifié", na.rm = TRUE)), by = identifiant][qualif > 0 & non_qualif > 0]
-
-# Group by et Having de SQL
-# https://github.com/Rdatatable/data.table/issues/788
+donnees_datatable_sansdoublon <- unique(donnees_datatable)
+donnees_datatable_sansdoublon <- donnees_datatable[! duplicated(donnees_datatable), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -685,226 +261,41 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 
 :::
 
-### Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins ayant débuté en 2022
-
+## Suppression des doublons pour une seule variable 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins ayant débuté en 2022 */
-proc sql;
-  create table Deux_Contrats as
-  select *
-  from donnees_sas
-  group by identifiant
-  having count(*) = 2 and sum(year(date_entree) = 2022) >= 1;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins ayant débuté en 2022
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-deux_contrats <- subset(
-  transform(donnees_rbase, 
-            nb = ave(identifiant, identifiant, FUN = length), 
-            an = ave(date_entree, identifiant, 
-                     FUN = function(x) 
-                       sum(ifelse(lubridate::year(x) == 2022, 1, 0), na.rm = TRUE))),
-  nb == 2 & an >= 1)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins ayant débuté en 2022
-deux_contrats <- donnees_tidyverse %>% 
-  group_by(identifiant) %>%
-  filter(n() == 2) %>% 
-  filter(any(lubridate::year(date_entree) == 2022)) %>%
-  ungroup()
-
-# Ou plus simplement
-deux_contrats <- donnees_tidyverse %>% 
-  filter(any(lubridate::year(date_entree) == 2022 & n() == 2), .by = identifiant)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins ayant débuté en 2022
-donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) >= 1) .SD, by = identifiant]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Ajouter une colonne désignant la note moyenne et la somme de Note_Contenu, par individu
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* 1ère solution */
-proc sort data = donnees_sas;by identifiant;run;
-proc means data = donnees_sas mean noprint;
-  var Note_Contenu;
-  by identifiant;
-  output out = Temp;
-run;
-data Temp;
-  set Temp (where = (_STAT_ = "MEAN"));
-  keep identifiant Note_Contenu;
-  rename Note_Contenu = Note_Contenu_Moyenne;
-run;
-data donnees_sas;
-  merge donnees_sas (in = a) Temp (in = b);
-  by identifiant;
-  if a;
-run;
-
-/* 2e solution : plus souple */
-/* Pour supprimer la variable ajoutée lors de la 1ère solution */
-data donnees_sas;
-  set donnees_sas (drop = Note_Contenu_Moyenne Note_Contenu_Somme);
-run;
-proc sql;
-  create table donnees_sas as
-  select *
-  from donnees_sas a left join
-       (select identifiant,
-               mean(Note_Contenu) as Note_Contenu_Moyenne,
-               sum(Note_Contenu) as Note_Contenu_Somme
-        from donnees_sas group by identifiant) b
-       on a.identifiant = b.identifiant
-  order by identifiant;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase <- transform(donnees_rbase, 
-                           note_contenu_moyenne = ave(note_contenu, identifiant, FUN = mean, na.rm = TRUE), 
-                           note_contenu_somme   = ave(note_contenu, identifiant, FUN = sum,  na.rm = TRUE))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>%
-  group_by(identifiant) %>%
-  mutate(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE),
-         note_contenu_somme   = sum(note_contenu, na.rm = TRUE)) %>% 
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, `:=` (note_contenu_moyenne = mean(note_contenu, na.rm = TRUE),
-                          note_contenu_somme = sum(note_contenu, na.rm = TRUE)), by = identifiant]
-# Moyenne de chaque note
-notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDcols = notes, keyby = identifiant]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Ajouter le nombre d'observations par CSP
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc sql;
-  create table donnees_sas as
-  select a.*, b.n
-  from donnees_sas a left join
-       (select CSPF, count(*) as n from donnees_sas group by CSPF) b on CSPF = CSPF
-  order by identifiant;
-quit;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase <- transform(donnees_rbase, 
-                           n = ave(cspf, cspf, FUN = length))
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>% add_count(cspf)
-
-# Autre solution
-donnees_tidyverse <- donnees_tidyverse %>%
-  group_by(cspf) %>%
-  mutate(n = n()) %>% 
-  ungroup()
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, n := .N, by = cspf]
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Ajouter une variable d'entrée initiale par individu
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-proc sort data = donnees_sas;by Identifiant date_entree;run;
-data donnees_sas;
+proc sort data = donnees_sas;by _all_;run;
+data sansDouble;
   set donnees_sas;
-  by Identifiant date_entree;
-  format premiere_entree ddmmyy10.;
-  retain premiere_entree;
-  if first.Identifiant then premiere_entree = date_entree;
-  else                      premiere_entree = premiere_entree;
+  by _all_;
+  if first.identifiant;
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
-donnees_rbase <- transform(donnees_rbase,
-                           premiere_entree = ave(date_entree, identifiant, FUN = function(x) head(x, 1)))
+donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+donnees_rbase_sansdoublon <- donnees_rbase_sansdoublon[!duplicated(donnees_rbase_sansdoublon$identifiant), , drop = FALSE]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>%
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  mutate(premiere_entree = head(date_entree, 1), .by = identifiant)
-
-# Autre solution
-donnees_tidyverse <- donnees_tidyverse %>%
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>%
-  group_by(identifiant) %>%
-  mutate(premiere_entree = case_when(row_number() == 1 ~ date_entree,
-                                     TRUE              ~ NA)) %>%
-  fill(premiere_entree, .direction = c("down")) %>% 
-  ungroup()
+# L'option .keep_all = TRUE est nécessaire 
+# À FAIRE : REVOIR LE TRI PAR RAPPORT A SAS !!!
+sansDouble <- donnees_tidyverse %>% 
+  arrange(pick(everything())) %>% 
+  distinct(identifiant, .keep_all = TRUE)
+sansDouble <- donnees_tidyverse %>% 
+  arrange(across(everything())) %>% 
+  distinct(identifiant, .keep_all = TRUE)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-setorderv(donnees_datatable, c("identifiant", "date_entree"), na.last = FALSE)
-donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
+setorderv(donnees_datatable, cols = colnames(donnees_datatable), na.last = FALSE)
+sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant")]), ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -914,30 +305,30 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 :::
 
-## Changement d'état (rleid) À FAIRE
-
-Exemple à trouver avec Financement publique privé mixte
-
+## Identifiants uniques 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-
+proc sql;
+  create table id as select distinct identifiant from donnees_sas order by identifiant;
+quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+unique(donnees_rbase["identifiant"])
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+donnees_tidyverse %>%
+  distinct(identifiant)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+unique(donnees_datatable[, "identifiant"])
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -947,79 +338,35 @@ Exemple à trouver avec Financement publique privé mixte
 
 :::
 
-## Variable retardée (lag)
+## Nombre de lignes uniques, sans doublon 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* La date de fin du contrat précédent (lag) */
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data donnees_sasBon;
-  set donnees_sas;
-  by identifiant date_entree;  
-  format Date_fin_1 ddmmyy10.;
-  Date_fin_1 = lag(Date_sortie);
-  if first.identifiant then Date_fin_1 = .;
-run;
-
-/* ATTENTION au lag DANS UNE CONDITION IF (cf. document) */
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data Lag_Bon;
-  set donnees_sas (keep = identifiant date_entree date_sortie);
-  format date_sortie_1 lag_faux lag_bon ddmmyy10.;
-  /* Erreur */
-  if date_entree = lag(date_sortie) + 1 then lag_faux = lag(date_sortie) + 1;
-  /* Bonne écriture */
-  date_sortie_1 = lag(date_sortie);
-  if date_entree = date_sortie_1 + 1 then lag_bon = date_sortie_1 + 1;
-run;
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;select name into :nom_col separated by ", " from Var order by varnum;quit;
+proc sql;
+  select count(*) as Nb_Lignes_Uniques
+  from (select &nom_col., count(*) from donnees_sas group by &nom_col.);
+quit;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# La date de fin du contrat précédent
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
-# Il n'existe pas de fonction lag dans le R de base (à notre connaissance)
-# Il faut soit utiliser un package, soit utiliser cette astuce
-donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(length(donnees_rbase$date_sortie) - 1)])
-# Peut-on aussi utiliser tail(..., -1) ?
-
-# La date du contrat futur (lead)
-donnees_rbase$date_sortie__1 <- c(donnees_rbase$date_sortie[ 2:(length(donnees_rbase$date_sortie))], as.Date(NA))
-
-# Autres solutions
-#https://stackoverflow.com/questions/3558988/basic-lag-in-r-vector-dataframe
+nrow(unique(donnees_rbase))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# La date de fin du contrat précédent
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  mutate(date_sortie_1 = lag(date_sortie))
-
-# La date du contrat futur (lead)
-donnees_tidyverse <- donnees_tidyverse %>% 
-  # Pour trier les données de la même façon que SAS
-  arrange(identifiant, !is.na(date_entree), date_entree) %>% 
-  mutate(date_sortie__1 = lead(date_sortie))
+donnees_tidyverse %>%
+  distinct() %>% 
+  nrow()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# La date de fin du contrat précédent
-setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
-donnees_datatable[, date_sortie_1 := shift(.SD, n = 1, fill = NA, "lag"), .SDcols = "date_sortie"]
-donnees_datatable[, .(date_sortie, date_sortie_1)]
-
-# La date du contrat futur (lead)
-setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
-donnees_datatable[, date_sortie__1 := shift(.SD, n = 1, fill = NA, "lead"), .SDcols = "date_sortie"]
-donnees_datatable[, .(date_sortie, date_sortie__1)]
-
-# Autres solutions
-#https://stackoverflow.com/questions/3558988/basic-lag-in-r-vector-dataframe
+# À FAIRE : pas sûr de moi
+uniqueN(donnees_datatable)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

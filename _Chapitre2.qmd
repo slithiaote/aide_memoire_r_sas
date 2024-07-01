@@ -2,7 +2,7 @@
 
 ## Mode d'emploi de l'aide-mémoire
 
-Les codes informatiques sont appliqués sur une base de données illustrative fictive. Cette base est importée à cette étape. Aussi, pour répliquer les codes sur sa machine, le lecteur doit d'abord exécuter le code d'importation de la base de données ci-dessous.
+Les codes informatiques sont appliqués sur une base de données illustrative fictive sur les formations. Cette base est importée à cette étape. Aussi, pour répliquer les codes sur sa machine, le lecteur doit d'abord exécuter le code d'importation de la base de données ci-dessous.
 
 Les codes sont majoritairement exécutables indépendamment les uns des autres. Les codes de la partie "Les jointures de bases" nécessitent cependant l'importation des bases réalisée lors de la première section de la partie.
 
@@ -120,7 +120,6 @@ donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_en
 # Données fictives sur des formations
 library(tidyverse)
 library(lubridate)
-# Données fictives sur des formations
 donnees_tidyverse <- tibble(
   Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
   Sexe = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "2", "2", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
@@ -176,7 +175,6 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Données fictives sur des formations
 library(data.table)
 library(lubridate)
-# Données fictives sur des formations
 donnees_datatable <- data.table(
   Identifiant = c("173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"),
   Sexe = c("2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "2", "2", "1", "1", "1", "2", "2", "1", "1", "1", "1"),
@@ -208,9 +206,9 @@ donnees_datatable <- data.table(
 colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
 
 # On a importé toutes les variables en format caractère
+
 # On convertit certaines variables en format numérique
 enNumerique <- c("duree", "note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-# Ne pas oublier le . devant SDcols !!!!
 donnees_datatable[, lapply(.SD, as.integer), .SDcols = enNumerique]
 # Autre solution
 # En data.table, les instructions débutant par set modifient les éléments par référence, c'est-à-dire sans copie.
@@ -314,7 +312,7 @@ is.data.table(donnees_datatable)
 # Autre possibilité
 donnees_datatable <- as.data.table(donnees_datatable)
 
-# Est-ce une liste ?
+# La data.table est une liste
 is.list(donnees_datatable)
 
 # Format de la base
@@ -337,14 +335,14 @@ Importer des données extérieures dans `SAS` ou `R` est sans doute la première
 
 Pour importer des fichiers :
 
--   plats (.csv, .tsv, .txt) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html>
+-   plats (.csv, .tsv, .txt, etc.) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html>
 -   `SAS` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tables_sas.html>
 -   issus de tableurs (Excel, Calc) : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_tableurs.html>
 -   parquet : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_parquet.html>
 
 Quelques éléments additionnels non couverts dans Utilit'R sont présentés ici.
 
-### La fonction ReadLines() de `R`
+### La fonction readLines() de `R`
 
 La fonction readLines() de `R` peut s'avérer utile lors de l'importation de fichiers très volumineux. Elle permet de n'importer que les premières lignes du fichier, sans importer l'ensemble de la base, et ainsi de visualiser rapidement le contenu des données et la nature de l'éventuel séparateur de colonnes.
 
