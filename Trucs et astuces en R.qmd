@@ -582,9 +582,7 @@ liste
 
 # Différences entre sort(), order(), rank()
 
-sort() trie un vecteur par ordre croissant.
-rank() donne le rang de chaque élément du vecteur, le plus petit élément se voyant attribué le rang 1.
-order() renvoie l'indice du vecteur trié par ordre croissant.
+sort() trie un vecteur par ordre croissant. rank() donne le rang de chaque élément du vecteur, le plus petit élément se voyant attribué le rang 1. order() renvoie l'indice du vecteur trié par ordre croissant.
 
 ```{r, warning=FALSE, message=FALSE}
 vecteur <- c(5,3,1,2,4)
@@ -594,9 +592,18 @@ rank(vecteur)
 ```
 
 Une autre solution que sort() pour trier un vecteur est :
+
 ```{r, warning=FALSE, message=FALSE}
 vecteur <- c(5,3,1,2,4)
 vecteur[order(vecteur)]
+```
+
+# Ramasse-miettes (Garbage Collector)
+
+Si la mémoire vive de l'ordinateur est saturée, on peut essayer de la "purger" en utilisant la fonction gc() de `R`.
+
+```{r, warning=FALSE, message=FALSE}
+gc()
 ```
 
 # Informations sur R

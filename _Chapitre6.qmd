@@ -114,6 +114,7 @@ id <- donnees_datatable[, "identifiant"] ; class(id)
 #id <- donnees_datatable[, .("identifiant")] ; class(id)
 #id <- donnees_datatable[J("identifiant")] ; class(id)
 #id <- donnees_datatable[, list("identifiant")] ; class(id)
+#id <- donnees_datatable[list("identifiant")] ; class(id)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

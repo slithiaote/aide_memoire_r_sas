@@ -1,87 +1,63 @@
-# Points de vigilance en `SAS`
+# Débogage
 
-## Emploi des guillemets et doubles guillemets 
+## Outils d'aide au débogage 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Quelques points de vigilance en SAS (à ne connaître que si on est amené à modifier le programme SAS, pas utiles sinon) */
-/* Double guillemets pour les macro-variables */
-%let a = Bonjour;
-%put '&a.'; /* Incorrect */
-%put "&a."; /* Correct */
+options symbolgen mprint mlogic;
+%macro Debogage;
+  %local phrase i j;
+  %let phrase = Voici une phrase;
+  %do i = 1 %to %sysfunc(countw(&phrase.));
+    %let j = %scan(&phrase., &i.);
+	%put Mot n°&i. = &j.;
+  %end;
+%mend Debogage;
+%Debogage;
+options nosymbolgen nomprint nomlogic;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
+# À FAIRE : creuser
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
+#phrase <- c("voici", "une", "phrase")
+#options(error=recover)
+#for (i in phrase) print(k)
+#options(error=NULL)
+
+# À FAIRE : autres outils
+#traceback()
+#browser()
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-# Sans objet en R
-```
 
-:::
-
-## Macro-variable définie avec un statut global avant son appel dans le cadre d'un statut local 
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-%macro test;
-  %let reponse = oui;
-%mend test;
-%test;
-
-/* 1. Erreur car &reponse. n'est défini que dans le cas d'un environnement local */ 
-%put &reponse.;
-
-/* 2. Défini auparavant dans un environnement global, elle change de valeur à l'appel de la fonction */
-%let reponse = non;
-%put Reponse : &reponse.;
-%test;
-%put Reponse après la macro : &reponse.;
-
-/* 3. Problème corrigé, en imposant la variable à local dans la macro */
-%macro test2;
-  %local reponse;
-  %let reponse = oui;
-%mend test2;
-%let reponse = non;
-%put Reponse : &reponse.;
-%test2;
-%put Année après la macro : &reponse.;
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Sans objet en R
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-# Sans objet en R
 ```
 
 :::

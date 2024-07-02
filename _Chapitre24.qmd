@@ -1,38 +1,90 @@
-# Créer ses propres fonctions
+# Fonctions `SAS` et `R` utiles
 
-Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
-<https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
-
-## Fonction calculant une moyenne 
+## Mesurer la durée d'exécution d'un programme
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-%macro CalculMoyenne0 (baseDonnees, variables, statistique, condition);
-  proc means data = &baseDonnees. &statistique.;
-    var &variables.;
-  run;
-%mend CalculMoyenne0;
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu);
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum median);
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum, condition = where sexef = "Femme");
+%let temps_debut = %sysfunc(datetime());
+proc sort data = donnees_sas;by identifiant date_entree;run;
+%let temps_fin = %sysfunc(datetime());
+
+%let duree = %sysevalf((&temps_fin. - &temps_debut.) / 60);
+%put Durée exécution : &duree minutes;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
-  baseDonnees <- subset(baseDonnees, ...)
-  moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
-  moyenne <- data.frame(moyenne)
-  return(moyenne)
-}
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
+system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+system.time(donnees_tidyverse <- donnees_tidyverse %>% 
+              arrange(identifiant, date_entree))
+```
 
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
+
+# Autre possibilité
+started.at <- proc.time()
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+timetaken(started.at)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Excécuter le code d'un autre fichier
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* include("chemin") */
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Fonctions assign et get
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* Sans objet en SAS */
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+```
+
+## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
@@ -48,5 +100,3 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef
 ```
 
 :::
-
-Autres exemples de fonctions possibles : statistiques par groupes et proc freq.

@@ -1,6 +1,6 @@
 # Boucles
 
-## Boucles imbriquées 
+## Boucles imbriquées
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -370,52 +370,6 @@ for (i in unique(donnees_datatable$cspf)) {
   # assign permet de faire passer une chaîne de caractères en variable R
   assign(nomBase, donnees_datatable[donnees_datatable$cspf == i, ])
 }
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
-
-## Autres transcriptions de fonctions `SAS` vers `R`
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* À FAIRE */
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(donnees_tidyverse <- donnees_tidyverse %>% 
-              arrange(identifiant, date_entree))
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mesurer la durée d'exécution d'un programme
-system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
-
-# Autre possibilité
-started.at <- proc.time()
-setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
-timetaken(started.at)
-
-# En SAS : include("chemin")
-# En R : source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}

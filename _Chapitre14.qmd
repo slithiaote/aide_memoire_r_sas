@@ -786,6 +786,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, n := .N, by = cspf]
+donnees_datatable[, n := length(identifiant), by = cspf]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
