@@ -6,9 +6,10 @@
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 %let temps_debut = %sysfunc(datetime());
-proc sort data = donnees_sas;by identifiant date_entree;run;
-%let temps_fin = %sysfunc(datetime());
 
+proc sort data = donnees_sas;by identifiant date_entree;run;
+
+%let temps_fin = %sysfunc(datetime());
 %let duree = %sysevalf((&temps_fin. - &temps_debut.) / 60);
 %put Durée exécution : &duree minutes;
 ```
@@ -41,7 +42,7 @@ timetaken(started.at)
 
 :::
 
-## Excécuter le code d'un autre fichier
+## Exécuter le code d'un autre fichier
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

@@ -8,7 +8,7 @@ author:
     affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
   - name: Sébastien LI-THIAO-TE
     affiliation: Dares/DFA, <sebastien.li-thiao-te@travail.gouv.fr>
-    
+
 format:
   html:
     toc: true
@@ -43,7 +43,7 @@ output:
   rmdformats::robobook:
     highlight: tango
     number_sections: true
-  
+
 categories:
   - SAS
   - R
