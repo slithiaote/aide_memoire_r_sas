@@ -71,33 +71,3 @@ timetaken(started.at)
 ```
 
 :::
-
-## Fonctions assign et get
-::: {.panel-tabset group="language"}
-
-## `SAS` {.unnumbered .unlisted}
-``` sas
-/* Sans objet en SAS */
-```
-
-## `R base` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-
-```
-
-## `tidyverse` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-
-```
-
-## `data.table` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-
-```
-
-## `arrow/duckdb` {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-:::
