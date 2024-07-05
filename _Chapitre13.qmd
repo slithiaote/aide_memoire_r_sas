@@ -127,7 +127,7 @@ long_tidyverse <- wide_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
-wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = identifiant, .SDcols = varNotes]
+wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), by = identifiant, .SDcols = varNotes]
 
 long_datatable <- melt(wide_datatable,
                        id.vars = c("identifiant"),

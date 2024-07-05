@@ -155,6 +155,9 @@ donnees_tidyverse %>%
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .SD[1], by = identifiant]
+
+# On peut aussi utiliser keyby si l'on souhaite que les résultats soient triés par la variable de groupement (ici identifiant)
+donnees_datatable[, .SD[1], keyby = identifiant]
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
