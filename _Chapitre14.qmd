@@ -925,7 +925,7 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 :::
 
-## Ligne où se trouve une valeur maximale pour un individu (REVOIR)
+## Ligne où se trouve une valeur maximale pour un individu (À REVOIR)
 
 On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de Note_contenu.
 
@@ -935,28 +935,54 @@ On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de N
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* À REVOIR */
+/* On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R */
+
+/* Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo */
 proc sort data = donnees_sas;by identifiant descending note_contenu;run;
-data donnees_sas;
+data ligne_max_note_contenu;
+  set donnees_sas;
+  by identifiant descending note_contenu;
+  if first.note_contenu;
+run;
+
+/* Renvoie seulement la première ligne en cas d'ex-aequo */
+proc sort data = donnees_sas;by identifiant descending note_contenu;run;
+data ligne_max_note_contenu;
   set donnees_sas;
   by identifiant descending note_contenu;
   if first.identifiant;
-run; 
+run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
+# PAS AVEC LA STRATEGIE DU GROUP ET FIRST. !!! DISTINGUER LES DEUX CAS !!!
 
+# Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
+ligne_max_note_contenu <- merge(aggregate(note_contenu ~ identifiant, max, data = donnees_rbase), donnees_rbase)
+
+# Autre solution
+donnees_rbase[with(donnees_rbase, note_contenu == ave(note_contenu, identifiant, FUN = max)),]
+
+# Renvoie seulement la première ligne en cas d'ex-aequo
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$note_contenu), ]
+ligne_max_note_contenu <- donnees_rbase[! duplicated(donnees_rbase$identifiant), ]
+
+# Autre solution
+ligne_max_note_contenu <- do.call(rbind, lapply(split(donnees_rbase, as.factor(donnees_rbase$identifiant)), function(x) {return(x[which.max(x$note_contenu),])}))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
+
 # Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
 ligne_max_note_contenu <- donnees_tidyverse %>% 
   group_by(identifiant) %>% 
   slice_max(note_contenu)
 
-# Renvoie seulemnent la première ligne en cas d'ex-aequo
+# Renvoie seulement la première ligne en cas d'ex-aequo
 ligne_max_note_contenu <- donnees_tidyverse %>%
      group_by(identifiant) %>%
      slice(which.max(note_contenu))
@@ -964,10 +990,12 @@ ligne_max_note_contenu <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
+
 # Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
 ligne_max_note_contenu <- donnees_datatable[donnees_datatable[, .I[note_contenu == max(note_contenu)], by = identifiant]$V1]
 
-# Renvoie seulemnent la première ligne en cas d'ex-aequo
+# Renvoie seulement la première ligne en cas d'ex-aequo
 ligne_max_note_contenu <- donnees_datatable[, .SD[which.max(note_contenu)], by = identifiant]
 ```
 
