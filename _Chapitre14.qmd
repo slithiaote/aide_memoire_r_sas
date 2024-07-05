@@ -925,6 +925,59 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 :::
 
+## Ligne où se trouve une valeur maximale pour un individu (REVOIR)
+
+On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de Note_contenu.
+
+<https://stackoverflow.com/questions/24558328/select-the-row-with-the-maximum-value-in-each-group>
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+/* À REVOIR */
+proc sort data = donnees_sas;by identifiant descending note_contenu;run;
+data donnees_sas;
+  set donnees_sas;
+  by identifiant descending note_contenu;
+  if first.identifiant;
+run; 
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
+ligne_max_note_contenu <- donnees_tidyverse %>% 
+  group_by(identifiant) %>% 
+  slice_max(note_contenu)
+
+# Renvoie seulemnent la première ligne en cas d'ex-aequo
+ligne_max_note_contenu <- donnees_tidyverse %>%
+     group_by(identifiant) %>%
+     slice(which.max(note_contenu))
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
+ligne_max_note_contenu <- donnees_datatable[donnees_datatable[, .I[note_contenu == max(note_contenu)], by = identifiant]$V1]
+
+# Renvoie seulemnent la première ligne en cas d'ex-aequo
+ligne_max_note_contenu <- donnees_datatable[, .SD[which.max(note_contenu)], by = identifiant]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
 ## Changement d'état (rleid) À FAIRE
 
 Exemple à trouver avec Financement public / privé / mixte
