@@ -275,7 +275,7 @@ Les autres environnements (`R base`, `data.table`) peuvent aussi se présenter a
 # Principe de base de data.table
 # dt[i, j, by = ]
 #   dt : nom de la base en format data.table (instruction FROM de SQL)
-#   i : sélection de lignes (instruction WHERE de SQL)
+#   i : sélection de lignes (instructions WHERE et ORDER de SQL)
 #   j : sélection et manipulation de colonnes (instruction SELECT de SQL)
 #   by = : groupements (instruction GROUP BY de SQL)
 
