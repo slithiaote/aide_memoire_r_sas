@@ -106,3 +106,30 @@ library(lubridate)
 ```
 
 :::
+
+## Documentation Utilit'R
+
+::: {.panel-tabset group="language"}
+## `SAS` {.unnumbered .unlisted}
+
+Sans objet pour SAS.
+
+## `R base` {.unnumbered .unlisted}
+
+Pas de documentation spécifique sur `R base` dans Utilit'R.
+
+## `tidyverse` {.unnumbered .unlisted}
+
+Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_tidyverse.html>.
+
+## `data.table` {.unnumbered .unlisted}
+
+Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_datatable.html>.
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+
+Documentation Utilit'R pour `arrow` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_arrow.html>.
+
+Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_duckdb.html>.
+
+:::
