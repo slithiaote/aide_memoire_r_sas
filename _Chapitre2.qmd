@@ -348,7 +348,7 @@ Les options de la fonction utiles sont :
 
 -   con : chemin du fichier à importer
 -   n : nombre maximal de lignes du fichier lues
--   encoding : définir l’encodage du fichier ("UTF-8" ou "Latin-1")
+-   encoding : définir l’encodage du fichier ("UTF-8" ou "latin1")
 
 
 ### Spécificité des environnements

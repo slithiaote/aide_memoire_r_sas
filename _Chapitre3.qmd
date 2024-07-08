@@ -135,15 +135,15 @@ paste0("Année passée : ", annee_1)
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
-#  print("Nous sommes en 2024 ou après")
+#  print("Nous sommes en 2024 ou après !")
 #}
 #else {
-#  print("Nous sommes avant 2024")
+#  print("Nous sommes avant 2024 !")
 #}
 
 # Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
-  print("Nous sommes en 2024 ou après")
+  print("Nous sommes en 2024 ou après !")
 } else {
   print("Nous sommes avant 2024 !")
 }
@@ -153,15 +153,15 @@ if (annee >= 2024) {
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
-#  print("Nous sommes en 2024 ou après")
+#  print("Nous sommes en 2024 ou après !")
 #}
 #else {
-#  print("Nous sommes avant 2024")
+#  print("Nous sommes avant 2024 !")
 #}
 
 # Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
-  print("Nous sommes en 2024 ou après")
+  print("Nous sommes en 2024 ou après !")
 } else {
   print("Nous sommes avant 2024 !")
 }
@@ -171,15 +171,15 @@ if (annee >= 2024) {
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
-#  print("Nous sommes en 2024 ou après")
+#  print("Nous sommes en 2024 ou après !")
 #}
 #else {
-#  print("Nous sommes avant 2024")
+#  print("Nous sommes avant 2024 !")
 #}
 
 # Construction correcte ! Le else doit être sur la même ligne que le {
 if (annee >= 2024) {
-  print("Nous sommes en 2024 ou après")
+  print("Nous sommes en 2024 ou après !")
 } else {
   print("Nous sommes avant 2024 !")
 }
@@ -252,7 +252,7 @@ Cet aide-mémoire n'ayant pas vocation à être un dictionnaire `SAS`, cette mé
 ## `R base` {.unnumbered .unlisted}
 
 `R base` est réputé plus lent que ses concurrents, ce qui est souvent vrai.
-Mais certaines fonctions en R-Base être très rapides (rowsum, rowSums, tapply, etc.)
+Mais certaines fonctions en `R base` peuvent être très rapides (rowsum, rowSums, colSums, rowMeans, colMeans, tapply, etc.)
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le pipe permet d'enchaîner des opérations sur une même base.

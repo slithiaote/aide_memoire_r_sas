@@ -191,17 +191,11 @@ data Lignes_&x.;set donnees_sas (firstobs = &deb. obs = &total_lignes.);run;
 ```{r, warning=FALSE, message=FALSE}
 x <- 10
 tail(donnees_rbase, x)
-```
 
-Alternativement
-
-```{r, warning=FALSE, message=FALSE, results='hide'}
+# Autre possibilité
 donnees_rbase[ ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase), ]
-```
 
-Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
-
-```{r, warning=FALSE, message=FALSE}
+# Les parenthèses sont importantes. Comparer les deux expressions ! Bon exemple du recycling
 ( nrow(donnees_rbase) - x ) : nrow(donnees_rbase)
 nrow(donnees_rbase) - x : nrow(donnees_rbase)
 ```
@@ -275,7 +269,6 @@ donnees_tidyverse %>% ncol()
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Les syntaxes dim(donnees_rbase)[1] et dim(donnees_rbase)[2] sont plus rapides que nrow() et ncol()
 dim(donnees_datatable) ; dim(donnees_datatable)[1] ; dim(donnees_datatable)[2]
 dim(donnees_datatable) ; nrow(donnees_datatable) ; ncol(donnees_datatable)
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable)[1], dim(donnees_datatable)[2])
@@ -485,7 +478,7 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 
 :::
 
-## Variables qui débutent par "note"
+## Variables qui débutent par le mot Note
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -497,6 +490,7 @@ proc sql;select Name from Variables where upcase(substr(Name,1,4)) = "NOTE";run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("^note", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+names(donnees_rbase)[grepl("^note", names(donnees_rbase), ignore.case = TRUE)]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -507,6 +501,7 @@ names(donnees_tidyverse) |> str_subset("^note")
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+names(donnees_datatable)[grepl("^note", names(donnees_datatable), ignore.case = TRUE)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -517,7 +512,7 @@ grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
 
 :::
 
-## Variables qui se terminent par "naissance"
+## Variables qui se terminent par le mot Naissance
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -532,6 +527,7 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("naissance$", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+names(donnees_rbase)[grepl("naissance$", names(donnees_rbase), ignore.case = TRUE)]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -542,6 +538,7 @@ names(donnees_tidyverse) |> str_subset("naissance$")
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("naissance$", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+names(donnees_datatable)[grepl("naissance$", names(donnees_datatable), ignore.case = TRUE)]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
