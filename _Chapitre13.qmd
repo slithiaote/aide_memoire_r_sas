@@ -32,19 +32,19 @@ donnees_rbase$num_observation <- row.names(donnees_rbase)
 donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
 
 # Numéro du contrat de chaque individu, contrat trié par date d'entrée
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase$un <- 1
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
 donnees_rbase$numero_contrat <- ave(donnees_rbase$un, donnees_rbase$identifiant, FUN = cumsum)
 donnees_rbase$un <- NULL
 
 # Autre solution
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
 donnees_rbase$numero_contrat <- as.numeric(ave(donnees_rbase$identifiant, donnees_rbase$identifiant, FUN = seq_along))
 
 # Autre solution : order pour éviter le as.numeric
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN !
 donnees_rbase$numero_contrat <- ave(order(donnees_rbase$date_entree), donnees_rbase$identifiant, FUN = seq_along)
 #https://stackoverflow.com/questions/11996135/create-a-sequential-number-counter-for-rows-within-each-group-of-a-dataframe
@@ -252,7 +252,7 @@ run;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase$premier_contrat <- ifelse(!duplicated(donnees_rbase$identifiant, fromLast = FALSE), 1, 0)
 donnees_rbase$dernier_contrat <- ifelse(!duplicated(donnees_rbase$identifiant, fromLast = TRUE), 1, 0)
 donnees_rbase$ni_prem_ni_der  <- ifelse(! c(!duplicated(donnees_rbase$identifiant, fromLast = FALSE) | !duplicated(donnees_rbase$identifiant, fromLast = TRUE)), 1, 0)
@@ -318,7 +318,7 @@ run;
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Créer une base avec les seuls premiers contrats, et une base avec les seuls derniers contrats
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 premier_contrat <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = FALSE), ]
 dernier_contrat <- donnees_rbase[!duplicated(donnees_rbase$identifiant, fromLast = TRUE), ]
 ni_prem_ni_der  <- donnees_rbase[! (!duplicated(donnees_rbase$identifiant, fromLast = FALSE) | !duplicated(donnees_rbase$identifiant, fromLast = TRUE)), ]
@@ -511,7 +511,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Avec le numéro de contrat
 deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 # Autre solution
 donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) x[length(x)-(length(x)-1)])), ]
 ```

@@ -188,9 +188,9 @@ requete_duckdb %>%
 
 :::
 
-## Utiliser les formats
+## Utiliser les formats (valeurs discrètes ou caractères) 
 
-Nécessite le lancement des formats aux étapes précédentes.
+Nécessite le lancement des formats à l'étape précédente.
 
 ::: {.panel-tabset group="language"}
 
@@ -204,21 +204,19 @@ data donnees_sas;
   /* On exprime la CSP en texte dans une variable CSPF avec le format */
   format CSPF $25.;
   CSPF = put(CSP, $cspf.);
-  /* Âge formaté */
-  Agef = put(Age, agef.);
 run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On exprime CSP et sexe en formaté
+# On exprime CSP et sexe en variable formatée
 donnees_rbase$cspf <- cspf[donnees_rbase$csp]
 donnees_rbase$sexef <- sexef[donnees_rbase$sexe]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On exprime CSP et sexe en formaté
+# On exprime CSP et sexe en variable formatée
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(sexef = sexef_format[sexe],
          cspf = cspf_format[csp])
@@ -250,7 +248,7 @@ valeurAuxNA <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On exprime CSP et sexe en formaté
+# On exprime CSP et sexe en variable formatée
 donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ```
 
@@ -266,13 +264,18 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Utilisation des formats */
+/* Âge formaté */
 proc format;
   /* Variable continue */
   value agef
   low-<26 = "1. De 15 à 25 ans"
   26<-<50 = "2. De 26 à 49 ans"
   50-high = "3. 50 ans ou plus";
+run;
+data donnees_sas;
+  set donnees_sas;
+  /* Âge formaté */
+  Agef = put(Age, agef.);
 run;
 ```
 
@@ -517,7 +520,9 @@ run;
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Création et suppressions de plusieurs variables
-donnees_rbase <- transform(donnees_rbase, note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)
+donnees_rbase <- transform(donnees_rbase, 
+                           note_contenu2 = note_contenu / 20 * 5,
+                           note_formateur2 = note_formateur / 20 * 5)
 
 # Suppression des variables créées
 variable <- c("note_contenu2", "note_formateur2")
@@ -654,6 +659,9 @@ requete_duckdb %>%
 :::
 
 ## Mettre un 0 devant un nombre
+
+Mettre le numéro du mois d'entrée sur 2 positions (avec un 0 devant si le mois <= 9).
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -672,13 +680,11 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9) le mois d'entrée
 donnees_rbase$mois <- sprintf("%02d", lubridate::month(donnees_rbase$date_entree))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9) le mois d'entrée
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(mois = sprintf("%02d", lubridate::month(date_entree)))
 
@@ -690,7 +696,6 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
 donnees_datatable[, mois := sprintf("%02d", lubridate::month(date_entree))]
 ```
 

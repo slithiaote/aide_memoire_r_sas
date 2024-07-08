@@ -1,11 +1,14 @@
 # Les valeurs manquantes
 
-## Repérer les valeurs manquantes (variables Âge et Niveau)
+## Repérer les valeurs manquantes (variables Age et Niveau)
+
+Lignes où les variables Age ou Niveau sont manquantes.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-data Missing;
+data Manquant;
   set donnees_sas;
   /* 1ère solution */
   if missing(age) or missing(Niveau) then missing1 = 1;else missing1 = 0;
@@ -18,30 +21,30 @@ run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[donnees_rbase$age == NA | donnees_rbase$niveau == NA,  ]
+manquant <- donnees_rbase[donnees_rbase$age == NA | donnees_rbase$niveau == NA, ]
 
 # Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_rbase[is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), ]
+manquant <- donnees_rbase[is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
+manquant <- donnees_tidyverse %>%
   filter(age == NA | niveau == NA)
 
 # Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_tidyverse %>%
+manquant <- donnees_tidyverse %>%
   filter(is.na(age) | is.na(niveau))
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_datatable[age == NA | niveau == NA]
+manquant <- donnees_datatable[age == NA | niveau == NA]
 
 # Bonne méthode pour repérer les valeurs manquantes
-ageManquant <- donnees_datatable[is.na(age)]
+manquant <- donnees_datatable[is.na(age)]
 donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
 ```
 
