@@ -598,6 +598,19 @@ vecteur <- c(5,3,1,2,4)
 vecteur[order(vecteur)]
 ```
 
+À noter aussi que sort() permet aussi d'exécuter simultanément les fonctions sort() et order(). Ainsi :
+
+```{r, warning=FALSE, message=FALSE}
+vecteur <- c(5,3,1,2,4)
+sort(vecteur, index.return = TRUE)
+# Fonction sort()
+sort(vecteur, index.return = TRUE)$x
+sort(vecteur)
+# Fonction order()
+sort(vecteur, index.return = TRUE)$ix
+order(vecteur)
+```
+
 # Ramasse-miettes (Garbage Collector)
 
 Si la mémoire vive de l'ordinateur est saturée, on peut essayer de la "purger" en utilisant la fonction gc() de `R`.
