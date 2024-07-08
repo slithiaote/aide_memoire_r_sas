@@ -606,6 +606,8 @@ Si la mémoire vive de l'ordinateur est saturée, on peut essayer de la "purger"
 gc()
 ```
 
+# Fonctions try() et tryCatch() À FAIRE
+
 # Informations sur R
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
