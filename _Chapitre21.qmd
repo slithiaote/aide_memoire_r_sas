@@ -240,6 +240,8 @@ xtabs(note_contenu ~ cspf + sexef, aggregate(note_contenu ~ cspf + sexef, data =
 # Ou, sous forme de formule
 formule <- as.formula(paste(variable, paste(varGroupement, collapse = " + "), sep = " ~ "))
 xtabs(formule, aggregate(formule, data = donnees_rbase, FUN = mean, na.rm = TRUE))
+# Et si l'on souhaite un dataframe
+as.data.frame.matrix(xtabs(formule, aggregate(formule, data = donnees_rbase, FUN = mean, na.rm = TRUE)))
 
 # Solution avec aggregate, en calculant un tableau "long" et en le transformant en "wide"
 tableau <- aggregate(note_contenu ~ cspf + sexef, data = donnees_rbase, FUN = mean, na.rm = TRUE)
