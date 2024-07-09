@@ -53,22 +53,75 @@ lubridate::ymd(paste0(annee,"-12-31"))
 :::
 
 ## Manipuler des dates
+
+### Ecart entre deux dates
+
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+### `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas;
+  set donnees_sas;
+  /* Durée (en année) entre 2 dates */
+  /* Âge à l'entrée dans le dispositif */
+  Age = intck('year', date_naissance, date_entree);
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
+# Âge à l'entrée dans le dispositif
+donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
+# Âge à l'entrée dans le dispositif
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Durée (en année) entre 2 dates
+# Âge à l'entrée dans le dispositif
+donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne age 
+requete_duckdb %>% 
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  select(age)
+
+# Âge formaté
+requete_duckdb %>%
+  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
+```
+
+:::
+
+### Ajouter une durée à une date
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
 ``` sas
 /* On utilise ici %sysevalf et non %eval pour des calculs avec des macro-variables non entières */
 %let sixmois = %sysevalf(365.25/2);
 %put sixmois : &sixmois.;
 data donnees_sas;
   set donnees_sas;
-  /* Durée (en année) entre 2 dates */
-  /* Âge à l'entrée dans le dispositif */
-  Age = intck('year', date_naissance, date_entree);
-  
-  /* Âge formaté */
-  Agef = put(Age, agef.);
-  
   /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
   format date_sortie ddmmyy10.;
   date_sortie = intnx('day', date_entree, duree);
@@ -77,16 +130,10 @@ data donnees_sas;
   format Date_6mois ddmmyy10.;
   Date_6mois = intnx('month', date_sortie, 6);
 run;
-/* Ventilation pondérée (cf. infra) */
-proc freq data = donnees_sas;tables apres_31_decembre;weight poids_sondage;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Durée (en année) entre 2 dates
-# Âge à l'entrée dans le dispositif
-donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
-
 # Date de sortie du dispositif
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
 
@@ -94,13 +141,8 @@ donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees
 donnees_rbase$date_6mois <- donnees_rbase$date_sortie + lubridate::month(6)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Durée (en année) entre 2 dates
-# Âge à l'entrée dans le dispositif
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
-
 # Date de sortie du dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(date_sortie = date_entree + lubridate::days(duree))
@@ -110,12 +152,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(date_6mois = date_sortie + lubridate::month(6))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Durée (en année) entre 2 dates
-# Âge à l'entrée dans le dispositif
-donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
-
 # Date de sortie du dispositif
 donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 
@@ -123,7 +161,7 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 # Création de la colonne age 
 requete_duckdb %>% 

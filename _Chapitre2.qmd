@@ -103,8 +103,6 @@ donnees_rbase$poids_sondage <- as.numeric(donnees_rbase$poids_sondage)
 
 # On récupère les variables dont le nom débute par le mot "date"
 enDate <- names(donnees_rbase)[grepl("date", tolower(names(donnees_rbase)))]
-# On remplace / par - dans les dates
-donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], function(x) gsub("/", "-", x))
 # On exprime les dates en format Date
 donnees_rbase[, enDate] <- lapply(donnees_rbase[, enDate], lubridate::dmy)
 
@@ -220,8 +218,6 @@ donnees_datatable[, poids_sondage := as.numeric(poids_sondage)]
 
 # On récupère les variables dont le nom débute par le mot "date"
 varDates <- names(donnees_datatable)[grepl("date", tolower(names(donnees_datatable)))]
-# On remplace / par - dans les dates
-donnees_datatable[, (varDates) := lapply(.SD, function(x) gsub("/", "-", x)), .SDcols = varDates]
 # On exprime les dates en format Date
 donnees_datatable[, (varDates) := lapply(.SD, lubridate::dmy), .SDcols = varDates]
 

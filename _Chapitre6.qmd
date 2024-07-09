@@ -787,3 +787,44 @@ requete_duckdb %>%
   select(starts_with("poids"))
 ```
 :::
+
+
+## Corriger une valeur de la base
+
+On souhaite corriger une valeur dans la base. La note_contenu de l'identifiant 168 est en fait 8 et non 18.
+
+::: {.panel-tabset group="language"}
+
+## `SAS` {.unnumbered .unlisted}
+``` sas
+data donnees_sas_corr;
+  set donnees_sas;
+  if identifiant = "168" then note_contenu = 8;
+run;
+```
+
+## `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase_cor <- donnees_rbase
+donnees_rbase_cor[donnees_rbase_cor$identifiant == "168", "note_contenu"] <- 8
+```
+
+## `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse_cor <- donnees_tidyverse
+donnees_tidyverse_cor[donnees_tidyverse_cor$identifiant == "168", "note_contenu"] <- 8
+# À FAIRE : y-a-t-il une façon de le faire en tidyverse pur ?
+```
+
+## `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable_cor <- copy(donnees_datatable)
+donnees_datatable_cor[identifiant == "168", note_contenu := 8]
+```
+
+## `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
