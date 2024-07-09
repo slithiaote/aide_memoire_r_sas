@@ -989,7 +989,7 @@ ligne_max_note_contenu <- donnees_datatable[, .SD[which.max(note_contenu)], by =
 
 :::
 
-## Changement d'état (rleid) À FAIRE
+## Changement d'état (rleid)
 
 Numérote les états successifs identiques d'un même identifiant. À chaque changement d'état d'un même individu, la variable d'état est incrémentée d'une unité.
 
