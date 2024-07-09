@@ -17,19 +17,37 @@ proc sort data = donnees_sas;by identifiant date_entree;run;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
+
+# Autre possibilité
+debut <- Sys.time()
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(donnees_tidyverse <- donnees_tidyverse %>% 
               arrange(identifiant, date_entree))
+
+# Autre possibilité
+debut <- Sys.time()
+donnees_tidyverse <- donnees_tidyverse %>% 
+              arrange(identifiant, date_entree)
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
 
-# Autre possibilité
+# Autres possibilités
+debut <- Sys.time()
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
+
 started.at <- proc.time()
 setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
 timetaken(started.at)
@@ -52,16 +70,28 @@ timetaken(started.at)
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
+
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
+
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
+
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
