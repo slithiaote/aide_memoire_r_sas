@@ -5,7 +5,7 @@
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On extrait tous les doublons, pas la première occurrence */
+/* On extrait tous les doublons, pas seulement la première occurrence */
 
 /* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
 proc contents data = donnees_sas out = Var noprint;run;
@@ -24,13 +24,13 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 doublons <- donnees_rbase[duplicated(donnees_rbase), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 donnees_tidyverse %>% 
   group_by(across(everything())) %>% 
   filter(n() > 1) %>% 
@@ -47,7 +47,7 @@ doublons <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 ```
 
@@ -64,7 +64,7 @@ doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
-/* On extrait tous les doublons, pas la première occurrence */
+/* On extrait tous les doublons, pas seulement la première occurrence */
 %let var = identifiant;
 proc sort data = donnees_sas;by &var.;run;
 data doublons;
@@ -76,14 +76,14 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 variable <- "identifiant"
 doublons <- donnees_rbase[duplicated(donnees_rbase[, variable]), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 variable <- "identifiant"
 doublons <- donnees_tidyverse %>%  
   group_by(across(variable)) %>% 
@@ -94,7 +94,7 @@ doublons <- donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas la première occurrence
+# On extrait tous les doublons, pas seulement la première occurrence
 variable <- "identifiant"
 doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 ```
@@ -125,7 +125,7 @@ quit;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "identifiant"
-enDouble <- donnees_rbase[donnees_rbase[, variable] %in%
+enDouble <- donnees_rbase[donnees_rbase[, variable] %in% 
                             donnees_rbase[duplicated(donnees_rbase[, variable]), variable]]
 ```
 
@@ -188,6 +188,8 @@ sansDouble <- donnees_tidyverse %>%
 variable <- "identifiant"
 sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
                                   donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
+sansDouble <- donnees_datatable[donnees_datatable[[variable]] %notin%
+                                donnees_datatable[[variable]][duplicated(donnees_datatable[[variable]])], ]
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -195,10 +197,9 @@ sansDouble <- donnees_datatable[! donnees_datatable[[variable]] %chin%
 
 ```
 
-
 :::
 
-## Suppression des doublons pour l'ensemble des variables 
+## Suppression des doublons pour l'ensemble des variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -229,16 +230,17 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase_sansdoublon <- unique(donnees_rbase)
 donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase), ]
 
 # Autre solution (équivalente à la solution first. de SAS)
 donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
-donnees_rbase_sansdoublon <- donnees_rbase[!duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
+donnees_rbase_sansdoublon <- donnees_rbase[! duplicated(donnees_rbase[, colnames(donnees_rbase)], fromLast = TRUE), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse_sansdoublon <- donnees_tidyverse %>% 
+donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(pick(everything())) %>% 
   distinct()
 
@@ -261,7 +263,7 @@ donnees_datatable_sansdoublon <- donnees_datatable[! duplicated(donnees_datatabl
 
 :::
 
-## Suppression des doublons pour une seule variable 
+## Suppression des doublons pour une seule variable
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -276,8 +278,8 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase_sansdoublon <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
-donnees_rbase_sansdoublon <- donnees_rbase_sansdoublon[!duplicated(donnees_rbase_sansdoublon$identifiant), , drop = FALSE]
+donnees_rbase <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE), ]
+sansDouble <- donnees_rbase[! duplicated(donnees_rbase$identifiant), , drop = FALSE]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -305,7 +307,7 @@ sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant"
 
 :::
 
-## Identifiants uniques 
+## Identifiants uniques
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -317,18 +319,28 @@ quit;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sous forme de data.frame
 unique(donnees_rbase["identifiant"])
+# Sous forme de vecteur
+unique(donnees_rbase[, "identifiant"])
+unique(donnees_rbase[["identifiant"]])
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sous forme de tibble
 donnees_tidyverse %>%
   distinct(identifiant)
+# Sous forme de vecteur
+donnees_tidyverse %>% distinct(identifiant) %>% pull()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sous forme de data.table
 unique(donnees_datatable[, "identifiant"])
+# Sous forme de vecteur
+unique(donnees_datatable[["identifiant"]])
 ```
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
@@ -338,7 +350,7 @@ unique(donnees_datatable[, "identifiant"])
 
 :::
 
-## Nombre de lignes uniques, sans doublon 
+## Nombre de lignes uniques, sans doublon
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
