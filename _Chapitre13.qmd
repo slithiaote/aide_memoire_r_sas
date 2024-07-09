@@ -407,13 +407,10 @@ quit;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# 2 premières lignes par identifiant (le premier si une seule ligne)
-# Peut-on le faire en moins d'étapes ??? Avec head ?
-donnees_rbase$a <- 1L
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
-donnees_rbase$numero_contrat <- ave(donnees_rbase$a, donnees_rbase$identifiant, FUN = cumsum)
-deux_premieres_lignes <- donnees_rbase[which(donnees_rbase$numero_contrat <= 2), ]
-donnees_rbase$a <- NULL
+# 2 dernières lignes par identifiant
+deux_dernieres_lignes <- donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), 
+                                                     donnees_rbase$identifiant, 
+                                                     function(x) tail(x, 2))), ]
 
 # REVOIR
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -437,10 +434,9 @@ deux_dernieres_lignes <- donnees_tidyverse %>%
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-deux_dernieres_lignes <- donnees_datatable[, .SD[.N-2:.N], by = identifiant]
+deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 
 # À REVOIR : ne fait pas exactement pareil
-# donnees_datatable[, tail(.SD, 2), by = identifiant]
 # Par ailleurs, utiliser rowid ???
 ```
 
@@ -480,10 +476,10 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Avec le numéro de contrat
 deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 
 # Autre solution
-donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) x[length(x)-(length(x)-1)])), ]
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) head(x, 2))), ]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -909,7 +905,7 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 
 ## Ligne où se trouve une valeur maximale pour un individu (À REVOIR)
 
-On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de Note_contenu.
+On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de note_contenu.
 
 <https://stackoverflow.com/questions/24558328/select-the-row-with-the-maximum-value-in-each-group>
 

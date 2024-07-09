@@ -92,13 +92,15 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 
-# À FAIRE : REVOIR LE PB DES VALEURS MANQUANTES !!!!
-donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) all(x >= 10, na.rm = TRUE)), ]
+# Toutes les notes >= 10 et non manquantes
+donnees_rbase[apply(donnees_rbase[, varNotes], 1, function(x) all(x >= 10 & ! is.na(x), na.rm = TRUE)), ]
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+
+# Toutes les notes >= 10 et non manquantes
 donnees_tidyverse %>%
   filter(if_all(varNotes, ~ . >= 10))
 
@@ -110,6 +112,8 @@ donnees_tidyverse %>%
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+
+# Toutes les notes >= 10 et non manquantes
 note_sup_10 <- donnees_datatable[
   donnees_datatable[, .I[rowSums(.SD >= 10, na.rm = TRUE) == length(varNotes)], .SDcols = varNotes]]
 
