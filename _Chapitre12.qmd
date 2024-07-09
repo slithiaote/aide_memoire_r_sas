@@ -1,6 +1,6 @@
 # Transposer une base
 
-## Transposer une base 
+## Transposer une base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -23,6 +23,7 @@ proc print data = transpose;run;
 nb <- as.data.frame.matrix(xtabs( ~ cspf + sexef, data = donnees_rbase))
 
 # On transpose le tableau
+# t() renvoie un objet matrix, d'où le as.data.frame
 nb_transpose <- as.data.frame(t(nb))
 ```
 
@@ -68,14 +69,14 @@ dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 
 ```
 
-
 :::
 
-## Passer d'une base en largeur (wide) à une base en longueur (long)
+## Passer d'une base en largeur (*wide*) à une base en longueur (*long*)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Note moyenne par identifiant */
 %let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
 proc sort data = donnees_sas;by identifiant;run;
 proc means data = donnees_sas mean noprint;var &notes.;output out = Temp;by identifiant;run;
@@ -93,6 +94,7 @@ proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+# Note moyenne par identifiant
 wide_rbase <- aggregate(donnees_rbase[, varNotes], donnees_rbase[, "identifiant", drop = FALSE], mean, na.rm = TRUE)
 
 long_rbase <- reshape(data = wide_rbase,
@@ -110,6 +112,7 @@ row.names(long_rbase) <- NULL
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
+# Note moyenne par identifiant
 wide_tidyverse <- donnees_tidyverse %>% 
   group_by(identifiant) %>% 
   summarise(across(all_of(varNotes), ~ mean(.x, na.rm = TRUE)))
@@ -126,6 +129,7 @@ long_tidyverse <- wide_tidyverse %>%
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
+# Note moyenne par identifiant
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), by = identifiant, .SDcols = varNotes]
 
@@ -143,7 +147,12 @@ long_datatable <- melt(wide_datatable,
 
 :::
 
-## Passer d'une base en longueur (long) à une base en largeur (wide)
+## Passer d'une base en longueur (*long*) à une base en largeur (*wide*)
+
+Le code précédent doit être lancé au préalable.
+Lien utile : <
+#https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
+
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -178,7 +187,6 @@ wide_rbase <- reshape(long_rbase,
                       timevar = "type_note",
                       idvar = c("identifiant", "id"),
                       direction = "wide")
-#https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
