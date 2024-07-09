@@ -16,6 +16,9 @@ proc sql;select mean(note_contenu) from donnees_sas;run;
 # Importance du na.rm = TRUE en cas de variables manquantes
 mean(donnees_rbase$note_contenu)
 mean(donnees_rbase$note_contenu, na.rm = TRUE)
+
+# La fonction mean de R est lente. Ecriture plus rapide
+sum(donnees_rbase$note_contenu, na.rm = TRUE) / sum(! is.na(donnees_rbase$note_contenu))
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -65,6 +68,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 with(subset(donnees_rbase, sexef == "Femme"), mean(note_contenu, na.rm = TRUE))
+mean(donnees_rbase[donnees_rbase$sexef == "Femme", "note_contenu"], na.rm = TRUE)
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -157,17 +161,12 @@ run;
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
-with(subset(donnees_rbase, sexef == "Femme"), sum(note_contenu * poids_sondage, na.rm = TRUE) / sum(poids_sondage, na.rm = TRUE))
-
-# On peut aussi utiliser la fonction crossprod
-# Mais ne fonctionne pas dans ce cas, car elle ne prend pas en compte les na.rm = TRUE
-# Ne pas confondre cumprod et crossprod !!!!
-with(subset(donnees_rbase, sexef == "Femme"), crossprod(note_contenu, poids_sondage) / sum(poids_sondage, na.rm = TRUE))
+with(subset(donnees_rbase, sexef == "Femme"), weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Par sélection
+# Par sélection (ici pour les seules femmes)
 donnees_tidyverse %>%
   filter(sexef == "Femme") %>%
   summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
@@ -304,7 +303,7 @@ moyennes
 ``` sas
 /* Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes */
 /* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
-   nombre de données manquantes (nmiss), intervalle, mode */
+   nombre de données manquantes (nmiss), intervalle (entre max et min), mode */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 
 /* Par la proc means, en un seul tableau */
@@ -320,8 +319,7 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes),
-# Nombre de valeurs manquantes, Intervalle
+# Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
 # Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
 library(collapse)
@@ -342,6 +340,7 @@ sapply(donnees_rbase[, notes], function(x) c("Somme"      = sum(x, na.rm = TRUE)
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
 # Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
 library(collapse)
@@ -380,6 +379,7 @@ donnees_tidyverse %>%
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 # Une solution pour obtenir le mode en R est d'utiliser fmode du package collapse
@@ -562,7 +562,7 @@ run;
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
-with(donnees_rbase, var(note_contenu))
+var(donnees_rbase$note_contenu)
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -623,7 +623,7 @@ donnees_datatable[, collapse::fvar(note_contenu, w = poids_sondage)]
 
 ### Calcul "manuel" de la variance pondérée
 
-La variance pondérée se calcul par la formule :
+La variance pondérée se calcule par la formule :
 $$
 \frac{\sum_i{w_i \times (x_i - \bar{x}) ^2}}{\sum_i{w_i}} = \frac{\sum_i{w_ix_i^2}} {\sum_i{w_i}} - \bar{x}^2
 $$
@@ -642,7 +642,6 @@ run;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(collapse)
 x_2 <- with(donnees_rbase,
             sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
 x_m <- with(donnees_rbase,
@@ -725,7 +724,7 @@ notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accomp
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 
 # Et les quantiles
-quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE)
 
 # Intervalle inter-quartile
 IQR(donnees_rbase$note_moyenne, na.rm = TRUE)
@@ -741,7 +740,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Et les quantiles
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
-  quantile(probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE)
+  quantile(probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE)
 
 # Intervalle inter-quartile
 donnees_tidyverse %>%
@@ -756,7 +755,7 @@ notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
 
 # Et les quantiles
-donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
+donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
 
 # Intervalle inter-quartile
 donnees_datatable[, IQR(note_moyenne, na.rm = TRUE)]
@@ -807,13 +806,9 @@ library(collapse)
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 
-# Les déciles
+# Les quantiles
 collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
-                    probs = c(seq(0, 1, 0.1)))
-
-# Les quartiles
-collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
-                    probs = c(0, 0.25, 0.5, 0.75, 1))
+                    probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -827,15 +822,10 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
 
-# Les déciles
+# Les quantiles
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
-  collapse::fquantile(probs = c(seq(0, 1, 0.1)), w = donnees_tidyverse$poids_sondage)
-
-# Les quartiles
-donnees_tidyverse %>%
-  pull(note_moyenne) %>% 
-  collapse::fquantile(probs = c(0, 0.25, 0.5, 0.75, 1), w = donnees_tidyverse$poids_sondage)
+  collapse::fquantile(probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), w = donnees_tidyverse$poids_sondage)
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -848,15 +838,9 @@ library(collapse)
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
 
-# Les centiles
+# Les quantiles
 donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
-                                                                probs = c(seq(0, 1, 0.1))
-                                                                )),
-                           .SDcols = "note_moyenne"]
-
-# Les quartiles
-donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
-                                                                probs = c(0, 0.25, 0.5, 0.75, 1)
+                                                                probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75)
                                                                 )),
                            .SDcols = "note_moyenne"]
 ```
@@ -895,14 +879,19 @@ run;
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 
+# Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
+# On exprime le rang par ordre décroissant, avec le - devant
 donnees_rbase$rang_note_moyenne <- rank(-donnees_rbase$note_moyenne)
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# On calcule déjà la moyenne des notes par individu
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE)) %>% 
+  # Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
+  # On exprime le rang par ordre décroissant, avec le - devant
   mutate(rang_note_moyenne = rank(-note_moyenne))
 ```
 
@@ -912,7 +901,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
 
-# Attention, en R, rank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
+# Attention, en R, frank trie par ordre croissant par défaut, alors que le tri est par ordre décroissant en SAS
 # On exprime le rang par ordre décroissant, avec le - devant
 donnees_datatable[, rang_note_moyenne := frank(-note_moyenne)]
 ```
@@ -1015,6 +1004,40 @@ setNames(donnees_datatable[, lapply(methodes,
                                                     method = x,
                                                     use = "complete.obs"))],
          methodes)
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Centrer et réduire les variables À FAIRE
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+centrer_reduire <- scale(donnees_rbase[, notes])
+
+# Essayer apply et sweep
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
