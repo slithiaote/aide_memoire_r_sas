@@ -26,6 +26,7 @@ run;
 table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always")
 # Tableau avec les sommes
 addmargins(table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always"))
+
 # Proportions
 tab <- table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always")
 # Proportions par case
