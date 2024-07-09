@@ -28,7 +28,7 @@ quit;
 colTri <- c("identifiant", "date_entree")
 donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
 
-# Autre possibilité, plus longue !
+# Autres possibilités, plus longues !
 donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colTri))]
 donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
 ```
@@ -70,14 +70,12 @@ requete_duckdb %>%
 
 :::
 
-
 ### Mettre la variable poids_sondage au début de la base
 
 ::: {.panel-tabset group="language"}
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Mettre la variable poids_sondage au début de la base */
 data donnees_sas;
   retain poids_sondage;
   set donnees_sas;
@@ -86,21 +84,63 @@ run;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage au début de la base
-donnees_rbase <- donnees_rbase[, c("poids_sondage", setdiff(colnames(donnees_rbase), "poids_sondage"))]
+donnees_rbase[, union("poids_sondage", colnames(donnees_rbase))]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage au début de la base
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage)
 ```
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage au début de la base
 setcolorder(donnees_datatable, "poids_sondage")
+```
+
+### `arrow/duckdb` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+```
+
+:::
+
+### Mettre la variable poids_sondage après la variable date_naissance À FAIRE
+
+::: {.panel-tabset group="language"}
+
+### `SAS` {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = var;run;
+
+proc sql noprint;
+  select name into :var separated by " "
+  from var
+  where varnum <= (select varnum from var where lowcase(name) = "date_naissance")
+  order by varnum;
+quit;
+
+data donnees_sas;
+  retain &var. poids_sondage;
+  set donnees_sas;
+run;
+```
+
+### `R base` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varAvant <- c( colnames(donnees_rbase)[1 : which("date_naissance" == colnames(donnees_rbase))], "poids_sondage" )
+donnees_rbase <- donnees_rbase[, c(varAvant, setdiff(colnames(donnees_rbase), varAvant))]
+```
+
+### `tidyverse` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>%
+  relocate(poids_sondage, .after = date_naissance)
+```
+
+### `data.table` {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varAvant <- c( colnames(donnees_datatable)[1 : which("date_naissance" == colnames(donnees_datatable))], "poids_sondage" )
+setcolorder(donnees_datatable, c(varAvant, setdiff(colnames(donnees_datatable), varAvant)))
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
@@ -115,7 +155,6 @@ setcolorder(donnees_datatable, "poids_sondage")
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* Mettre la variable poids_sondage à la fin de la base */
 proc contents data = donnees_sas out = var;run;
 proc sql noprint;
   select name into :var separated by " " from var
@@ -129,20 +168,17 @@ run;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage à la fin de la base
 donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sondage"), "poids_sondage")]
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage à la fin de la base
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage, .after = last_col())
 ```
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Mettre la variable poids_sondage à la fin de la base
 setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_sondage"), "poids_sondage"))
 ```
 
@@ -152,7 +188,7 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 
 :::
 
-## Trier les lignes
+## Trier les lignes de la base
 
 ### Tri par ordre croissant d'identifiant et date_entree
 
@@ -220,7 +256,7 @@ quit;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
+# Tri par ordre croissant de identifiant et décroissant de date_entree
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
 
 # Autre possibilité : - devant la variable (uniquement pour les variables numériques)
