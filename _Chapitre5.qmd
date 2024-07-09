@@ -367,7 +367,7 @@ varNotes <- donnees_tidyverse %>% select(starts_with("note"))
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1ère méthode
 cols <- names(donnees_datatable)[substr(names(donnees_datatable), 1, 4) == "note"]
-# On encore
+# Ou encore
 cols <- names(donnees_datatable)[names(donnees_datatable) %like% "^note"]
 
 sel <- donnees_datatable[, .SD, .SDcols = cols]
