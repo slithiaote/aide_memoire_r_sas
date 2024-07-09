@@ -1,6 +1,6 @@
 # Tableaux de statistiques
 
-## Une seule variable de groupement, une seule variable 
+## Une seule variable de groupement, une seule variable
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -51,7 +51,7 @@ aggregate(note_contenu ~ cspf, donnees_rbase, mean, na.rm = TRUE)
 
 # rowsum (à ne pas confondre avec rowSums) calcule des sommes, et uniquement des sommes
 rowsum(donnees_rbase$note_contenu, donnees_rbase$cspf, recorder = TRUE, na.rm = TRUE)
-# Pour obtenir une moyenne, on peut écrire :
+# Pour obtenir une moyenne, on peut écrire
 rowsum(donnees_rbase$note_contenu, donnees_rbase$cspf, recorder = TRUE, na.rm = TRUE) / as.vector(table(donnees_rbase$cspf))
 
 # Fonctions tapply et by
@@ -100,11 +100,13 @@ donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N
 varNotes <- "note_contenu"
 var_groupe <- "cspf"
 # À FAIRE : les deux variables sont empilées, pourquoi ??
-donnees_datatable[, lapply(.SD, function(x) list(moyenne = mean(x, na.rm = TRUE), n = length(x))), keyby = var_groupe,
+donnees_datatable[, lapply(.SD, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x))),
+                  by = var_groupe,
                   .SDcols = varNotes]
 
 # Avec la pondération
-donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), keyby = var_groupe,
+donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)),
+                  keyby = var_groupe,
                   .SDcols = varNotes]
 ```
 
@@ -113,10 +115,9 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
 
 ```
 
-
 :::
 
-## Plusieurs variables 
+## Plusieurs variables
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -211,10 +212,9 @@ donnees_datatable[, .(Femmes = sum(sexef == "Femme", na.rm = TRUE), Hommes = sum
 
 ```
 
-
 :::
 
-## Tableaux croisés à 2 variables de groupement 
+## Tableaux croisés à 2 variables de groupement
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -289,10 +289,9 @@ data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var 
 
 ```
 
-
 :::
 
-## Tableaux croisés à 3 variables de groupement ou plus : 1 variable en ligne, 2 en colonne 
+## Tableaux croisés à 3 variables de groupement ou plus : 1 variable en ligne, 2 en colonne
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}

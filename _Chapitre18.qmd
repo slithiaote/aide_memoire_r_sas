@@ -43,6 +43,9 @@ donnees_tidyverse %>%
 # Importance du na.rm = TRUE en cas de variables manquantes
 donnees_datatable[, mean(note_contenu)]
 donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
+
+# Autre solution
+donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = "note_contenu"]
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
