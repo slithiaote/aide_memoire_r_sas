@@ -1,6 +1,6 @@
-# Variable retardée (lag) et avancée (lead)
+# Variable retardée (*lag*) et avancée (*lead*)
 
-## Variable retardée (lag) 
+## Variable retardée (*lag*) 
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -32,6 +32,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date de fin du contrat précédent
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
+
 # Il n'existe pas de fonction lag dans le R de base (à notre connaissance)
 # Il faut soit utiliser un package, soit utiliser cette astuce
 donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(length(donnees_rbase$date_sortie) - 1)])
@@ -65,7 +66,7 @@ donnees_datatable[, .(date_sortie, date_sortie_1)]
 
 :::
 
-## Variable avancée (lead)
+## Variable avancée (*lead*)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -96,6 +97,7 @@ run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Il n'existe pas de fonction lead dans le R de base (à notre connaissance)
 # La date du contrat futur (lead)
 donnees_rbase$date_sortie__1 <- c(donnees_rbase$date_sortie[ 2:(length(donnees_rbase$date_sortie))], as.Date(NA))
 ```

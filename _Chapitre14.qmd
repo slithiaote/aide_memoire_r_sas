@@ -157,10 +157,9 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 varNotes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 
+donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, varNotes], na.rm = TRUE)
 # apply permet d'appliquer une fonctions aux lignes (1) ou colonnes (2) d'un data.frame
 donnees_rbase$note_moyenne <- apply(donnees_rbase[, varNotes], 1, mean, na.rm = TRUE)
-
-# À FAIRE : Utiliser rowMeans !!!
 ```
 
 ### `tidyverse` {.unnumbered .unlisted}
@@ -287,7 +286,7 @@ table(donnees_datatable$note_superieure_moyenne, useNA = "always")
 
 ## Moyenne pondérée par ligne
 
-Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne, cette fois-ci en pondérant chacune de ces notes.
+Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces 5 notes pour chaque ligne, mais cette fois-ci en pondérant chacune de ces notes.
 
 ::: {.panel-tabset group="language"}
 
@@ -332,11 +331,12 @@ sum(ponderation)
 donnees_rbase$note_moyennepond <- apply(donnees_rbase[, notes], 1, function(x) weighted.mean(x, ponderation, na.rm = TRUE))
 
 # Autre manière, en exploitant le calcul matriciel
-# Ne fonctionne pas, du fait des NA
+# Ne fonctionne pas dans cet exemple, du fait des NA
 as.matrix(donnees_rbase[, notes]) %*% as.matrix(ponderation)
 # Produit élément par élément
-# On peut procéder par produit matriciel
-as.matrix(donnees_rbase[, notes]) * matrix(t(as.matrix(ponderation)), nrow(donnees_rbase), 5)
+# On peut procéder par produit tensoriel
+# À REVOIR
+as.matrix(donnees_rbase[, notes]) * matrix(t(as.matrix(ponderation)), nrow(donnees_rbase), length(notes))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}

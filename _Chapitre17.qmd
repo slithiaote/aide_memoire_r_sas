@@ -2,7 +2,7 @@
 
 ## Concaténer deux bases de données
 
-On va mettre côte à côte le numéro de la ligne à la base de données.
+On va mettre côte à côte (juxtaposer) le numéro de la ligne et la base de données.
 
 ### Les deux bases concaténées ont le même nombre de lignes
 

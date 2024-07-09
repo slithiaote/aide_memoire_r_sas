@@ -1,6 +1,6 @@
 # Les jointures de bases
 
-Pour fonctionner, les codes de cette partie nécessitent l'import des bases d'exemple de la section "Importation de bases pour la jointure".
+Pour fonctionner, les codes de cette partie nécessitent l'importation des bases d'exemple de la section "Importation de bases pour la jointure".
 
 ## Importation de bases pour les jointures 
 ::: {.panel-tabset group="language"}
@@ -49,10 +49,12 @@ run;
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_rbase <- data.frame(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
                       diplome = c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"))
+
 # On suppose que l'on dispose d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller
 entrevue_rbase <- data.frame(identifiant = c("173", "168", "087", "689", "099", "765"),
                        date_entrevue = c("06/08/2021", "17/10/2019", "12/06/2021", "28/03/2018", "01/09/2022", "01/10/2020"))
 entrevue_rbase$date_entrevue <- lubridate::dmy(entrevue_rbase$date_entrevue)
+
 # On récupère un extrait de la base initiale
 jointure_rbase <- donnees_rbase[, c("identifiant", "sexe", "date_entree", "date_sortie")]
 ```
@@ -62,11 +64,13 @@ jointure_rbase <- donnees_rbase[, c("identifiant", "sexe", "date_entree", "date_
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_tidyverse <- tibble(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
                       diplome = c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"))
+
 # On suppose que l'on dispose d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller
 entrevue_tidyverse <- tibble(identifiant = c("173", "168", "087", "689", "099", "765"),
                        date_entrevue = c("06/08/2021", "17/10/2019", "12/06/2021", "28/03/2018", "01/09/2022", "01/10/2020"))
 entrevue_tidyverse <- entrevue_tidyverse %>% 
   mutate(date_entrevue = lubridate::dmy(date_entrevue))
+
 # On récupère un extrait de la base initiale
 variable <- c("identifiant", "sexe", "date_entree", "date_sortie")
 jointure_tidyverse <- donnees_tidyverse %>%
@@ -78,10 +82,12 @@ jointure_tidyverse <- donnees_tidyverse %>%
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_datatable <- data.table(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
                                 diplome = c("Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"))
+
 # On suppose que l'on dispose d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller
 entrevue_datatable <- data.table(identifiant = c("173", "168", "087", "689", "099", "765"),
                                  date_entrevue = c("06/08/2021", "17/10/2019", "12/06/2021", "28/03/2018", "01/09/2022", "01/10/2020"))
 entrevue_datatable[, date_entrevue := lubridate::dmy(date_entrevue)]
+
 # On récupère un extrait de la base initiale
 jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree", "date_sortie")]
 ```
@@ -99,6 +105,7 @@ jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree"
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Sont appariés les identifiants communs aux deux bases */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
 proc sort data = Diplome;by identifiant;run;
 proc sort data = Jointure;by identifiant;run;
@@ -144,6 +151,7 @@ dim(innerJoin)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sont appariés les identifiants communs aux deux bases
 innerJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant")
 innerJoin <- jointure_datatable[diplome_datatable, nomatch = 0, on = list(identifiant == identifiant)]
 innerJoin <- jointure_datatable[diplome_datatable, nomatch = 0, on = .(identifiant == identifiant)]
@@ -155,14 +163,14 @@ dim(innerJoin)
 
 ```
 
-
 :::
 
-## Left join : les identifiants de la base de gauche 
+## Left join : les identifiants de la base de gauche
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
 proc sort data = Diplome;by identifiant;run;
 proc sort data = Jointure;by identifiant;run;
@@ -208,6 +216,7 @@ dim(leftJoin)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite
 leftJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all.x = TRUE)
 dim(leftJoin)
 leftJoin <- diplome_datatable[jointure_datatable, on = .(identifiant == identifiant)]
@@ -219,14 +228,14 @@ dim(leftJoin)
 
 ```
 
-
 :::
 
-## Right join : les identifiants de la base de droite 
+## Right join : les identifiants de la base de droite
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
 proc sort data = Diplome;by identifiant;run;
 proc sort data = Jointure;by identifiant;run;
@@ -272,6 +281,7 @@ dim(rightJoin)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
 rightJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all.y = TRUE)
 dim(rightJoin)
 rightJoin <- jointure_datatable[diplome_datatable, on = .(identifiant == identifiant)]
@@ -285,11 +295,12 @@ dim(rightJoin)
 
 :::
 
-## Full join : les identifiants des deux bases 
+## Full join : les identifiants des deux bases
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
+/* Sont appariés les identifiants des deux bases */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
 proc sort data = Diplome;by identifiant;run;
 proc sort data = Jointure;by identifiant;run;
@@ -336,6 +347,7 @@ dim(fullJoin)
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sont appariés les identifiants des deux bases
 fullJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all = TRUE)
 dim(fullJoin)
 ```
@@ -347,7 +359,7 @@ dim(fullJoin)
 
 :::
 
-## Jointure de 3 bases ou plus en une seule opération (exemple avec inner join) 
+## Jointure de 3 bases ou plus en une seule opération (exemple avec inner join)
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -431,7 +443,7 @@ proc sql;select count(*) from Inner_Join_Inegalite;quit;
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ne semble pas natif en R-Base.
-# Une proposition indicative où on applique la sélection après la jointure, ce qui ne doit pas être très efficace ...
+# Une proposition indicative où l'on applique la sélection après la jointure, ce qui ne doit pas être très efficace ...
 innerJoinInegalite <- merge(jointure_rbase, entrevue_rbase, by = "identifiant")
 innerJoinInegalite <- with(innerJoinInegalite,
                            innerJoinInegalite[which(date_entree <= date_entrevue & date_entrevue <= date_sortie), ])
@@ -496,7 +508,6 @@ dim(crossJoin)
 # Autre solution
 crossJoin2 <- unique(merge(donnees_rbase[, c("cspf", "sexef")], diplome_rbase[, "diplome"], by = NULL))
 dim(crossJoin2)
-# https://stackoverflow.com/questions/10600060/how-to-do-cross-join-in-r
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
@@ -651,9 +662,6 @@ quit;
 
 ### `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# base:: permet de s'assurer que les fonctions proviennent de R base
-# Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
-
 # Concaténation des identifiants avec les doublons
 sort(c(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```
