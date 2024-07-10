@@ -104,7 +104,7 @@ setcolorder(donnees_datatable, "poids_sondage")
 
 :::
 
-### Mettre la variable poids_sondage après la variable date_naissance À FAIRE
+### Mettre la variable poids_sondage après la variable date_naissance
 
 ::: {.panel-tabset group="language"}
 
@@ -139,8 +139,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ### `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-varAvant <- c( colnames(donnees_datatable)[1 : which("date_naissance" == colnames(donnees_datatable))], "poids_sondage" )
-setcolorder(donnees_datatable, c(varAvant, setdiff(colnames(donnees_datatable), varAvant)))
+setcolorder(donnees_datatable, "poids_sondage", after = "date_naissance")
 ```
 
 ### `arrow/duckdb` {.unnumbered .unlisted}
