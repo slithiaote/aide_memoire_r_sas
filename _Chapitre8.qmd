@@ -204,11 +204,11 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ### Extraire des éléments d'une chaîne de caractères
 
-Le comportement du substr est différent entre `SAS` et `R` :
+Le comportement de la fonction substr est différent entre `SAS` et `R` :
 
-- en `SAS`, dans substr(extrait, 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 le nombre total de caractères à partir du 2e
+- en `SAS`, dans substr(extrait, 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 au nombre total de caractères extrait à partir du 2e => Le résultat est xtr ;
 
-- en `R`, dans substr("extrait", 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 à la position du dernier caractère
+- en `R`, dans substr("extrait", 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 à la position du dernier caractère => Le résultat est "xt".
 
 ::: {.panel-tabset group="language"}
 
