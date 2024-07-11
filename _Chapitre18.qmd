@@ -182,7 +182,7 @@ donnees_datatable[sexef == "Femme", weighted.mean(note_contenu, poids_sondage, n
 donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), .SDcols = "note_contenu"]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+### `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -1016,16 +1016,16 @@ setNames(donnees_datatable[, lapply(methodes,
 
 :::
 
-### Centrer et réduire les variables À FAIRE
+## Centrer et réduire les variables À FAIRE
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+## `SAS` {.unnumbered .unlisted}
 ``` sas
 
 ```
 
-### `R base` {.unnumbered .unlisted}
+## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 centrer_reduire <- scale(donnees_rbase[, notes])
@@ -1033,17 +1033,17 @@ centrer_reduire <- scale(donnees_rbase[, notes])
 # Essayer apply et sweep
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+## `arrow/duckdb` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

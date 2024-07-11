@@ -273,7 +273,7 @@ dim(donnees_datatable) ; dim(donnees_datatable)[1] ; dim(donnees_datatable)[2]
 dim(donnees_datatable) ; nrow(donnees_datatable) ; ncol(donnees_datatable)
 sprintf("Nombre de lignes : %d | Nombre de colonnes : %d", dim(donnees_datatable)[1], dim(donnees_datatable)[2])
 
-# Autre solution rapide pour les colonnes
+# Autre solution rapide pour le nombre de lignes
 donnees_datatable[, .N]
 ```
 
@@ -291,7 +291,7 @@ requete_duckdb %>%  ncol()
 
 :::
 
-## Liste des variables de la base
+## Les variables de la base
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
@@ -313,32 +313,32 @@ proc sql;select name into :nom_col separated by " " from Var;run;
 
 ## `R base` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Liste des variables par ordre d'apparition dans la base
+# Les variables par ordre d'apparition dans la base
 names(donnees_rbase)
 colnames(donnees_rbase)
 
-# Liste des variables par ordre alphabétique
+# Les variables par ordre alphabétique
 ls(donnees_rbase)
 sort(colnames(donnees_rbase))
 ```
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Liste des variables par ordre d'apparition dans la base
+# Les variables par ordre d'apparition dans la base
 donnees_tidyverse %>% names()
 donnees_tidyverse %>% colnames()
 
-# Liste des variables par ordre alphabétique
+# Les variables par ordre alphabétique
 donnees_tidyverse %>% colnames() %>% sort()
 ```
 
 ## `data.table` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Liste des variables par ordre d'apparition dans la base
+# Les variables par ordre d'apparition dans la base
 names(donnees_datatable)
 colnames(donnees_datatable)
 
-# Liste des variables par ordre alphabétique
+# Les variables par ordre alphabétique
 sort(colnames(donnees_datatable))
 ```
 
