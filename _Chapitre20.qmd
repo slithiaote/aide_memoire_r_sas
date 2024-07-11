@@ -334,7 +334,7 @@ summary(table(donnees_rbase$cspf, donnees_rbase$sexef))
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Test du Khi-Deux
-chisq.test(donnees_tidyverse |> pull(cspf), donnees_tidyverse |> pull(sexef))
+chisq.test(donnees_tidyverse %>% pull(cspf), donnees_tidyverse %>% pull(sexef))
 ```
 
 ## `data.table` {.unnumbered .unlisted}

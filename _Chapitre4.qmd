@@ -495,7 +495,7 @@ names(donnees_rbase)[grepl("^note", names(donnees_rbase), ignore.case = TRUE)]
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-names(donnees_tidyverse) |> str_subset("^note")
+names(donnees_tidyverse) %>% str_subset("^note")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
@@ -532,7 +532,7 @@ names(donnees_rbase)[grepl("naissance$", names(donnees_rbase), ignore.case = TRU
 
 ## `tidyverse` {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-names(donnees_tidyverse) |> str_subset("naissance$")
+names(donnees_tidyverse) %>% str_subset("naissance$")
 ```
 
 ## `data.table` {.unnumbered .unlisted}
