@@ -24,6 +24,7 @@ data Diplome;
   554|Bep-Cap
   ;
 run;
+
 /* On suppose que l'on dispose aussi d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller */
 data Entrevue;
   infile cards dsd dlm='|';
@@ -38,6 +39,7 @@ data Entrevue;
   765|01/10/2020
   ;
 run;
+
 /* On récupère un extrait de la base initiale */
 data Jointure;
   set donnees_sas (keep = Identifiant Sexe date_entree date_sortie);
@@ -122,6 +124,7 @@ proc sql;
   select * from Jointure a inner join Diplome b on a.identifiant = b.identifiant
   order by a.identifiant;
 quit;
+
 proc print data = Inner_Join1 (obs = 10);run;
 proc sql;select count(*) from Inner_Join1;quit;
 proc sql;select count(*) from Inner_Join2;quit;
@@ -187,6 +190,7 @@ proc sql;
   select * from Jointure a left join Diplome b on a.identifiant = b.identifiant
   order by a.identifiant;
 quit;
+
 proc print data = Left_Join1 (obs = 10);run;
 proc sql;select count(*) from Left_Join1;quit;
 proc sql;select count(*) from Left_Join2;quit;
@@ -252,6 +256,7 @@ proc sql;
   select * from Jointure a right join Diplome b on a.identifiant = b.identifiant
   order by a.identifiant;
 quit;
+
 proc print data = Right_Join1 (obs = 10);run;
 proc sql;select count(*) from Right_Join1;quit;
 proc sql;select count(*) from Right_Join2;quit;
@@ -318,6 +323,7 @@ proc sql;
   from Jointure a full outer join Diplome b on a.identifiant = b.identifiant
   order by calculated identifiant;
 quit;
+
 proc print data = Full_Join1 (obs = 10);run;
 proc sql;select count(*) from Full_Join1;quit;
 proc sql;select count(*) from Full_Join2;quit;
@@ -377,10 +383,11 @@ run;
 /* Le tri préalable des bases de données à joindre n'est pas nécessaire avec la jointure SQL */
 proc sql;
   create table Inner_Join4 as
-  select * from Jointure a inner join Diplome b on a.identifiant = b.identifiant
+  select * from Jointure a inner join Diplome  b on a.identifiant = b.identifiant
                            inner join Entrevue c on a.identifiant = c.identifiant
   order by a.identifiant;
 quit;
+
 proc print data = Inner_Join4 (obs = 10);run;
 proc sql;select count(*) from Inner_Join3;quit;
 proc sql;select count(*) from Inner_Join4;quit;
@@ -490,8 +497,8 @@ dim(innerJoinInegalite)
 proc sql;
   create table CrossJoin as
   select *
-  from (select distinct CSPF from donnees_sas)  cross join
-       (select distinct Sexef from donnees_sas) cross join
+  from (select distinct CSPF    from donnees_sas) cross join
+       (select distinct Sexef   from donnees_sas) cross join
        (select distinct Diplome from Diplome)
   order by CSPF, Sexef, Diplome;
 quit;
@@ -556,6 +563,8 @@ proc sql;
   where Identifiant in (select distinct Identifiant from Diplome);
   select count(*) from Semi_Join;
 quit;
+
+/* Autre possibilité */
 proc sql;
   create table Semi_Join as select * from donnees_sas a
   where exists (select * from Diplome b where (a.Identifiant = b.Identifiant));
@@ -656,7 +665,8 @@ dim(antiJoin)
 proc sql;
   /* Concaténation des identifiants */
   select Identifiant from Jointure union all
-  select Identifiant from Diplome order by identifiant;
+  select Identifiant from Diplome order
+  by identifiant;
 quit;
 ```
 
@@ -700,7 +710,7 @@ sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 proc sql;
   /* Identifiants uniques des 2 bases */
   select distinct Identifiant from
-  (select distinct Identifiant from Jointure union select distinct Identifiant from Diplome)
+  (select Identifiant from Jointure union select Identifiant from Diplome)
   order by identifiant;
 quit;
 ```
@@ -797,6 +807,8 @@ proc sql;
   select distinct Identifiant from Jointure where
   Identifiant not in (select distinct Identifiant from Diplome)
   order by identifiant;
+  
+  /* Autre possibilité */
   select Identifiant from Jointure except select Identifiant from Diplome;
 quit;
 ```
