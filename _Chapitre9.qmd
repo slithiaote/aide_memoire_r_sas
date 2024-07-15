@@ -67,6 +67,7 @@ donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
   %local nbVar;
   proc contents data = donnees_sas out = ListeVar noprint;run;
   proc sql noprint;select count(*) into :nbVar from ListeVar;quit;
+  
   %do i = 1 %to &nbVar.;
     data _null_;
       set ListeVar (firstobs = &i. obs = &i.);
@@ -77,8 +78,10 @@ donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
       from &base.;
     quit;
   %end;
+  
   proc datasets lib = work nolist;delete ListeVar;run;
 %mend Iteration;
+
 %Iteration;
 ```
 
@@ -186,6 +189,8 @@ data Valeur_Manquante;
   Jeune_Incorrect = (Age <= 25);
   Jeune_Correct   = (0 <= Age <= 25);
 run;
+
+/* On affiche les résultats */
 proc print data = Valeur_Manquante (keep  = Age Jeune_Correct Jeune_Incorrect
                                     where = (missing(Age)));
 run;
@@ -298,6 +303,7 @@ proc contents data = donnees_sas out = Var noprint;run;
 proc sql noprint;
   select name into :nom_col separated by " " from Var where format = "";
 run;
+
 data donnees_sas_sans_missing;
   set donnees_sas;
   
@@ -382,7 +388,7 @@ On souhaite supprimer toutes les lignes où la variable age est manquante.
 data age_non_manquant;
   set donnees_sas (where = (age ne .));
   /* Ou alors */
-  /*if age ne .;*/
+  if age ne .;
 run;
 ```
 
