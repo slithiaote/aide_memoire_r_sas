@@ -101,3 +101,37 @@ timetaken(started.at)
 ```
 
 :::
+
+## Nombre de lignes affectées par un changement
+
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+/* Ne semble pas exister nativement */
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ne semble pas exister nativement
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ne semble pas exister nativement
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, sexef2 := tolower(sexef)]
+sprintf("Nombre de lignes modifiées : %d", .Last.updated)
+donnees_datatable[, sexef2 := NULL]
+
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
