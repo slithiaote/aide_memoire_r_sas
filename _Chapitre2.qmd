@@ -357,16 +357,15 @@ Les options de la fonction utiles sont :
 /* proc import out = NomBaseImportee 
    datafile = "CHEMIN DE LA BASE"
    DBMS = XLS REPLACE;
-  run;*/
+  run; */
   
 /* Importer un fichier avec séparateur | */
 /* data NomDeLaBase;
-  infile "CHEMIN DE LA BASE IMPORTEE 
-	dlm = "|" missover dsd lrecl=32767 firstobs = 2;
-  informat VARIABLES;
-  format VARIABLES;
-  input VARIABLES;
-run; */
+     infile "CHEMIN DE LA BASE IMPORTEE" dlm = "|" missover dsd firstobs = 2;
+     informat VARIABLES;
+     format VARIABLES;
+     input VARIABLES;
+   run; */
 ```
 
 ### R base {.unnumbered .unlisted}
