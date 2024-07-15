@@ -81,6 +81,7 @@ dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* Note moyenne par identifiant */
+/* On va créer une base Wide avec les notes en colonne et les identifiants en ligne */
 %let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
 proc sort data = donnees_sas;by identifiant;run;
 proc means data = donnees_sas mean noprint;var &notes.;output out = Temp;by identifiant;run;
@@ -91,6 +92,7 @@ data Wide;
 run;
 
 /* On passe de Wide à Long */
+/* On met les notes en ligne */
 proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 ```
 
@@ -101,13 +103,13 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 # Note moyenne par identifiant
 wide_rbase <- aggregate(donnees_rbase[, varNotes], donnees_rbase[, "identifiant", drop = FALSE], mean, na.rm = TRUE)
 
-long_rbase <- reshape(data = wide_rbase,
-                      varying = varNotes,
-                      v.names = "notes",
-                      timevar = "type_note",
-                      times = varNotes,
+long_rbase <- reshape(data          = wide_rbase,
+                      varying       = varNotes,
+                      v.names       = "notes",
+                      timevar       = "type_note",
+                      times         = varNotes,
                       new.row.names = NULL,
-                      direction = "long")
+                      direction     = "long")
 long_rbase <- long_rbase[order(long_rbase$identifiant), ]
 row.names(long_rbase) <- NULL
 ```
@@ -124,8 +126,8 @@ wide_tidyverse <- donnees_tidyverse %>%
 # On l'exprime en format long
 # Mise en garde : ne pas écrire value_to !
 long_tidyverse <- wide_tidyverse %>% 
-  pivot_longer(cols = !identifiant,
-               names_to = "type_note",
+  pivot_longer(cols      = !identifiant,
+               names_to  = "type_note",
                values_to = "note") %>% 
   arrange(type_note, identifiant)
 ```
@@ -155,8 +157,6 @@ long_datatable <- melt(wide_datatable,
 
 Le code précédent doit être lancé au préalable.
 
-Lien utile : <https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
-
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -185,6 +185,9 @@ run;
 ```
 
 ## R base {.unnumbered .unlisted}
+
+Lien utile : <https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Passer de long à wide : on souhaite revenir à la situation initiale
 wide_rbase <- reshape(long_rbase,
