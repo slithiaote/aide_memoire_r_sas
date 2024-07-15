@@ -305,8 +305,7 @@ moyennes
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes */
-/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
-   nombre de données manquantes (nmiss), intervalle (entre max et min), mode */
+/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n), nombre de données manquantes (nmiss), intervalle (entre max et min), mode */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 
 /* Par la proc means, en un seul tableau */
@@ -434,8 +433,7 @@ donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
-   nombre de données manquantes (nmiss), intervalle, mode */
+/* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n), nombre de données manquantes (nmiss), intervalle, mode */
 /* Par la proc means, en un seul tableau */
 /* L'option vardef = wgt permet de diviser la variable par la somme des poids et non le nombre de données, pour être cohérent
    avec R */
@@ -631,7 +629,7 @@ $$
 \frac{\sum_i{w_i \times (x_i - \bar{x}) ^2}}{\sum_i{w_i}} = \frac{\sum_i{w_ix_i^2}} {\sum_i{w_i}} - \bar{x}^2
 $$
 
-On la calcule "manuellement" pour confirmer le résultat.
+On la calcule "manuellement" en `R` pour confirmer le résultat.
 
 ::: {.panel-tabset group="language"}
 
@@ -694,19 +692,11 @@ x_2 / p - (x_m / p) ** 2
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 data donnees_sas;
   set donnees_sas;
-  /* 1ère solution */
-  Note_moyenne    = mean(of &notes.);
-  /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
-  %macro List_comprehension;
-    Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
-	                            %let j = %scan(&notes., &i.);
-						                  &j.
-						                %end;);;
-  %mend List_comprehension;
-  %List_comprehension;
+  Note_moyenne = mean(of &notes.);
 run;
 
 /* Déciles et quartiles de la note moyenne */
+
 /* Par la proc means */
 proc means data = donnees_sas StackODSOutput Min P10 P20 P30 P40 Median P60 P70 Q3 P80 P90 Max Q1 Median Q3 QRANGE;
   var Note_moyenne;
