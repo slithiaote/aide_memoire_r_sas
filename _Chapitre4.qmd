@@ -73,9 +73,6 @@ requete_duckdb %>% glimpse() # préférer glimpse()
 
 ``` sas
 proc contents data = donnees_sas;run;
-
-/* On supprime la base Var temporaire */
-proc datasets lib = Work nolist;delete Var;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
@@ -241,9 +238,6 @@ proc sql;
   from donnees_sas;
 quit;
 
-/* Liste des variables de la base dans la base Var */
-proc contents data = donnees_sas out = Var noprint;run;
-
 /* Nombre de colonnes */
 proc sql;select count(*) as Nb_Colonnes from Var;run;
 ```
@@ -309,6 +303,9 @@ proc sql;select name into :nom_col separated by " " from Var;run;
 
 /* On affiche les noms des variables */
 %put Liste des variables : &nom_col.;
+
+/* On supprime la base Var temporaire */
+proc datasets lib = Work nolist;delete Var;run;
 ```
 
 ## `R base` {.unnumbered .unlisted}
@@ -484,7 +481,7 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 proc contents data = donnees_sas out = Variables;run;
-proc sql;select Name from Variables where upcase(substr(Name,1,4)) = "NOTE";run;
+proc sql;select Name from Variables where upcase(substr(Name, 1, 4)) = "NOTE";run;
 ```
 
 ## `R base` {.unnumbered .unlisted}

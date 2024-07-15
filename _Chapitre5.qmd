@@ -7,11 +7,13 @@
 ``` sas
 %let pos = 1;
 proc contents data = donnees_sas out = Var noprint;run;
+
 proc sql noprint;
   select name into :nom_col separated by " "
   from Var
   where varnum = &pos.;
 run;
+
 data Colonnes;set donnees_sas (keep = &nom_col.);run;
 proc datasets lib = Work nolist;delete Var;run;
 ```
@@ -86,6 +88,7 @@ id <- donnees_rbase[, "identifiant"] ; class(id)
 # Résultat sous forme de data.frame
 id <- donnees_rbase[, "identifiant"] ; class(id)
 id <- donnees_rbase["identifiant"] ; class(id)
+
 # Attention, utilisation du drop = FALSE étrange
 # En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
 id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
@@ -138,7 +141,7 @@ Note : on déconseille l'utilisation de `select` sur des chaînes de caractère 
 data Colonnes;
   /* Sélection de colonnes */
   set donnees_sas (keep = &var.);
-  /* Selection de colonnes */
+  /* Autre solution */
   keep &var.;
 run;
 ```
@@ -241,11 +244,13 @@ requete_duckdb %>% select(-all_of(variable))
 ## `SAS` {.unnumbered .unlisted}
 ``` sas
 proc contents data = donnees_sas out = Var noprint;run;
+
 proc sql noprint;
   select name into :nom_col separated by " "
   from Var
   where varnum = 3;
 run;
+
 data Col3;set donnees_sas (keep = &nom_col.);run;
 ```
 
@@ -281,6 +286,9 @@ requete_duckdb %>% select(3)
 ``` sas
 %let var = identifiant note_contenu sexe;
 data Colonnes;set donnees_sas (keep = &var.);run;
+
+/* Autre solution */
+/* En SQL, les variables sélectionnées dans l'instruction SELECT sont séparées par des virgules. On ajoute des virgules entre les variables. */
 proc sql;
   create table Colonnes as
   select %sysfunc(tranwrd(&var., %str( ), %str(, )))
@@ -530,7 +538,8 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ``` sas
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql noprint;
-  select name into :nom_col separated by " " from Var
+  select name into :nom_col separated by " "
+  from Var
   where 1 <= varnum <= 3;
 run;
 data Top3;
@@ -700,10 +709,13 @@ requete_duckdb %>%
 ``` sas
 %let var = identifiant;
 %let sel = 087;
+
 data Selection;
   set donnees_sas;
   if &var. in ("&sel.");
 run;
+
+/* Autre solution */
 data Selection;
   set donnees_sas (where = (&var. in ("&sel.")));
 run;
@@ -809,3 +821,8 @@ requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
 ```
 
 :::
+
+
+# Appendix {.appendix}
+
+## Les fonctions apply
