@@ -1,6 +1,9 @@
 # Points de vigilance en `SAS`
 
-## Emploi des guillemets et doubles guillemets 
+## Emploi des guillemets et doubles guillemets
+
+Une macro exprimée sous format caractère doit être entourée de "", et non ''.
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -34,7 +37,8 @@
 
 :::
 
-## Macro-variable définie avec un statut global avant son appel dans le cadre d'un statut local 
+## Macro-variable définie avec un statut global avant son appel dans le cadre d'un statut local
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -58,10 +62,11 @@
   %local reponse;
   %let reponse = oui;
 %mend test2;
+
 %let reponse = non;
 %put Reponse : &reponse.;
 %test2;
-%put Année après la macro : &reponse.;
+%put Reponse après la macro : &reponse.;
 ```
 
 ## R base {.unnumbered .unlisted}

@@ -3,7 +3,43 @@
 Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 <https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
 
-## Fonction calculant une moyenne 
+## Sélection de données
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%macro Selection (BaseInitiale, BaseFinale, condition);
+  data &BaseFinale.;
+    set BaseInitiale (&condition);
+  run;
+%mend Selection;
+%Selection();
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+```
+
+## tidyverse {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Fonction calculant une moyenne
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -49,4 +85,4 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef
 
 :::
 
-Autres exemples de fonctions possibles : statistiques par groupes et proc freq.
+Autres exemples de fonctions possibles : statistiques par groupes (proc tabulate), proc freq, ajout dans la base d'indicatrices de présence en stock à la fin du mois (%local).

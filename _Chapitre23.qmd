@@ -6,10 +6,9 @@
 ## SAS {.unnumbered .unlisted}
 ``` sas
 %let temps_debut = %sysfunc(datetime());
-
 proc sort data = donnees_sas;by identifiant date_entree;run;
-
 %let temps_fin = %sysfunc(datetime());
+
 %let duree = %sysevalf((&temps_fin. - &temps_debut.) / 60);
 %put Durée exécution : &duree minutes;
 ```

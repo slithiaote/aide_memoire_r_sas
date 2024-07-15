@@ -12,10 +12,11 @@ data _null_;call symput('annee', strip(year(today())));run;
   %local i j;
   %global liste_mois;
   %let liste_mois = ;
+  
   %do i = &an_debut. %to &an_fin.;
     %do j = 1 %to 12;
-	  %let liste_mois = &liste_mois. %sysfunc(putn(%sysfunc(mdy(&j., 1, &i.)), ddmmyy10.));
-	%end;
+	    %let liste_mois = &liste_mois. %sysfunc(putn(%sysfunc(mdy(&j., 1, &i.)), ddmmyy10.));
+	  %end;
   %end;
 %mend Boucles_Imbriquees;
 
@@ -132,15 +133,18 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 %macro noms_fichiers(base = temp);
   %global res;
   %let res = ;
+  /* 1ère boucle */
   %do j = 1 %to %sysfunc(countw(&liste_an., "-"));
     %let y = %scan(&liste_an., &j., "-"); /* année */
+    /* 2e boucle */
     %do i = 1 %to 4;
       %let t = %scan(&liste_trim, &i.); /* trimestre */
+      /* 3e boucle */
       %do g = 1 %to 2;
         %let n = %scan(&liste_niv., &g.); /* niveau */
-		%let res = &res. &base._&y._t&t._n&n.;
+		    %let res = &res. &base._&y._t&t._n&n.;
+	    %end;
 	  %end;
-	%end;
   %end;
 %mend noms_fichiers;
 
@@ -203,14 +207,15 @@ quit;
   %global nom_bases;
   /* On initalise la création de la macri-variable nom_bases */
   %let nom_bases = ;
+  
   /* On itère entre &debut. et &fin. */
   %do an = &debut. %to &fin.;
     data Entree_&an.;
-	  set donnees_sas;
-	  if year(date_entree) = &an.;
-	run;
-	/* On ajoute à la macro-variable le nom de la base */
-	%let nom_bases = &nom_bases. Entree_&an.;
+	    set donnees_sas;
+	    if year(date_entree) = &an.;
+	  run;
+	  /* On ajoute à la macro-variable le nom de la base */
+	  %let nom_bases = &nom_bases. Entree_&an.;
   %end;
 %mend Base_par_mois;
 
