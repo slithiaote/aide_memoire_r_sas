@@ -200,7 +200,7 @@ proc sort data = donnees_sas;by Identifiant Date_entree;run;
 
 /* 2e possibilité */
 proc sql;
-  create table Donnes as select * from donnees_sas
+  create table donnees_sas as select * from donnees_sas
   order by Identifiant, Date_entree;
 quit;
 ```
@@ -246,9 +246,13 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 ### SAS {.unnumbered .unlisted}
 ``` sas
 /* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
+
+/* 1ère possibilité */
 proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
+
+/* 2e possibilité */
 proc sql;
-  create table Donnes as select * from donnees_sas
+  create table donnees_sas as select * from donnees_sas
   order by Identifiant, Date_entree desc;
 quit;
 ```
@@ -291,8 +295,10 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* Dans SAS, les valeurs manquantes sont considérées comme des valeurs négatives */
+
 /* Elles sont donc situées en premier dans un tri par ordre croissant ... */
 proc sort data = donnees_sas;by identifiant date_entree;run;proc print;run;
+
 /* ... et en dernier dans un tri par ordre décroissant */
 proc sort data = donnees_sas;by identifiant descending date_entree;run;
 proc print;run;
@@ -306,6 +312,7 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 # SAS considère les valeurs manquantes comme des nombres négatifs faibles.
 # Pour mimer le tri par ordre croissant en SAS :
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+
 # Pour mimer le tri par ordre décroissant en SAS :
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree,
                                      na.last = FALSE,
@@ -327,6 +334,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Pour mimer le tri par ordre croissant en SAS : les valeurs manquantes de date_entree sont classées en premier
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, !is.na(date_entree), date_entree)
+
 # Pour mimer le tri par ordre décroissant en SAS
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, desc(date_entree))
@@ -336,9 +344,11 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
 donnees_datatable <- donnees_datatable[order(identifiant, date_entree)]
+
 # SAS considère les valeurs manquantes comme des nombres négatifs faibles.
 # Pour mimer le tri par ordre croissant en SAS :
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
+
 # Pour mimer le tri par ordre décroissant en SAS :
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
