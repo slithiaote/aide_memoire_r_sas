@@ -1,6 +1,6 @@
 # Gestion par rangées de lignes
 
-## Sélectionner les lignes avec au moins une note inférieure à 10 
+## Sélectionner les lignes avec au moins une note inférieure à 10
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -11,11 +11,11 @@ data Note_Inferieure_10;
   
   %macro Inf10;
     %global temp;
-	%let temp = ;
+	  %let temp = ;
     %do i = 1 %to %sysfunc(countw(&notes.));
       %let j = %scan(&notes., &i.);
-	  &j._inf_10 = (&j. < 10 and not missing(&j.));
-	  %let temp = &temp. &j._inf_10;
+	    &j._inf_10 = (&j. < 10 and not missing(&j.));
+	    %let temp = &temp. &j._inf_10;
     %end;
   %mend Inf10;
   %Inf10;
@@ -61,7 +61,7 @@ note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `
 
 :::
 
-## Sélectionner les lignes avec toutes les notes supérieures à 10 
+## Sélectionner les lignes avec toutes les notes supérieures à 10
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -70,19 +70,17 @@ note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `
 data Note_Sup_10;
   set donnees_sas;
   
-  %macro Inf10;
+  %macro Sup10;
     %global temp;
-	%let temp = ;
+	  %let temp = ;
     %do i = 1 %to %sysfunc(countw(&notes.));
       %let j = %scan(&notes., &i.);
-	  &j._sup_10 = (&j. >= 10);
-	  %let temp = &temp. &j._sup_10;
+	    &j._sup_10 = (&j. >= 10);
+	    %let temp = &temp. &j._sup_10;
     %end;
-  %mend Inf10;
-  %Inf10;
+  %mend Sup10;
+  %Sup10;
   
-  a = sum(of &temp.);
-  b = %sysfunc(countw(&notes.));
   if sum(of &temp.) = %sysfunc(countw(&notes.));
   drop &temp.;
 run;
@@ -126,7 +124,6 @@ note_sup_10 <- donnees_datatable[donnees_datatable[, Reduce(`&`, lapply(.SD, `>=
 
 ```
 
-
 :::
 
 ## Moyenne par ligne
@@ -149,9 +146,9 @@ data donnees_sas;
   /* 2e solution : l'équivalent des list-comprehension de Python en SAS */
   %macro List_comprehension;
     Note_moyenne2 = mean(of %do i = 1 %to %sysfunc(countw(&notes.));
-	                      %let j = %scan(&notes., &i.);
-						  &j.
-						 %end;);;
+	                            %let j = %scan(&notes., &i.);
+						                  &j.
+						                %end;);;
   %mend List_comprehension;
   %List_comprehension;
 run;
@@ -203,7 +200,7 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNo
 
 :::
 
-### Moyenne des moyennes des lignes 
+### Moyenne des moyennes des lignes
 
 ::: {.panel-tabset group="language"}
 
@@ -245,7 +242,7 @@ donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
 
 :::
 
-### La moyenne par ligne est-elle supérieure à la moyenne ? 
+### La moyenne par ligne est-elle supérieure à la moyenne ?
 ::: {.panel-tabset group="language"}
 
 ### SAS {.unnumbered .unlisted}
@@ -299,7 +296,7 @@ Pour chaque observation, 5 notes sont renseignées. On calcule la moyenne de ces
 /* On souhaite affecter les pondérations suivantes aux notes :
 Note_Contenu : 30%, Note_Formateur : 20%, Note_Moyens : 25%, Note_Accompagnement : 15%, Note_Materiel : 10% */
 /* Voici une solution possible. Une alternative intéressante serait de passer par IML (non traité ici) */
-%let ponderation = 0.3 0.2 0.25 0.15 0.10;
+%let ponderation = 0.3 0.2 0.25 0.15 0.1;
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 
 data donnees_sas;
@@ -316,6 +313,7 @@ data donnees_sas;
 	  %end;
   %mend Somme_pond;
   %Somme_pond;
+  
   Note_moyenne_pond = sum(of &temp.);
   drop &temp.;
 run;
