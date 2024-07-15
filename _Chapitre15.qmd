@@ -1,11 +1,12 @@
 # Variable retardée (*lag*) et avancée (*lead*)
 
-## Variable retardée (*lag*) 
+## Variable retardée (*lag*)
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* La date de fin du contrat précédent (lag) */
+/* Ecriture correcte d'un lag en SAS */
 proc sort data = donnees_sas;by identifiant date_entree;run;
 data donnees_sasBon;
   set donnees_sas;
@@ -15,7 +16,9 @@ data donnees_sasBon;
   if first.identifiant then Date_fin_1 = .;
 run;
 
-/* ATTENTION au lag DANS UNE CONDITION IF (cf. document) */
+/* Ecriture incorrecte d'un lag en SAS */
+/* ATTENTION au lag DANS UNE CONDITION IF */
+/* Il faut toujours "sortir" le lag de la condition IF */
 proc sort data = donnees_sas;by identifiant date_entree;run;
 data Lag_Bon;
   set donnees_sas (keep = identifiant date_entree date_sortie);
@@ -71,27 +74,8 @@ donnees_datatable[, .(date_sortie, date_sortie_1)]
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* À FAIRE !!!!!!! */
-/* La date de fin du contrat précédent (lag) */
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data donnees_sasBon;
-  set donnees_sas;
-  by identifiant date_entree;  
-  format Date_fin_1 ddmmyy10.;
-  Date_fin_1 = lag(Date_sortie);
-  if first.identifiant then Date_fin_1 = .;
-run;
-
-/* ATTENTION au lag DANS UNE CONDITION IF (cf. document) */
-proc sort data = donnees_sas;by identifiant date_entree;run;
-data Lag_Bon;
-  set donnees_sas (keep = identifiant date_entree date_sortie);
-  format date_sortie_1 lag_faux lag_bon ddmmyy10.;
-  /* Erreur */
-  if date_entree = lag(date_sortie) + 1 then lag_faux = lag(date_sortie) + 1;
-  /* Bonne écriture */
-  date_sortie_1 = lag(date_sortie);
-  if date_entree = date_sortie_1 + 1 then lag_bon = date_sortie_1 + 1;
+proc expand data= donnees_sas out = Lead;
+  convert date_sortie = date_sortie__1 / transformout = (lead 1);
 run;
 ```
 
