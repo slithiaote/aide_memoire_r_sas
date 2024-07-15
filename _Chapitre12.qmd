@@ -3,7 +3,7 @@
 ## Transposer une base
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On commence déjà par calculer un tableau croisé comptant les occurrences */
 proc freq data = donnees_sas;table Sexef * cspf / out = Nb;run;
@@ -16,7 +16,7 @@ data transpose;set transpose (drop = _name_ _label_);run;
 proc print data = transpose;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On commence déjà par calculer un tableau croisé comptant les occurrences
 # as.data.frame.matrix est nécessaire, car le résultat de xtabs est un array
@@ -27,7 +27,7 @@ nb <- as.data.frame.matrix(xtabs( ~ cspf + sexef, data = donnees_rbase))
 nb_transpose <- as.data.frame(t(nb))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On commence déjà par calculer un tableau croisé comptant les occurrences
 nb <- donnees_tidyverse %>% 
@@ -52,7 +52,7 @@ nb_transpose <- nb %>%
   sjmisc::rotate_df()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Etablissement d'un tableau croisé comptant les occurrences
 nb <- donnees_datatable[, .N, by = list(cspf, sexef)]
@@ -64,7 +64,7 @@ transpose(nb, keep.names = "sexef", make.names = "cspf")
 dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -74,7 +74,7 @@ dcast(melt(nb, id.vars = "cspf", variable.name = "sexef"), sexef ~ cspf)
 ## Passer d'une base en largeur (*wide*) à une base en longueur (*long*)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Note moyenne par identifiant */
 %let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
@@ -90,7 +90,7 @@ run;
 proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -108,7 +108,7 @@ long_rbase <- long_rbase[order(long_rbase$identifiant), ]
 row.names(long_rbase) <- NULL
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -126,7 +126,7 @@ long_tidyverse <- wide_tidyverse %>%
   arrange(type_note, identifiant)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 # Note moyenne par identifiant
@@ -140,7 +140,7 @@ long_datatable <- melt(wide_datatable,
                        value.name = "note")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -155,7 +155,7 @@ Lien utile : <
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On souhaite mettre les notes en ligne et non en colonne */
 /* On commence par calculer les notes moyennes par identifiant */
@@ -180,7 +180,7 @@ proc transpose data = Long out = Wide;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Passer de long à wide : on souhaite revenir à la situation initiale
 wide_rbase <- reshape(long_rbase,
@@ -189,7 +189,7 @@ wide_rbase <- reshape(long_rbase,
                       direction = "wide")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Passer de long à wide : on souhaite revenir à la situation initiale
 # Mise en garde : ne pas écrire value_from !
@@ -198,12 +198,12 @@ wide_tidyverse <- pivot_wider(long_tidyverse,
                               values_from = note)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 wide_datatable <- dcast(long_datatable, identifiant ~ type_note, value.var = "note")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

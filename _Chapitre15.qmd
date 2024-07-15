@@ -3,7 +3,7 @@
 ## Variable retardée (*lag*) 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* La date de fin du contrat précédent (lag) */
 proc sort data = donnees_sas;by identifiant date_entree;run;
@@ -28,7 +28,7 @@ data Lag_Bon;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date de fin du contrat précédent
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entre, na.last = FALSE), ]
@@ -42,7 +42,7 @@ donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(leng
 #https://stackoverflow.com/questions/3558988/basic-lag-in-r-vector-dataframe
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date de fin du contrat précédent
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -51,7 +51,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(date_sortie_1 = lag(date_sortie))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date de fin du contrat précédent
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
@@ -59,7 +59,7 @@ donnees_datatable[, date_sortie_1 := shift(.SD, n = 1, fill = NA, "lag"), .SDcol
 donnees_datatable[, .(date_sortie, date_sortie_1)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -69,7 +69,7 @@ donnees_datatable[, .(date_sortie, date_sortie_1)]
 ## Variable avancée (*lead*)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* À FAIRE !!!!!!! */
 /* La date de fin du contrat précédent (lag) */
@@ -95,14 +95,14 @@ data Lag_Bon;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Il n'existe pas de fonction lead dans le R de base (à notre connaissance)
 # La date du contrat futur (lead)
 donnees_rbase$date_sortie__1 <- c(donnees_rbase$date_sortie[ 2:(length(donnees_rbase$date_sortie))], as.Date(NA))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date du contrat futur (lead)
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -111,7 +111,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(date_sortie__1 = lead(date_sortie))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La date du contrat futur (lead)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
@@ -119,7 +119,7 @@ donnees_datatable[, date_sortie__1 := shift(.SD, n = 1, fill = NA, "lead"), .SDc
 donnees_datatable[, .(date_sortie, date_sortie__1)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

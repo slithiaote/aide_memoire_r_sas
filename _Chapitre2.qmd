@@ -10,7 +10,7 @@ Les codes sont majoritairement exécutables indépendamment les uns des autres. 
 ## Création d'une base de données d'exemple
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Données fictives sur des formations */
 data donnees_sas;
@@ -61,7 +61,7 @@ data donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Données fictives sur des formations
 library(lubridate)
@@ -113,7 +113,7 @@ donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees
 donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Données fictives sur des formations
 library(tidyverse)
@@ -168,7 +168,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Données fictives sur des formations
 library(data.table)
@@ -228,7 +228,7 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 Duckdb est un serveur SQL séparé de la session R. Les calculs sont effectués _en dehors_ de `R` et l'espace mémoire est distinct de celui de `R`. 
 Au lieu d'accéder directement aux données, il faut passer par un objet _connection_ qui contient l'adresse du serveur, un peu comme lorsque l'on se connecte à un serveur web. Ici en particulier, il est nécessaire de transférer les données vers `duckdb`.
@@ -264,10 +264,10 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 ## Manipulation du format de la base de données
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 Sans objet pour `SAS`.
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 # On vérifie que la base importée est bien un data.frame
@@ -277,7 +277,7 @@ is.data.frame(donnees_rbase)
 class(donnees_rbase)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 # On vérifie que la base importée est bien un tibble
@@ -290,7 +290,7 @@ donnees_tidyverse <- as_tibble(donnees_tidyverse)
 class(donnees_tidyverse)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 # On vérifie que la base est bien un data.table
@@ -315,7 +315,7 @@ is.list(donnees_datatable)
 class(donnees_datatable)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -351,7 +351,7 @@ Les options de la fonction utiles sont :
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Importer un fichier xls */
 /* proc import out = NomBaseImportee 
@@ -369,21 +369,21 @@ Les options de la fonction utiles sont :
 run; */
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 
 On utilisera les fonctions read.table, read.csv et read.csv2.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 
 On utilisera les fonctions du package readr : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-readr>.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 
 On utilisera la fonction fread : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_import_fichiers_plats.html#importer-un-fichier-avec-le-package-data.table>.
 
@@ -395,7 +395,7 @@ Si cette option est valorisée à TRUE, les valeurs numériques précédées par
 
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 

@@ -5,13 +5,13 @@
 ### Moyenne
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas mean;var note_contenu;run;
 proc sql;select mean(note_contenu) from donnees_sas;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 mean(donnees_rbase$note_contenu)
@@ -21,7 +21,7 @@ mean(donnees_rbase$note_contenu, na.rm = TRUE)
 sum(donnees_rbase$note_contenu, na.rm = TRUE) / sum(! is.na(donnees_rbase$note_contenu))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 donnees_tidyverse %>% pull(note_contenu) %>% mean()
@@ -38,7 +38,7 @@ donnees_tidyverse %>%
 # donnees_tidyverse %>% mean(note_contenu, na.rm = TRUE)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Importance du na.rm = TRUE en cas de variables manquantes
 donnees_datatable[, mean(note_contenu)]
@@ -48,7 +48,7 @@ donnees_datatable[, mean(note_contenu, na.rm = TRUE)]
 donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = "note_contenu"]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -58,7 +58,7 @@ donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = "note_contenu"]
 ### Moyenne par sélection
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Ici pour les seules femmes */
 proc means data = donnees_sas mean;
@@ -67,14 +67,14 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 with(subset(donnees_rbase, sexef == "Femme"), mean(note_contenu, na.rm = TRUE))
 mean(donnees_rbase[donnees_rbase$sexef == "Femme", "note_contenu"], na.rm = TRUE)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 donnees_tidyverse %>%
@@ -95,14 +95,14 @@ donnees_tidyverse %>%
   {mean(.$note_contenu, na.rm = TRUE)}
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ici, pour les seules femmes
 donnees_datatable[sexef == "Femme", mean(note_contenu, na.rm = TRUE)]
 donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = "note_contenu"]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -114,7 +114,7 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) mean(x, na.rm = TRUE
 ### Moyenne pondérée
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas mean;
   var note_contenu;
@@ -122,7 +122,7 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = TRUE)
 
@@ -130,18 +130,18 @@ weighted.mean(donnees_rbase$note_contenu, donnees_rbase$poids_sondage, na.rm = T
 with(donnees_rbase, sum(note_contenu * poids_sondage, na.rm = TRUE) / sum((!is.na(note_contenu)) * poids_sondage, na.rm = TRUE))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>%
   summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -151,7 +151,7 @@ donnees_datatable[, weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
 ### Moyenne pondérée par sélection
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Par sélection (ici pour les seules femmes) */
 proc means data = donnees_sas mean;
@@ -161,13 +161,13 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
 with(subset(donnees_rbase, sexef == "Femme"), weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
 donnees_tidyverse %>%
@@ -175,14 +175,14 @@ donnees_tidyverse %>%
   summarise(across(note_contenu, ~weighted.mean(., w = poids_sondage, na.rm = TRUE)))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Par sélection (ici pour les seules femmes)
 donnees_datatable[sexef == "Femme", weighted.mean(note_contenu, poids_sondage, na.rm = TRUE)]
 donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), .SDcols = "note_contenu"]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -192,7 +192,7 @@ donnees_datatable[sexef == "Femme", lapply(.SD, function(x) weighted.mean(x, poi
 ## Moyenne de plusieurs variables
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 proc means data = donnees_sas mean;
@@ -200,7 +200,7 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 
@@ -219,7 +219,7 @@ names(moyennes) <- paste("Moyenne", names(moyennes), sep = "_")
 moyennes
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_tidyverse %>%
@@ -241,7 +241,7 @@ moyennes <- donnees_tidyverse %>%
   rename_with(~ paste("Moyenne", ., sep = "_"))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 moyennes <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), .SDcols = notes]
@@ -251,7 +251,7 @@ setnames(moyennes, notes, paste("Moyenne", notes, sep = "_"))
 moyennes
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -261,7 +261,7 @@ moyennes
 ## Moyenne pondérée de plusieurs variables
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
 proc means data = donnees_sas mean;
@@ -270,12 +270,12 @@ proc means data = donnees_sas mean;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 with(donnees_rbase, sapply(donnees_rbase[, notes], function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_tidyverse %>%
@@ -286,13 +286,13 @@ donnees_tidyverse %>%
   summarise_at(notes, ~ weighted.mean(.x, poids_sondage, na.rm = TRUE))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 moyennes <- donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)), .SDcols = notes]
 moyennes
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -302,7 +302,7 @@ moyennes
 ## Nombreuses statistiques (somme, moyenne, médiane, mode, etc.)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes */
 /* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
@@ -320,7 +320,7 @@ proc univariate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
@@ -341,7 +341,7 @@ sapply(donnees_rbase[, notes], function(x) c("Somme"      = sum(x, na.rm = TRUE)
 ))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
@@ -380,7 +380,7 @@ donnees_tidyverse %>%
   relocate(Indicateur)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données (manquantes et non manquantes), nombre de valeurs manquantes, Intervalle (entre max et min), mode
 # Petite différence avec SAS sur le nombre de lignes du fait des valeurs manquantes
@@ -422,7 +422,7 @@ StatsDesc <- function(x) {
 donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -432,7 +432,7 @@ donnees_datatable[, StatsDesc(.SD), .SDcols = notes]
 ## Nombreuses statistiques pondérées (somme, moyenne, médiane, mode, etc.)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Somme, moyenne, médiane, minimum, maximum, variance, écart-type, nombre de données non manquantes (n),
    nombre de données manquantes (nmiss), intervalle, mode */
@@ -454,7 +454,7 @@ proc univariate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -475,7 +475,7 @@ sapply(donnees_rbase[, notes], function(x) c("Somme"      = collapse::fsum(x, w 
 ))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -513,7 +513,7 @@ donnees_tidyverse %>%
   relocate(Indicateur)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -542,7 +542,7 @@ StatsDescPond <- function(x, poids = donnees_datatable$poids_sondage) {
 donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -555,31 +555,31 @@ donnees_datatable[, StatsDescPond(.SD), .SDcols = notes]
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas var;
   var note_contenu;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
 var(donnees_rbase$note_contenu)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   summarise(var = var(note_contenu))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, var(note_contenu)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -590,7 +590,7 @@ donnees_datatable[, var(note_contenu)]
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas var vardef = wgt;
   var note_contenu;
@@ -598,26 +598,26 @@ proc means data = donnees_sas var vardef = wgt;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
 with(donnees_rbase, collapse::fvar(note_contenu, w = poids_sondage))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
 donnees_tidyverse %>% 
   summarise(var = collapse::fvar(note_contenu, w = poids_sondage))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(collapse)
 donnees_datatable[, collapse::fvar(note_contenu, w = poids_sondage)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -635,7 +635,7 @@ On la calcule "manuellement" pour confirmer le résultat.
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc means data = donnees_sas var vardef = wgt;
   var note_contenu;
@@ -643,7 +643,7 @@ proc means data = donnees_sas var vardef = wgt;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 x_2 <- with(donnees_rbase,
             sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE))
@@ -654,7 +654,7 @@ p <- with(donnees_rbase,
 x_2 / p - (x_m / p) ** 2
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 x_2 <- donnees_tidyverse %>%  
   summarise(sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage), na.rm = TRUE)) %>% 
@@ -668,7 +668,7 @@ p <- donnees_tidyverse %>%
 x_2 / p - (x_m / p) ** 2
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 x_2 <- donnees_datatable[, sum(poids_sondage * note_contenu**2 * complete.cases(note_contenu, poids_sondage),
                                na.rm = TRUE)]
@@ -678,7 +678,7 @@ p <- donnees_datatable[, sum(poids_sondage * complete.cases(note_contenu, poids_
 x_2 / p - (x_m / p) ** 2
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -688,7 +688,7 @@ x_2 / p - (x_m / p) ** 2
 ## Déciles et quantiles
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On calcule déjà la moyenne des notes par individu */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
@@ -720,7 +720,7 @@ proc univariate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On calcule déjà la moyenne des notes par individu
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
@@ -733,7 +733,7 @@ quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75),
 IQR(donnees_rbase$note_moyenne, na.rm = TRUE)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # on calcule déjà la moyenne des notes par individu
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -751,7 +751,7 @@ donnees_tidyverse %>%
   IQR(na.rm = TRUE)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # on calcule déjà la moyenne des notes par individu
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
@@ -765,7 +765,7 @@ donnees_datatable[, IQR(note_moyenne, na.rm = TRUE)]
 donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "note_moyenne"]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -775,7 +775,7 @@ donnees_datatable[, lapply(.SD, function(x) IQR(x, na.rm = TRUE)), .SDcols = "no
 ## Déciles et quantiles pondérés
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On calcule déjà la moyenne des notes par individu */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
@@ -799,7 +799,7 @@ proc univariate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -814,7 +814,7 @@ collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
                     probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser les fonctions du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -831,7 +831,7 @@ donnees_tidyverse %>%
   collapse::fquantile(probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), w = donnees_tidyverse$poids_sondage)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une solution pour obtenir les résultats pondérés est d'utiliser la fonction fquantile du package collapse
 # L'option na.rm est par défaut à TRUE dans le package
@@ -848,7 +848,7 @@ donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_son
                            .SDcols = "note_moyenne"]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -861,7 +861,7 @@ Ajouter dans la base le rang de la note par ordre décroissant.
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On calcule déjà la moyenne des notes par individu */
 %let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
@@ -876,7 +876,7 @@ proc rank data = donnees_sas out = donnees_sas descending;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On calcule déjà la moyenne des notes par individu
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
@@ -887,7 +887,7 @@ donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 donnees_rbase$rang_note_moyenne <- rank(-donnees_rbase$note_moyenne)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On calcule déjà la moyenne des notes par individu
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -898,7 +898,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(rang_note_moyenne = rank(-note_moyenne))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On calcule déjà la moyenne des notes par individu
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
@@ -909,7 +909,7 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes
 donnees_datatable[, rang_note_moyenne := frank(-note_moyenne)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -921,7 +921,7 @@ donnees_datatable[, rang_note_moyenne := frank(-note_moyenne)]
 ### Covariance entre deux notes
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Covariance et corrélation linéaire (Kendall, Pearson, Spearman) */
 proc corr data = donnees_sas kendall pearson spearman cov;
@@ -929,7 +929,7 @@ proc corr data = donnees_sas kendall pearson spearman cov;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Covariance (Kendall, Pearson, Spearman)
 with(donnees_rbase,
@@ -937,7 +937,7 @@ with(donnees_rbase,
             function(x) cov(note_contenu, note_formateur, method = x, use = "complete.obs")))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Covariance (Kendall, Pearson, Spearman)
 methodes <- c("pearson", "spearman", "kendall")
@@ -949,7 +949,7 @@ methodes %>%
   as_tibble()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Covariance (Kendall, Pearson, Spearman)
 methodes <- c("pearson", "spearman", "kendall")
@@ -960,7 +960,7 @@ setNames(donnees_datatable[, lapply(methodes,
          methodes)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -971,7 +971,7 @@ setNames(donnees_datatable[, lapply(methodes,
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Corrélation linéaire (Kendall, Pearson, Spearman) */
 proc corr data = donnees_sas kendall pearson spearman cov;
@@ -979,7 +979,7 @@ proc corr data = donnees_sas kendall pearson spearman cov;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Corrélation linéaire (Kendall, Pearson, Spearman)
 with(donnees_rbase,
@@ -987,7 +987,7 @@ with(donnees_rbase,
             function(x) cor(note_contenu, note_formateur, method = x, use = "complete.obs")))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Corrélation linéaire (Kendall, Pearson, Spearman)
 methodes <- c("pearson", "spearman", "kendall")
@@ -998,7 +998,7 @@ methodes %>%
   as_tibble()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Corrélation linéaire (Kendall, Pearson, Spearman)
 methodes <- c("pearson", "spearman", "kendall")
@@ -1009,7 +1009,7 @@ setNames(donnees_datatable[, lapply(methodes,
          methodes)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -1020,12 +1020,12 @@ setNames(donnees_datatable[, lapply(methodes,
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 centrer_reduire <- scale(donnees_rbase[, notes])
@@ -1033,17 +1033,17 @@ centrer_reduire <- scale(donnees_rbase[, notes])
 # Essayer apply et sweep
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

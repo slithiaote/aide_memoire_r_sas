@@ -3,7 +3,7 @@
 ## Outils d'aide au débogage 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 options symbolgen mprint mlogic;
 %macro Debogage;
@@ -18,7 +18,7 @@ options symbolgen mprint mlogic;
 options nosymbolgen nomprint nomlogic;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 #phrase <- c("voici", "une", "phrase")
 #options(error=recover)
@@ -30,7 +30,7 @@ options nosymbolgen nomprint nomlogic;
 #browser()
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # À FAIRE : creuser
 #phrase <- c("voici", "une", "phrase")
@@ -43,7 +43,7 @@ options nosymbolgen nomprint nomlogic;
 #browser()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 #phrase <- c("voici", "une", "phrase")
 #options(error=recover)
@@ -55,7 +55,7 @@ options nosymbolgen nomprint nomlogic;
 #browser()
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

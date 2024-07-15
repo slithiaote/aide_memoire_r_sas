@@ -6,7 +6,7 @@ Cette tâche, immédiate en `SAS`, est plus complexe à réaliser en `R`. Plusie
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe * CSP / missing;
@@ -20,7 +20,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau simple
 table(donnees_rbase$cspf, donnees_rbase$sexef, useNA = "always")
@@ -43,7 +43,7 @@ addmargins(prop.table(tab, margin = 1), margin = 2) * 100
 addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau de fréquence
 tab <- donnees_tidyverse %>% 
@@ -74,7 +74,7 @@ donnees_tidyverse %>%
   spread(sexef, prop)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 
 1ère solution
 
@@ -153,7 +153,7 @@ tab_prop[, (lapply(.SD, function(col) col / sum(col))), .SDcols = cols]
 #tab_prop <- dcast(tab_prop, cspf ~ sexef, value.var = c("prop"), fill = 0)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -163,7 +163,7 @@ tab_prop[, (lapply(.SD, function(col) col / sum(col))), .SDcols = cols]
 ## Tableau de contingence avec pondération
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe * CSP / missing;
@@ -172,7 +172,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 tab <- xtabs(poids_sondage ~ cspf + sexef, data = donnees_rbase, addNA = TRUE)
 tab
@@ -181,7 +181,7 @@ addmargins(prop.table(tab, margin = 1), margin = 2) * 100
 addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Avec la fonction count
 donnees_tidyverse %>% 
@@ -214,7 +214,7 @@ tab <- bind_rows(tab, tab %>%
 tab
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 tab <- donnees_datatable[, xtabs(poids_sondage ~ cspf + sexef, data = donnees_datatable, addNA = TRUE) ]
 tab
@@ -223,7 +223,7 @@ addmargins(prop.table(tab, margin = 1), margin = 2) * 100
 addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -233,7 +233,7 @@ addmargins(prop.table(tab, margin = 2), margin = 1) * 100
 ## Copier-coller le tableau dans un tableur (Excel, etc.)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Copier-coller le résultat sur la fenêtre html "Results Viewer" */
 proc freq data = donnees_sas;
@@ -242,7 +242,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On utilise les packages knitr et kableExtra
 library(knitr)
@@ -261,7 +261,7 @@ kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
 # ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On utilise les packages knitr et kableExtra
 library(knitr)
@@ -286,7 +286,7 @@ tab %>%
 # ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On utilise les packages knitr et kableExtra
 library(knitr)
@@ -306,7 +306,7 @@ kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
 # ... et de copier-coller le résultat de la fenêtre Viewer vers Excel
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -316,7 +316,7 @@ kableExtra::kable_paper(kableExtra::kbl(tab), "hover", full_width = F)
 ## Tests d'associaton (Chi-Deux, etc.)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe * CSP / missing chisq;
@@ -324,26 +324,26 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Test du Khi-Deux
 with(donnees_rbase, chisq.test(cspf, sexef))
 summary(table(donnees_rbase$cspf, donnees_rbase$sexef))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Test du Khi-Deux
 chisq.test(donnees_tidyverse %>% pull(cspf), donnees_tidyverse %>% pull(sexef))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Test du Khi-Deux
 donnees_datatable[, chisq.test(cspf, sexef)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -364,7 +364,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/descr/desc
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -374,7 +374,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(descr)
 # Non pondéré
@@ -385,7 +385,7 @@ with(donnees_rbase, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r 
 with(donnees_rbase, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(descr)
 # Non pondéré
@@ -396,7 +396,7 @@ with(donnees_tidyverse, descr::crosstab(cspf, sexef, weight = poids_sondage, pro
 with(donnees_tidyverse, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(descr)
 # Non pondéré
@@ -407,7 +407,7 @@ donnees_datatable[, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r 
 donnees_datatable[, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r = FALSE, prop.c = FALSE, prop.t = TRUE)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -423,7 +423,7 @@ Lien vers la documentation :
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -433,7 +433,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(flextable)
 # Non pondéré
@@ -444,7 +444,7 @@ flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage")
 flextable::proc_freq(donnees_rbase, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(flextable)
 # Non pondéré
@@ -455,7 +455,7 @@ flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage
 flextable::proc_freq(donnees_tidyverse, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(flextable)
 # Non pondéré
@@ -466,7 +466,7 @@ flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage
 flextable::proc_freq(donnees_datatable, "cspf", "sexef", weight = "poids_sondage", include.row_percent = FALSE, include.column_percent = FALSE)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -479,7 +479,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/questionr/
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -489,7 +489,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(questionr)
 # Tableau croisé
@@ -506,7 +506,7 @@ questionr::cprop(tab)
 questionr::rprop(tab)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sans pondération
 library(questionr)
@@ -524,7 +524,7 @@ questionr::cprop(tab)
 questionr::rprop(tab)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sans pondération
 library(questionr)
@@ -542,7 +542,7 @@ questionr::cprop(tab)
 questionr::rprop(tab)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -555,7 +555,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/survey/sur
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -565,7 +565,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # À FAIRE : ne fonctionne pas
 library(survey)
@@ -573,7 +573,7 @@ tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_rbase
 survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # La syntaxe avec pipe n'est pas compatible avec le package survey
 library(survey)
@@ -581,7 +581,7 @@ tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_tidyv
 survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # À FAIRE : ne fonctionne pas
 library(survey)
@@ -589,7 +589,7 @@ tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_datat
 survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -602,7 +602,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/procs/vign
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -612,7 +612,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(procs)
 procs::proc_freq(donnees_rbase, tables = cspf * sexef, options = v(missing))
@@ -620,7 +620,7 @@ procs::proc_freq(donnees_rbase, tables = cspf * sexef, options = v(missing))
 #procs::proc_freq(donnees_rbase, tables = cspf * sexef, weight = poids_sondage, options = v(missing))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(procs)
 procs::proc_freq(donnees_tidyverse, tables = cspf * sexef, options = v(missing))
@@ -628,7 +628,7 @@ procs::proc_freq(donnees_tidyverse, tables = cspf * sexef, options = v(missing))
 #procs::proc_freq(donnees_tidyverse, tables = cspf * sexef, weight = poids_sondage, options = v(missing))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(procs)
 # Il semble nécessaire de convertire l'objet en data.frame
@@ -639,7 +639,7 @@ procs::proc_freq(setDF(donnees_datatable), tables = cspf * sexef, options = v(mi
 setDT(donnees_datatable)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -656,7 +656,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/janitor/vi
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -666,7 +666,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(janitor)
 # Attention, la fonction tabyl ne permet pas de pondérer
@@ -681,7 +681,7 @@ janitor::adorn_percentages(tab, denominator = "row", na.rm = TRUE)
 janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(janitor)
 # Attention, la fonction tabyl ne permet pas de pondérer
@@ -697,7 +697,7 @@ tab %>% janitor::adorn_percentages(denominator = "row", na.rm = TRUE)
 tab %>% janitor::adorn_percentages(denominator = "col", na.rm = TRUE)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(janitor)
 # Attention, la fonction tabyl ne permet pas de pondérer
@@ -712,7 +712,7 @@ janitor::adorn_percentages(tab, denominator = "row", na.rm = TRUE)
 janitor::adorn_percentages(tab, denominator = "col", na.rm = TRUE)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -725,7 +725,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/crosstable
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -735,27 +735,27 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(crosstable)
 crosstable::crosstable(donnees_rbase, cspf, by = sexef, showNA = "always", percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(crosstable)
 crosstable::crosstable(donnees_tidyverse, cspf, by = sexef, showNA = "always",
                        percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(crosstable)
 crosstable::crosstable(donnees_datatable, cspf, by = sexef, showNA = "always",
                        percent_digits = 0, percent_pattern ="{n} ({p_col}/{p_row})")
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -768,7 +768,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/gmodels/gm
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -778,26 +778,26 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gmodels)
 gmodels::CrossTable(donnees_rbase$cspf, donnees_rbase$sexef)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gmodels)
 donnees_tidyverse %>% 
   summarise(gmodels::CrossTable(cspf, sexef))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gmodels)
 gmodels::CrossTable(donnees_datatable$cspf, donnees_datatable$sexef)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -810,7 +810,7 @@ Lien vers la documentation : <https://cran.r-project.org/web/packages/gtsummary/
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Sans objet pour SAS */
 proc freq data = donnees_sas;
@@ -820,7 +820,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gtsummary)
 # Pourcentages par case, colonne, ligne
@@ -829,7 +829,7 @@ gtsummary::tbl_cross(data = donnees_rbase, row = cspf, col = sexef, percent = c(
 gtsummary::tbl_cross(data = donnees_rbase, row = cspf, col = sexef, percent = c("row"),    margin = c("column", "row"), missing = c("always"))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gtsummary)
 # Pourcentages par case, colonne, ligne
@@ -838,7 +838,7 @@ gtsummary::tbl_cross(data = donnees_tidyverse, row = cspf, col = sexef, percent 
 gtsummary::tbl_cross(data = donnees_tidyverse, row = cspf, col = sexef, percent = c("row"),    margin = c("column", "row"), missing = c("always"))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(gtsummary)
 # Pourcentages par case, colonne, ligne
@@ -850,7 +850,7 @@ gtsummary::tbl_cross(data = donnees_datatable, row = cspf, col = sexef, percent 
                      margin = c("column", "row"), missing = c("always"))
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

@@ -3,7 +3,7 @@
 ## Chemin du bureau de l'utilisateur 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On vide la log */
 dm "log; clear; ";
@@ -15,7 +15,7 @@ dm "log; clear; ";
 libname bur "&bureau.";
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
@@ -24,7 +24,7 @@ user <- Sys.getenv("USERNAME")
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
@@ -33,7 +33,7 @@ user <- Sys.getenv("USERNAME")
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On récupère déjà l'identifiant de l'utilisateur
 user <- Sys.getenv("USERNAME")
@@ -42,7 +42,7 @@ user <- Sys.getenv("USERNAME")
 chemin <- file.path("C:/Users", user, "Desktop")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -52,7 +52,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 ## Affichage de l'année 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Année courante */
 %let annee = %sysfunc(year(%sysfunc(today())));
@@ -67,7 +67,7 @@ data _null_;call symput('annee', strip(year(today())));run;
 %put Année passée : %eval(&annee. - 1);
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Année courante
 annee <- lubridate::year(Sys.Date())
@@ -82,7 +82,7 @@ annee_1 <- annee - 1
 paste0("Année passée : ", annee_1)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Année courante
 annee <- lubridate::year(Sys.Date())
@@ -97,7 +97,7 @@ annee_1 <- annee - 1
 paste0("Année passée : ", annee_1)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Année courante
 annee <- lubridate::year(Sys.Date())
@@ -112,7 +112,7 @@ annee_1 <- annee - 1
 paste0("Année passée : ", annee_1)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -122,7 +122,7 @@ paste0("Année passée : ", annee_1)
 ## Construction des instructions if / else 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %macro Annee(an);
   %if &an. >= 2024 %then %put Nous sommes en 2024 ou après !;
@@ -131,7 +131,7 @@ paste0("Année passée : ", annee_1)
 %Annee(&annee.);
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
@@ -149,7 +149,7 @@ if (annee >= 2024) {
 }
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
@@ -167,7 +167,7 @@ if (annee >= 2024) {
 }
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Construction incorrecte ! Le else doit être sur la même ligne que le {
 #if (annee >= 2024) {
@@ -185,7 +185,7 @@ if (annee >= 2024) {
 }
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -195,7 +195,7 @@ if (annee >= 2024) {
 ## Répertoire de travail 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Afficher le répertoire de travail par défaut (la Work) */
 %let chemin_work = %sysfunc(pathname(work));
@@ -210,7 +210,7 @@ quit;
 /* libname "nom du répertoire"; */
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Afficher le répertoire de travail
 getwd()
@@ -219,7 +219,7 @@ getwd()
 #setwd(dir = "nom du répertoire")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Afficher le répertoire de travail
 getwd()
@@ -228,7 +228,7 @@ getwd()
 #setwd(dir = "nom du répertoire")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Afficher le répertoire de travail
 getwd()
@@ -237,7 +237,7 @@ getwd()
 #setwd(dir = "nom du répertoire")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -247,12 +247,12 @@ getwd()
 ## Autres points à connaître 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 Mise en garde : certains codes `SAS` pourraient aussi avec profit être écrits en langage `SAS IML` (Interactive Matrix Language).
 Cet aide-mémoire n'ayant pas vocation à être un dictionnaire `SAS`, cette méthode d'écriture n'est pas proposée ici.
 
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 
 `R base` est réputé plus lent que ses concurrents, ce qui est souvent vrai.
 Mais certaines fonctions en `R base` peuvent être très rapides (rowsum, rowSums, colSums, rowMeans, colMeans, tapply, etc.)
@@ -263,7 +263,7 @@ Mais certaines fonctions en `R base` peuvent être très rapides (rowsum, rowSum
 1:10 |> sum()
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 `tidyverse` promeut l'utilisation du pipe (%>%), qui permet d'enchaîner des opérations sur une même base modifiée successivement.
 2 types de pipes existent, le pipe de magrittr (%>%) et le pipe de R-Base (|>, à partir de la version 4.1)
 Les fonctionnalités simples des deux opérateurs sont identiques, mais il existe des différences.
@@ -273,7 +273,7 @@ Le tidyverse peut s'utiliser sans pipe, mais le pipe simplifie la gestion des pr
 Les autres environnements (`R base`, `data.table`) peuvent aussi se présenter avec le pipe.
 
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Principe de base de data.table
 # dt[i, j, by = ]
@@ -286,7 +286,7 @@ Les autres environnements (`R base`, `data.table`) peuvent aussi se présenter a
 # dt[i, j, by = ][SOMME > VALEUR]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

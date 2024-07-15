@@ -3,7 +3,7 @@
 ## Boucles imbriquées
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data _null_;call symput('annee', strip(year(today())));run;
 
@@ -24,7 +24,7 @@ data _null_;call symput('annee', strip(year(today())));run;
 %put &liste_mois.;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
 annee <- lubridate::year(Sys.Date())
@@ -50,7 +50,7 @@ listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1,
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
 annee <- lubridate::year(Sys.Date())
@@ -72,7 +72,7 @@ listeMois <- tidyr::expand_grid(annee = seq(2020, annee), mois = 1:12) %>%
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ensemble des premiers jours de chaque mois entre 2020 et l'année courante
 annee <- lubridate::year(Sys.Date())
@@ -99,7 +99,7 @@ listeMois <- sort(as.Date(apply(expand.grid(seq(2020, annee), 1:12), 1,
 seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%02d-12-01", annee)), by = "month")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -109,7 +109,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 ## Boucles imbriquées (second exemple)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Itérer sur toutes les années et les trimestres d'une certaine plage */
 /* On va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 */
@@ -148,7 +148,7 @@ seq.Date(lubridate::ymd(sprintf("%02d-01-01", 2020)), lubridate::ymd(sprintf("%0
 %put &res.;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Itérer sur toutes les années et les trimestres d'une certaine plage
 # on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
@@ -157,7 +157,7 @@ fin <- lubridate::year(Sys.Date())
 res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y)  sprintf("base_%4d_t%d_n%s", x, 1:4, y))))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Itérer sur toutes les années et les trimestres d'une certaine plage
 # on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
@@ -169,7 +169,7 @@ listeMois <- purrr::map(debut:fin,
                           unlist()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Itérer sur toutes les années et les trimestres d'une certaine plage
 # on va afficher les noms base_AAAA_tT_nmax où AAAA désigne les années, T les trimestres, depuis 2020 
@@ -178,7 +178,7 @@ fin <- lubridate::year(Sys.Date())
 res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y)  sprintf("base_%4d_t%d_n%s", x, 1:4, y))))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -188,7 +188,7 @@ res <- unlist(lapply(debut:fin, function(x) lapply(c("max", "min"), function(y) 
 ## Boucles for
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On va créer une base par année d'entrée */
 proc sql noprint;
@@ -224,7 +224,7 @@ data concatene;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va créer une base par année d'entrée
 anMin <- min(lubridate::year(donnees_rbase$date_entree), na.rm = TRUE)
@@ -241,7 +241,7 @@ for (i in anMin:anMax) {
 concatene <- do.call(rbind, lapply(paste("entree", anMin:anMax, sep = "_"), get))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # À FAIRE : problème pour les entrées où la date est manquante
 # On va créer une base par année d'entrée
@@ -261,7 +261,7 @@ concatene <- purrr::map(paste("entree", anMin:anMax, sep = "_"), get) %>%
   purrr::reduce(bind_rows)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va créer une base par année d'entrée
 anMin <- min(lubridate::year(donnees_datatable$date_entree), na.rm = TRUE)
@@ -278,7 +278,7 @@ for (i in anMin:anMax) {
 concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -288,7 +288,7 @@ concatene <- rbindlist(lapply(paste("entree", anMin:anMax, sep = "_"), get))
 ## Boucles for (second exemple)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On recherche toutes les valeurs de CSP différentes et on les met dans une variable.
    On appelle la proc SQL :
@@ -338,7 +338,7 @@ run;
 %Boucles(base = donnees_sas, var = CSPF2);
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Base par CSP
 for (i in unique(donnees_rbase$cspf)) {
@@ -349,7 +349,7 @@ for (i in unique(donnees_rbase$cspf)) {
 }
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Base par CSP
 for (i in donnees_tidyverse %>% distinct(cspf) %>% pull()) {
@@ -361,7 +361,7 @@ for (i in donnees_tidyverse %>% distinct(cspf) %>% pull()) {
 }
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Créer une base pour chaque individu d'une certaine CSP
 for (i in unique(donnees_datatable$cspf)) {
@@ -372,7 +372,7 @@ for (i in unique(donnees_datatable$cspf)) {
 }
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

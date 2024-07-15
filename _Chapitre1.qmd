@@ -27,7 +27,7 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 # install.packages("nom_du_package")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les packages doivent au préalable être installés sur le disque dur
@@ -35,7 +35,7 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 # install.packages("nom_du_package")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 # Les packages doivent au préalable être installés sur le disque dur
@@ -47,13 +47,13 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 ## Importation des packages
 
 ::: {.panel-tabset group="language"}
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 
 ``` sas
 /* Sans objet pour SAS */
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sans objet pour R-Base
@@ -87,7 +87,7 @@ library(magrittr)
 vignette("dplyr")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(data.table)
@@ -98,7 +98,7 @@ library(lubridate)
 ?'[.data.table'
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
 #library(duckdb)
@@ -110,11 +110,11 @@ library(lubridate)
 ## Documentation (Utilit'R, *cheatsheets*, etc.)
 
 ::: {.panel-tabset group="language"}
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 
 Sans objet pour SAS.
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 
 Pas de documentation spécifique sur `R base` dans Utilit'R.
 
@@ -136,7 +136,7 @@ Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_t
 - forcats : <https://rstudio.github.io/cheatsheets/factors.pdf>
 - lubridate : <https://rstudio.github.io/cheatsheets/lubridate.pdf>
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_datatable.html>.
 
@@ -145,7 +145,7 @@ Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_d
 - <https://www.beoptimized.be/pdf/R_Data_Transformation.pdf>
 - <https://paulvanderlaken.com/wp-content/uploads/2017/08/datatable_cheat_sheet_r.pdf>
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 Documentation Utilit'R pour `arrow` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_arrow.html>.
 

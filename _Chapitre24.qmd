@@ -6,7 +6,7 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 ## Fonction calculant une moyenne 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %macro CalculMoyenne0 (baseDonnees, variables, statistique, condition);
   proc means data = &baseDonnees. &statistique.;
@@ -18,7 +18,7 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 %CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum, condition = where sexef = "Femme");
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
   baseDonnees <- subset(baseDonnees, ...)
@@ -31,18 +31,18 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique =
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

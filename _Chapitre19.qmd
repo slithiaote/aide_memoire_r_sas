@@ -3,7 +3,7 @@
 ## Tableaux de fréquence pour 1 variable
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe CSP;
@@ -11,7 +11,7 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableaux de fréquence (proc freq) (sans les valeurs manquantes)
 table(donnees_rbase$cspf)
@@ -33,7 +33,7 @@ freq <- transform(freq,
 freq
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   count(cspf) %>% 
@@ -51,7 +51,7 @@ donnees_tidyverse %>%
   )
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableaux de fréquence (proc freq) (avec les valeurs manquantes)
 donnees_datatable[, table(cspf) ]
@@ -71,7 +71,7 @@ tab[, Prop := lapply(.SD, function(col) col / sum(col) * 100), .SDcols = is.nume
 tab[, c("Freq_cum", "Prop_cum") := list(cumsum(Nombre), cumsum(Prop))]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -81,7 +81,7 @@ tab[, c("Freq_cum", "Prop_cum") := list(cumsum(Nombre), cumsum(Prop))]
 ## Tableaux de fréquence avec les valeurs manquantes
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe CSP / missing;
@@ -89,20 +89,20 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 table(donnees_rbase$cspf, useNA = "always")
 prop.table(table(donnees_rbase$cspf, useNA = "always")) * 100
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   count(cspf) %>% 
   mutate(prop = n / sum(n) * 100)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, table(cspf, useNA = "always") ]
 donnees_datatable[, prop.table(table(cspf, useNA = "always"))] * 100
@@ -112,7 +112,7 @@ donnees_datatable[, .(Nombre = .N,
 donnees_datatable[, {tot = .N; .SD[, .(frac = .N / tot * 100), keyby = cspf]} ]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -122,7 +122,7 @@ donnees_datatable[, {tot = .N; .SD[, .(frac = .N / tot * 100), keyby = cspf]} ]
 ## Tableaux de fréquence triés par la modalité la plus courante
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas order = freq;
   tables Sexe CSP / missing;
@@ -130,14 +130,14 @@ proc freq data = donnees_sas order = freq;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 freq <- setNames(as.data.frame(table(donnees_rbase$cspf)), c("cspf", "Freq"))
 freq <- transform(freq, Prop = Freq / sum(Freq) * 100)
 freq[order(-freq$Freq), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   count(cspf) %>% 
@@ -154,14 +154,14 @@ donnees_tidyverse %>%
          prop_cum = cumsum(prop))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .(Nombre = .N,
                       Pourcentage = .N / length(donnees_datatable[, cspf]) * 100),
                   keyby = cspf][order(-Nombre)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -171,7 +171,7 @@ donnees_datatable[, .(Nombre = .N,
 ## Tableaux de fréquence avec la pondération
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc freq data = donnees_sas;
   tables Sexe CSP / missing;
@@ -180,13 +180,13 @@ proc freq data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 xtabs(poids_sondage ~ cspf, data = donnees_rbase, addNA = TRUE)
 prop.table(xtabs(poids_sondage ~ cspf, data = donnees_rbase, addNA = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   count(cspf, wt = poids_sondage) %>% 
@@ -195,7 +195,7 @@ donnees_tidyverse %>%
          prop_cum = cumsum(prop))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, xtabs(poids_sondage ~ cspf, data = donnees_datatable, addNA = TRUE) ]
 donnees_datatable[, prop.table(xtabs(poids_sondage ~ cspf, data = donnees_datatable, addNA = TRUE)) ]
@@ -203,7 +203,7 @@ donnees_datatable[, .(prop = sum(poids_sondage, na.rm = TRUE) / sum(donnees_data
 donnees_datatable[, {tot = sum(poids_sondage, na.rm = TRUE); .SD[, .(prop = sum(poids_sondage, na.rm = TRUE) / tot * 100), by = cspf]} ]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

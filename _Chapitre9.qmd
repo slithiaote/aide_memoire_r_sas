@@ -6,7 +6,7 @@ Lignes où les variables Age ou Niveau sont manquantes.
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Manquant;
   set donnees_sas;
@@ -18,7 +18,7 @@ data Manquant;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
 manquant <- donnees_rbase[donnees_rbase$age == NA | donnees_rbase$niveau == NA, ]
@@ -27,7 +27,7 @@ manquant <- donnees_rbase[donnees_rbase$age == NA | donnees_rbase$niveau == NA, 
 manquant <- donnees_rbase[is.na(donnees_rbase$age) | is.na(donnees_rbase$niveau), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
 manquant <- donnees_tidyverse %>%
@@ -38,7 +38,7 @@ manquant <- donnees_tidyverse %>%
   filter(is.na(age) | is.na(niveau))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Mauvaise méthode pour repérer les valeurs manquantes
 manquant <- donnees_datatable[age == NA | niveau == NA]
@@ -48,7 +48,7 @@ manquant <- donnees_datatable[is.na(age)]
 donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -60,7 +60,7 @@ donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
 ### Pour l'ensemble des variables
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Une solution possible */
 %macro Iteration(base = donnees_sas);
@@ -82,7 +82,7 @@ donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
 %Iteration;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Nombre de valeurs manquantes
 colSums(is.na(donnees_rbase))
@@ -93,7 +93,7 @@ colMeans(is.na(donnees_rbase)) * 100
 apply(is.na(donnees_rbase), 2, mean) * 100
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Nombre et proportion de valeurs manquantes
 donnees_tidyverse %>%
@@ -109,13 +109,13 @@ donnees_tidyverse %>% map(~c( sum(is.na(.x)), mean(is.na(.x) * 100)))
 donnees_tidyverse %>% summarise_each(funs(mean(is.na(.)) * 100))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Nombre et proportion de valeurs manquantes
 donnees_datatable[, lapply(.SD, function(x) c(sum(is.na(x)), mean(is.na(x)) * 100))]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -126,13 +126,13 @@ donnees_datatable[, lapply(.SD, function(x) c(sum(is.na(x)), mean(is.na(x)) * 10
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Partie "Missing Values" en bas du tableau consacré à la variable */
 proc univariate data = donnees_sas;var _numeric_;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 apply(is.na(
   donnees_rbase[sapply(donnees_rbase, function(x) is.numeric(x) | lubridate::is.Date(x))]
@@ -149,7 +149,7 @@ sapply(
   function(x) c (sum(is.na(x)), sum(is.na(x)) / length(x) * 100) )
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>%
   summarise(across(where(~ is.numeric(.x) | lubridate::is.Date(.x)),
@@ -159,13 +159,13 @@ donnees_tidyverse %>%
                    list(~sum(is.na(.x)), ~sum(is.na(.x)) / length(.x))))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100),
                   .SDcols = function(x) c(lubridate::is.Date(x) | is.numeric(x))]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -175,7 +175,7 @@ donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100),
 ## Incidence des valeurs manquantes
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* En SAS, les valeurs manquantes sont des nombres négatifs faibles */
 data Valeur_Manquante;
@@ -192,7 +192,7 @@ run;
 proc freq data = Valeur_Manquante;tables Jeune_Incorrect Jeune_Correct;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une somme avec NA donne NA en résultat
 mean(donnees_rbase$note_formateur)
@@ -200,7 +200,7 @@ mean(donnees_rbase$note_formateur)
 mean(donnees_rbase$note_formateur, na.rm = TRUE)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une somme avec NA donne NA en résultat
 donnees_tidyverse %>% pull(note_formateur) %>% mean()
@@ -212,7 +212,7 @@ donnees_tidyverse %>% pull(note_formateur) %>% mean(na.rm = TRUE)
 # donnees_tidyverse %>% mean(note_formateur, na.rm = TRUE)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Une somme avec NA donne NA en résultat
 donnees_datatable[, mean(note_formateur)]
@@ -220,7 +220,7 @@ donnees_datatable[, mean(note_formateur)]
 donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -230,7 +230,7 @@ donnees_datatable[, mean(note_formateur, na.rm = TRUE)]
 ## Remplacer les valeurs manquantes d'une seule variable par 0
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %let var = note_contenu;
 data donnees_sas_sans_missing;
@@ -243,7 +243,7 @@ data donnees_sas_sans_missing;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "note_contenu"
 donnees_rbase_sans_na <- donnees_rbase
@@ -259,7 +259,7 @@ donnees_rbase_sans_na <- donnees_rbase
 donnees_rbase_sans_na$note_contenu[is.na(donnees_rbase_sans_na$note_contenu)] <- 0
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "note_contenu"
 donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
@@ -270,7 +270,7 @@ donnees_tidyverse_sans_na <- donnees_tidyverse %>%
   mutate(note_contenu = tidyr::replace_na(note_contenu, 0))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "note_contenu"
 donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = variable]
@@ -281,7 +281,7 @@ donnees_datatable[, lapply(.SD, \(x) fifelse(is.na(x), 0, x)), .SDcols = variabl
 donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -291,7 +291,7 @@ donnees_datatable[, replace(.SD, is.na(.SD), 0), .SDcols = "note_contenu"]
 ## Remplacer toutes les valeurs numériques manquantes par 0
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On sélectionne toutes les variables numériques */
 proc contents data = donnees_sas out = Var noprint;run;
@@ -314,7 +314,7 @@ run;
 proc datasets lib = Work nolist;delete Var;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Dans le cas des dates, la valeur manquante a été remplacée par 1970-01-01
 donnees_rbase_sans_na <- donnees_rbase
@@ -330,7 +330,7 @@ donnees_rbase_sans_na[, varNumeriques] <- lapply(donnees_rbase_sans_na[, varNume
                                                  function(x) {replace(x, is.na(x), 0)})
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On remplace seulement les valeurs numériques par 0
 donnees_tidyverse_sans_na <- donnees_tidyverse %>% 
@@ -349,7 +349,7 @@ donnees_tidyverse_sans_na <- donnees_tidyverse %>%
   purrr::modify_if(is.numeric, ~tidyr::replace_na(.x, 0))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable_sans_na <- copy(donnees_datatable)
 setnafill(donnees_datatable[, .SD, .SDcols = is.numeric], fill = 0)
@@ -364,7 +364,7 @@ donnees_datatable_sans_na <- copy(donnees_datatable)
 donnees_datatable_sans_na[is.na(donnees_datatable_sans_na)] <- 0
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -377,7 +377,7 @@ On souhaite supprimer toutes les lignes où la variable age est manquante.
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data age_non_manquant;
   set donnees_sas (where = (age ne .));
@@ -386,25 +386,25 @@ data age_non_manquant;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 age_non_manquant <- donnees_rbase[complete.cases(donnees_rbase[, "age"]), ]
 age_non_manquant <- donnees_rbase[! is.na(donnees_rbase[, "age"]), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 age_non_manquant <- donnees_tidyverse %>% drop_na(age)
 age_non_manquant <- donnees_tidyverse %>% filter(!is.na(age))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 age_non_manquant <- na.omit(donnees_datatable, cols = c("age"))
 age_non_manquant <- donnees_datatable[! is.na(age), ]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -417,7 +417,7 @@ On souhaite supprimer toutes les lignes où au moins une variable de la base est
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data non_manquant;
   set donnees_sas;
@@ -425,22 +425,22 @@ data non_manquant;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 non_manquant <- donnees_rbase[complete.cases(donnees_rbase), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 non_manquant <- donnees_tidyverse %>% drop_na()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 non_manquant <- na.omit(donnees_datatable)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

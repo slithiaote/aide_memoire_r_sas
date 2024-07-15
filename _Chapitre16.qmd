@@ -5,7 +5,7 @@ Pour fonctionner, les codes de cette partie nécessitent l'importation des bases
 ## Importation de bases pour les jointures 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes */
 data Diplome;
@@ -44,7 +44,7 @@ data Jointure;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_rbase <- data.frame(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
@@ -59,7 +59,7 @@ entrevue_rbase$date_entrevue <- lubridate::dmy(entrevue_rbase$date_entrevue)
 jointure_rbase <- donnees_rbase[, c("identifiant", "sexe", "date_entree", "date_sortie")]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_tidyverse <- tibble(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
@@ -77,7 +77,7 @@ jointure_tidyverse <- donnees_tidyverse %>%
   select(variable)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
 diplome_datatable <- data.table(identifiant = c("173", "168", "112", "087", "689", "765", "113", "999", "554"),
@@ -92,7 +92,7 @@ entrevue_datatable[, date_entrevue := lubridate::dmy(date_entrevue)]
 jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree", "date_sortie")]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -103,7 +103,7 @@ jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree"
 ## Inner join : les seuls identifiants communs aux deux bases 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Sont appariés les identifiants communs aux deux bases */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
@@ -127,14 +127,14 @@ proc sql;select count(*) from Inner_Join1;quit;
 proc sql;select count(*) from Inner_Join2;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants communs aux deux bases
 innerJoin <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant")
 dim(innerJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants communs aux deux bases
 innerJoin <- jointure_tidyverse %>% 
@@ -149,7 +149,7 @@ innerJoin <- inner_join(jointure_tidyverse, diplome_tidyverse, by = "identifiant
 dim(innerJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants communs aux deux bases
 innerJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant")
@@ -158,7 +158,7 @@ innerJoin <- jointure_datatable[diplome_datatable, nomatch = 0, on = .(identifia
 dim(innerJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -168,7 +168,7 @@ dim(innerJoin)
 ## Left join : les identifiants de la base de gauche
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
@@ -192,14 +192,14 @@ proc sql;select count(*) from Left_Join1;quit;
 proc sql;select count(*) from Left_Join2;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite
 leftJoin <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant", all.x = TRUE)
 dim(leftJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite
 leftJoin <- jointure_tidyverse %>% 
@@ -214,7 +214,7 @@ leftJoin <- left_join(jointure_tidyverse, diplome_tidyverse, by = "identifiant")
 dim(leftJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite
 leftJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all.x = TRUE)
@@ -223,7 +223,7 @@ leftJoin <- diplome_datatable[jointure_datatable, on = .(identifiant == identifi
 dim(leftJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -233,7 +233,7 @@ dim(leftJoin)
 ## Right join : les identifiants de la base de droite
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
@@ -257,14 +257,14 @@ proc sql;select count(*) from Right_Join1;quit;
 proc sql;select count(*) from Right_Join2;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
 rightJoin <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant", all.y = TRUE)
 dim(rightJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
 rightJoin <- jointure_tidyverse %>% 
@@ -279,7 +279,7 @@ rightJoin <- right_join(jointure_tidyverse, diplome_tidyverse, by = "identifiant
 dim(rightJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
 rightJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all.y = TRUE)
@@ -288,7 +288,7 @@ rightJoin <- jointure_datatable[diplome_datatable, on = .(identifiant == identif
 dim(rightJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -298,7 +298,7 @@ dim(rightJoin)
 ## Full join : les identifiants des deux bases
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Sont appariés les identifiants des deux bases */
 /* Le tri préalable des bases de données à joindre par la variable de jointure est nécessaire avec la stratégie merge */
@@ -323,14 +323,14 @@ proc sql;select count(*) from Full_Join1;quit;
 proc sql;select count(*) from Full_Join2;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants des deux bases
 fullJoin <- merge(jointure_rbase, diplome_rbase, by.x = "identifiant", by.y = "identifiant", all = TRUE)
 dim(fullJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants des deux bases
 fullJoin <- jointure_tidyverse %>% 
@@ -345,14 +345,14 @@ fullJoin <- full_join(jointure_tidyverse, diplome_tidyverse, by = "identifiant")
 dim(fullJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sont appariés les identifiants des deux bases
 fullJoin <- merge(jointure_datatable, diplome_datatable, by.x = "identifiant", by.y = "identifiant", all = TRUE)
 dim(fullJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -362,7 +362,7 @@ dim(fullJoin)
 ## Jointure de 3 bases ou plus en une seule opération (exemple avec inner join)
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = Jointure;by identifiant;run;
 proc sort data = Diplome;by identifiant;run;
@@ -386,7 +386,7 @@ proc sql;select count(*) from Inner_Join3;quit;
 proc sql;select count(*) from Inner_Join4;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Utilisation de la fonction Reduce
 # Elle applique successivement (et non simultanément, comme do.call) une fonction à tous les éléments d'une liste
@@ -395,7 +395,7 @@ innerJoin2 <- Reduce(function(x, y) merge(x, y, all = FALSE, by.x = "identifiant
 dim(innerJoin2)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Utilisation de la fonction reduce de purrr
 # Elle applique successivement (et non simultanément, comme do.call) à tous les éléments d'une liste une fonction
@@ -404,7 +404,7 @@ innerJoin2 <- list(jointure_tidyverse, diplome_tidyverse, entrevue_tidyverse) %>
 dim(innerJoin2)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Utilisation de la fonction Reduce
 # Elle applique successivement (et non simultanément, comme do.call) une fonction à tous les éléments d'une liste
@@ -413,7 +413,7 @@ innerJoin2 <- Reduce(function(x, y) merge(x, y, all = FALSE, by.x = "identifiant
 dim(innerJoin2)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -426,7 +426,7 @@ On cherche à obtenir les entrevues qui se sont déroulées durant le contrat. O
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On associe l'entrevue au contrat au cours duquel elle a eu lieu */
 proc sql;
@@ -440,7 +440,7 @@ proc print data = Inner_Join_Inegalite (obs = 10);run;
 proc sql;select count(*) from Inner_Join_Inegalite;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ne semble pas natif en R-Base.
 # Une proposition indicative où l'on applique la sélection après la jointure, ce qui ne doit pas être très efficace ...
@@ -450,7 +450,7 @@ innerJoinInegalite <- with(innerJoinInegalite,
 dim(innerJoinInegalite)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 innerJoinInegalite <- jointure_tidyverse %>% 
   inner_join(entrevue_tidyverse, join_by(identifiant == identifiant,
@@ -459,7 +459,7 @@ innerJoinInegalite <- jointure_tidyverse %>%
 dim(innerJoinInegalite)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Attention, l'ordre des conditions doit correspondre à l'ordre des bases dans la jointure !
 # Il semble que l'on soit forcé de spécifier tous les noms des colonnes, et ce qui est un peu problématique ...
@@ -472,7 +472,7 @@ innerJoinInegalite <- jointure_datatable[entrevue_datatable,
 dim(innerJoinInegalite)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -485,7 +485,7 @@ dim(innerJoinInegalite)
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   create table CrossJoin as
@@ -498,7 +498,7 @@ quit;
 proc sql;select count(*) from CrossJoin;quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Toutes les combinaisons possibles de CSP, sexe et diplome
 crossJoin <- unique(expand.grid(donnees_rbase$cspf, donnees_rbase$sexef, diplome_rbase$diplome))
@@ -510,7 +510,7 @@ crossJoin2 <- unique(merge(donnees_rbase[, c("cspf", "sexef")], diplome_rbase[, 
 dim(crossJoin2)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Toutes les combinaisons possibles de CSP, sexe et diplome
 crossJoin <- donnees_tidyverse %>%
@@ -531,14 +531,14 @@ crossJoin <- donnees_tidyverse %>%
 dim(crossJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 crossJoin <- data.table::CJ(donnees_datatable[, cspf], donnees_datatable[, sexef], diplome_datatable[, diplome], unique = TRUE)
 colnames(crossJoin) <- c("cspf", "sexef", "diplome")
 dim(crossJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -548,7 +548,7 @@ dim(crossJoin)
 ## Semi join
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Identifiants de la base de gauche qui ont un correspondant dans la base de droite */
 proc sql;
@@ -563,14 +563,14 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui ont un correspondant dans la base de droite
 semiJoin <- donnees_rbase[donnees_rbase$identifiant %in% diplome_rbase$identifiant, ]
 dim(semiJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui ont un correspondant dans la base de droite
 semiJoin <- donnees_tidyverse %>% 
@@ -581,14 +581,14 @@ semiJoin <- semi_join(donnees_tidyverse, diplome_tidyverse, join_by(identifiant 
 dim(semiJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui ont un correspondant dans la base de droite
 semiJoin <- donnees_datatable[identifiant %in% diplome_datatable[, identifiant], ]
 dim(semiJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -598,7 +598,7 @@ dim(semiJoin)
 ## Anti join
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite */
 proc sql;
@@ -613,14 +613,14 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite
 antiJoin <- donnees_rbase[! donnees_rbase$identifiant %in% diplome_rbase$identifiant, ]
 dim(antiJoin)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite
 antiJoin <- donnees_tidyverse %>% 
@@ -632,14 +632,14 @@ antiJoin <- anti_join(donnees_tidyverse, diplome_tidyverse, join_by(identifiant 
 dim(antiJoin)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite
 antiJoin <- donnees_datatable[! identifiant %in% diplome_datatable[, identifiant], ]
 dim(antiJoin)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -651,7 +651,7 @@ dim(antiJoin)
 ### Concaténation des identifiants
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Concaténation des identifiants */
@@ -660,13 +660,13 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténation des identifiants avec les doublons
 sort(c(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
@@ -675,7 +675,7 @@ dplyr::union_all(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) 
   sort()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
@@ -684,7 +684,7 @@ variable <- "identifiant"
 sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -695,7 +695,7 @@ sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Identifiants uniques des 2 bases */
@@ -705,7 +705,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
@@ -715,7 +715,7 @@ sort(base::union(jointure_rbase$identifiant, diplome_rbase$identifiant))
 sort(base::unique(c(jointure_rbase$identifiant, diplome_rbase$identifiant)))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
@@ -726,7 +726,7 @@ dplyr::union(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>%
   sort()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
@@ -735,7 +735,7 @@ sort(unique(c(jointure_datatable[[variable]], diplome_datatable[[variable]])))
 sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -745,7 +745,7 @@ sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 ### Identifiants communs des 2 bases
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Identifiants communs des 2 bases */
@@ -754,7 +754,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
@@ -763,7 +763,7 @@ quit;
 sort(base::intersect(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
@@ -772,7 +772,7 @@ dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) 
   sort()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
@@ -780,7 +780,7 @@ dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) 
 fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -790,7 +790,7 @@ fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[or
 ### Identifiants dans Jointure mais pas Diplome
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Identifiants dans Jointure mais pas Diplome */
@@ -801,7 +801,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
@@ -810,7 +810,7 @@ quit;
 sort(base::setdiff(jointure_rbase$identifiant, diplome_rbase$identifiant))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
@@ -819,7 +819,7 @@ dplyr::setdiff(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>
   sort()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
@@ -827,7 +827,7 @@ dplyr::setdiff(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>
 fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -837,7 +837,7 @@ fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[orde
 ### Identifiants dans Diplome mais pas Jointure
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   /* Identifiants dans Diplome mais pas Jointure */
@@ -849,7 +849,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # base:: permet de s'assurer que les fonctions proviennent de R base
 # Des fonctions du même nom existent en Tidyverse, et tendent à prédominer si le package est lancé
@@ -858,7 +858,7 @@ quit;
 sort(base::setdiff(diplome_rbase$identifiant, jointure_rbase$identifiant))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # dplyr:: permet de s'assurer que ce sont les fonctions du Tidyverse (et non leurs homonymes de R-Base qui sont utilisées)
 
@@ -867,7 +867,7 @@ dplyr::setdiff(diplome_tidyverse$identifiant, jointure_tidyverse$identifiant) %>
   sort()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
@@ -875,7 +875,7 @@ dplyr::setdiff(diplome_tidyverse$identifiant, jointure_tidyverse$identifiant) %>
 fsetdiff(diplome_datatable[, ..variable], jointure_datatable[, ..variable])[order(identifiant)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

@@ -6,7 +6,7 @@
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 %let colTri = identifiant date_entree;
 data donnees_sas;
@@ -23,7 +23,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 colTri <- c("identifiant", "date_entree")
 donnees_rbase <- donnees_rbase[, union(colTri, colnames(donnees_rbase))]
@@ -33,7 +33,7 @@ donnees_rbase <- donnees_rbase[, c(colTri, setdiff(colnames(donnees_rbase), colT
 donnees_rbase <- donnees_rbase[, c(colTri, colnames(donnees_rbase)[! colnames(donnees_rbase) %in% colTri])]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(identifiant, date_entree)
@@ -46,7 +46,7 @@ donnees_tidyverse_tri <- donnees_tidyverse %>%
   select(all_of(colTri), everything())
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 colTri <- c("identifiant", "date_entree")
 tri <- union(colTri, colnames(donnees_datatable))
@@ -57,7 +57,7 @@ donnees_datatable <- donnees_datatable[, ..tri]
 setcolorder(donnees_datatable, colTri)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% 
   mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
@@ -74,7 +74,7 @@ requete_duckdb %>%
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   retain poids_sondage;
@@ -82,23 +82,23 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[, union("poids_sondage", colnames(donnees_rbase))]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 setcolorder(donnees_datatable, "poids_sondage")
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 ```
 
@@ -108,7 +108,7 @@ setcolorder(donnees_datatable, "poids_sondage")
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc contents data = donnees_sas out = var;run;
 
@@ -125,24 +125,24 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 varAvant <- c( colnames(donnees_rbase)[1 : which("date_naissance" == colnames(donnees_rbase))], "poids_sondage" )
 donnees_rbase <- donnees_rbase[, c(varAvant, setdiff(colnames(donnees_rbase), varAvant))]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage, .after = date_naissance)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 setcolorder(donnees_datatable, "poids_sondage", after = "date_naissance")
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 ```
 
@@ -152,7 +152,7 @@ setcolorder(donnees_datatable, "poids_sondage", after = "date_naissance")
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc contents data = donnees_sas out = var;run;
 proc sql noprint;
@@ -165,23 +165,23 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase <- donnees_rbase[, c(setdiff(colnames(donnees_rbase), "poids_sondage"), "poids_sondage")]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   relocate(poids_sondage, .after = last_col())
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_sondage"), "poids_sondage"))
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 ```
 
@@ -193,7 +193,7 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* 1ère possibilité */
 proc sort data = donnees_sas;by Identifiant Date_entree;run;
@@ -205,21 +205,21 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant
 # L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, date_entree)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant
 # L'option na.last = FALSE (resp. TRUE) indique que les valeurs manquantes doivent figurer à la fin (resp. au début) du tri, que le tri soit croissant ou décroissant
@@ -232,7 +232,7 @@ setorder(donnees_datatable, identifiant, date_entree, na.last = FALSE)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -243,7 +243,7 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Idem par ordre croissant d'identifiant et ordre décroissant de date d'entrée */
 proc sort data = donnees_sas;by Identifiant descending Date_entree;run;
@@ -253,7 +253,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant de identifiant et décroissant de date_entree
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
@@ -262,14 +262,14 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$duree, na.last = FALSE), ]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant de identifiant et décroissant de date_entree
 donnees_tidyverse <- donnees_tidyverse %>% 
   arrange(identifiant, desc(date_entree))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant de identifiant et décroissant de date_entree (- avant le nom de la variable)
 donnees_datatable <- donnees_datatable[order(identifiant, -date_entree, na.last = FALSE)]
@@ -278,7 +278,7 @@ setorder(donnees_datatable, identifiant, -date_entree, na.last = FALSE)
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -288,7 +288,7 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 ## Incidence des valeurs manquantes dans les tris 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Dans SAS, les valeurs manquantes sont considérées comme des valeurs négatives */
 /* Elles sont donc situées en premier dans un tri par ordre croissant ... */
@@ -298,7 +298,7 @@ proc sort data = donnees_sas;by identifiant descending date_entree;run;
 proc print;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree), ]
@@ -313,7 +313,7 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
                                      method = "radix"), ]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Attention, avec arrange, les variables manquantes (NA) sont toujours classées en dernier, même avec desc()
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -332,7 +332,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   arrange(identifiant, desc(date_entree))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
 donnees_datatable <- donnees_datatable[order(identifiant, date_entree)]
@@ -343,7 +343,7 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
 requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
@@ -358,17 +358,17 @@ requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! 
 ## Trier par ordre croissant de toutes les variables de la base 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by _all_;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 tri_toutes_variables <- donnees_rbase[order(colnames(donnees_rbase), na.last = FALSE)]
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 tri_toutes_variables <- donnees_tidyverse %>% 
   arrange(pick(everything()))
@@ -376,12 +376,12 @@ tri_toutes_variables <- donnees_tidyverse %>%
   arrange(across(everything()))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

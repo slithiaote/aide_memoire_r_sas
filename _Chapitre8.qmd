@@ -7,7 +7,7 @@ Pour en savoir plus sur le fonctionnement des chaînes de caractères en `R` : <
 ### Majuscule
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -15,23 +15,23 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(csp_maj = toupper(cspf))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, csp_maj := toupper(cspf)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -41,7 +41,7 @@ donnees_datatable[, csp_maj := toupper(cspf)]
 ### Minuscule
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -49,24 +49,24 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(csp_maj = tolower(cspf))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # En minuscule
 donnees_datatable[, csp_min := tolower(cspf)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -76,7 +76,7 @@ donnees_datatable[, csp_min := tolower(cspf)]
 ### Première lettre en majuscule
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -84,26 +84,26 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_tidyverse <- donnees_tidyverse %>%  
   mutate(niveau = str_to_title(niveau))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1ère lettre en majuscule, autres lettres en minuscule
 donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(substr(niveau, 2, length(niveau))))]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -113,7 +113,7 @@ donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(subs
 ## Nombre de caractères dans une chaîne de caractères
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -121,12 +121,12 @@ data donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase$taille_id <- nchar(donnees_rbase$identifiant)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(taille_id = nchar(identifiant))
@@ -135,12 +135,12 @@ donnees_tidyverse <- donnees_tidyverse %>%
            lengths)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, taille_id := nchar(identifiant)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -150,7 +150,7 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 ## Remplacer une chaîne de caractères par une autre
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data A_Corriger;
   infile cards dsd dlm='|';
@@ -171,7 +171,7 @@ data A_Corriger;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
@@ -179,7 +179,7 @@ aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
 gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
@@ -187,7 +187,7 @@ aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
 aCorriger %>% tolower() %>% str_replace_all("[Q-q]ualifie", "Qualifié")
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
@@ -195,7 +195,7 @@ aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
 gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -212,7 +212,7 @@ Le comportement de la fonction substr est différent entre `SAS` et `R` :
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   set Exemple_texte;
@@ -225,28 +225,28 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de Concatener
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
 extrait <- substr("extrait", 2, 5)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de Concatener
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
 extrait <- str_sub("extrait", 2, 5)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de texte
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
 extrait <- substr("extrait", 2, 5)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -256,7 +256,7 @@ extrait <- substr("extrait", 2, 5)
 ### Enlever les blancs superflus d'une chaîne de caractères
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   Texte = "              Ce   Texte   mériterait   d être   corrigé                  ";
@@ -277,7 +277,7 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé   
@@ -288,7 +288,7 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- gsub("\\s+", " ", trimws(texte))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé  
@@ -297,7 +297,7 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- str_squish(texte)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé  
@@ -308,7 +308,7 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- gsub("\\s+", " ", trimws(texte))
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -318,7 +318,7 @@ texte <- gsub("\\s+", " ", trimws(texte))
 ### Concaténer des chaînes de caractères
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   Texte1 = "Je m'appelle";
@@ -342,7 +342,7 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -356,7 +356,7 @@ paste0(texte1, texte2, texte3)
 paste(texte4, texte3, sep = "-")
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -369,7 +369,7 @@ concatene <- str_flatten(c(texte1, texte2, texte3), collapse = " ")
 str_flatten(c(texte4, texte3), collapse = "-")
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -380,7 +380,7 @@ paste(texte1, texte2, sep = " ")
 paste0(texte1, texte2)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -393,7 +393,7 @@ Supprimer les accents, cédilles, caractères spéciaux.
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   set Exemple_texte;
@@ -405,28 +405,28 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -439,7 +439,7 @@ Découper une phrase selon les espaces pour isoler les mots.
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Mots;
   delim = " ";
@@ -463,25 +463,25 @@ run;
 proc print data = Mots;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 texte  <- "Mon texte va être coupé !"
 unlist(strsplit(texte, split = " "))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 texte  <- "Mon texte va être coupé !"
 str_split(texte, pattern = " ") %>% unlist()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 texte  <- "Mon texte va être coupé !"
 unlist(strsplit(texte, split = " "))
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -491,7 +491,7 @@ unlist(strsplit(texte, split = " "))
 ## Inverser une chaîne de caractères
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Mots;
   Texte = "Mon texte va être inversé !";
@@ -500,7 +500,7 @@ run;
 proc print data = Mots;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 texte <- "Mon texte va être inversé !"
 inverserTexte <- function(x) {
@@ -511,14 +511,14 @@ inverserTexte <- function(x) {
 inverserTexte(texte)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 library(stringi)
 texte <- "Mon texte va être inversé !"
 stringi::stri_reverse(texte)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 texte <- "Mon texte va être inversé !"
 inverserTexte <- function(x) {
@@ -529,7 +529,7 @@ inverserTexte <- function(x) {
 inverserTexte(texte)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

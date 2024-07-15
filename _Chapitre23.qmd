@@ -3,7 +3,7 @@
 ## Mesurer la durée d'exécution d'un programme
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %let temps_debut = %sysfunc(datetime());
 
@@ -14,7 +14,7 @@ proc sort data = donnees_sas;by identifiant date_entree;run;
 %put Durée exécution : &duree minutes;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
 
@@ -25,7 +25,7 @@ fin <- Sys.time()
 sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(donnees_tidyverse <- donnees_tidyverse %>% 
               arrange(identifiant, date_entree))
@@ -38,7 +38,7 @@ fin <- Sys.time()
 sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
 
@@ -53,7 +53,7 @@ setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
 timetaken(started.at)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -63,12 +63,12 @@ timetaken(started.at)
 ## Exécuter le code d'un autre fichier
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* include("chemin") */
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # encoding permet de gérer l'encodage des caractères accentués
 # echo affiche le script dans la console
@@ -77,7 +77,7 @@ timetaken(started.at)
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # encoding permet de gérer l'encodage des caractères accentués
 # echo affiche le script dans la console
@@ -86,7 +86,7 @@ timetaken(started.at)
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # encoding permet de gérer l'encodage des caractères accentués
 # echo affiche le script dans la console
@@ -95,7 +95,7 @@ timetaken(started.at)
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

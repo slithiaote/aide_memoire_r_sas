@@ -8,7 +8,7 @@ On va mettre côte à côte (juxtaposer) le numéro de la ligne et la base de do
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Numéro de la ligne */
 proc sql noprint;select count(*) into :tot from donnees_sas;run;
@@ -18,7 +18,7 @@ data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
 data Concatener;merge Ajout donnees_sas;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de la ligne
 ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase)))
@@ -26,7 +26,7 @@ ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase)))
 concatener <- cbind(ajout, donnees_rbase)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de la ligne
 ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
@@ -34,7 +34,7 @@ ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse)))
 concatener <- donnees_tidyverse %>% bind_cols(ajout)
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de la ligne
 ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
@@ -42,7 +42,7 @@ ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable)))
 concatener <- data.frame::cbind(ajout, donnees_datatable)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -53,7 +53,7 @@ concatener <- data.frame::cbind(ajout, donnees_datatable)
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Si l'une des bases comprend plus de ligne que l'autre, ajout d'une ligne de valeurs manquantes */
 proc sql noprint;select count(*) + 1 into :tot from donnees_sas;run;
@@ -61,7 +61,7 @@ data Ajout;do Num_ligne = 1 to &tot.;output;end;run;
 data Concatener;merge Ajout donnees_sas;run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Erreur si l'une des bases comprend plus de lignes que l'autre
 ajout <- data.frame(num_ligne = seq_len(nrow(donnees_rbase) + 1))
@@ -84,7 +84,7 @@ cbind_alt <- function(liste) {
 concatener <- cbind_alt(list(ajout, donnees_rbase))
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Ne fonctionne si l'une des bases comprend plus de lignes que l'autre !
 ajout <- tibble(num_ligne = seq_len(nrow(donnees_tidyverse) + 1))
@@ -107,7 +107,7 @@ cbind_alt <- function(liste) {
 concatener <- cbind_alt(list(ajout, donnees_tidyverse))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # data.table::cbind fonctionne aussi avec des bases comportant un nombre différent de lignes
 # Mais attention, le résultat n'est pas le même que sur SAS, il y a recycling
@@ -115,7 +115,7 @@ ajout <- data.table(num_ligne = seq_len(nrow(donnees_datatable) + 1))
 concatener <- data.table::cbind(ajout, donnees_datatable)
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -128,7 +128,7 @@ On va empiler la somme des notes en dessous de la base des notes.
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On sélectionne un nombre réduit de variables pour simplifier l'exemple */
 %let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
@@ -152,7 +152,7 @@ data Empiler;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -180,7 +180,7 @@ empiler <- rbind_alt(notes, moyennes)
 empiler[nrow(empiler), "identifiant"] <- "Moyenne"
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -202,7 +202,7 @@ empiler <- empiler %>%
                               identifiant))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On va empiler la somme des notes en dessous de la base des notes
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -218,7 +218,7 @@ empiler <- rbindlist(list(notes, moyennes), fill = TRUE)
 set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -229,30 +229,30 @@ set(empiler, i = nrow(empiler), j = "identifiant", value = "Moyenne")
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Ajout;run;
 data Ajout_Missing;set Jointure Ajout;run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ajout_na <- donnees_rbase
 ajout_na[nrow(ajout_na) + 1, ] <- NA
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ajout_na <- donnees_tidyverse %>%
   bind_rows(tibble(NA))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 ajout_na <- rbindlist(list(donnees_datatable, data.table(NA)), fill = TRUE)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

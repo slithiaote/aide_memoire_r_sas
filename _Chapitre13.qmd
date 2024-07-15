@@ -6,7 +6,7 @@
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -28,14 +28,14 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de l'observation : 2 manières différentes
 donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
 donnees_rbase$num_observation <- row.names(donnees_rbase)
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de l'observation
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -44,14 +44,14 @@ donnees_tidyverse <- donnees_tidyverse %>%
   mutate(num_observation = row_number())
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de l'observation : 2 manières différentes
 donnees_datatable[, num_observation := .I]
 donnees_datatable[, num_observation := seq_len(.N)]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -62,7 +62,7 @@ donnees_datatable[, num_observation := seq_len(.N)]
 
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Numéro du contrat de chaque individu, contrat trié par date d'entrée */
 proc sort data = donnees_sas;by identifiant date_entree;run;
@@ -76,7 +76,7 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro du contrat de chaque individu, contrat trié par date d'entrée
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
@@ -96,7 +96,7 @@ donnees_rbase$numero_contrat <- ave(order(donnees_rbase$date_entree), donnees_rb
 #https://stackoverflow.com/questions/13732062/what-are-examples-of-when-seq-along-works-but-seq-produces-unintended-results
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro du contrat de chaque individu, contrat trié par date d'entrée
 # arrange() va permettre de trier les observations par identifiant et date d'entrée 
@@ -109,7 +109,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # À FAIRE : Dans group_by, à quoi sert le drop ?
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro du contrat de chaque individu, contrat trié par date d'entrée
 setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
@@ -117,7 +117,7 @@ donnees_datatable[, numero_contrat := rowid(identifiant)]
 donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -129,7 +129,7 @@ donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 ### Première ligne par identifiant
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by identifiant date_entree;run;
 /* L'instruction options permet de ne pas afficher d'erreur si la variable numero_contrat n'existe pas */
@@ -150,12 +150,12 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[! duplicated(donnees_rbase$identifiant), , drop = FALSE]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   group_by(identifiant) %>% 
@@ -187,7 +187,7 @@ donnees_tidyverse %>%
   ungroup()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .SD[1], by = identifiant]
 
@@ -195,7 +195,7 @@ donnees_datatable[, .SD[1], by = identifiant]
 donnees_datatable[, .SD[1], keyby = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -205,7 +205,7 @@ donnees_datatable[, .SD[1], keyby = identifiant]
 ### Dernière ligne par identifiant
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by identifiant date_entree;run;
 /* L'instruction options permet de ne pas afficher d'erreur si la variable numero_contrat n'existe pas */
@@ -226,12 +226,12 @@ data donnees_sas;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[! duplicated(donnees_rbase$identifiant, fromLast = TRUE), , drop = FALSE]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   group_by(identifiant) %>% 
@@ -256,12 +256,12 @@ donnees_tidyverse %>%
   ungroup()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .SD[.N], by = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -271,7 +271,7 @@ donnees_datatable[, .SD[.N], by = identifiant]
 ## Le premier contrat, le dernier contrat, ni le premier ni le dernier contrat de chaque individu
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by identifiant date_entree;run;
 data donnees_sas;
@@ -283,7 +283,7 @@ data donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase$premier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, fromLast = FALSE), 1, 0)
@@ -291,7 +291,7 @@ donnees_rbase$dernier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, 
 donnees_rbase$ni_prem_ni_der  <- ifelse(! c(! duplicated(donnees_rbase$identifiant, fromLast = FALSE) | ! duplicated(donnees_rbase$identifiant, fromLast = TRUE)), 1, 0)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Premier contrat
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -318,7 +318,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   ungroup()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
 donnees_datatable[, premier_contrat := fifelse(! duplicated(identifiant, fromLast = FALSE), 1, 0)]
@@ -326,7 +326,7 @@ donnees_datatable[, dernier_contrat := fifelse(! duplicated(identifiant, fromLas
 donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fromLast = FALSE) | ! duplicated(identifiant, fromLast = TRUE)), 1, 0)]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -338,7 +338,7 @@ donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fro
 ### Les 2 premières lignes de chaque identifiant
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Les 2 premières lignes de chaque identifiant */
 proc sort data = donnees_sas;by identifiant numero_contrat;run;
@@ -348,7 +348,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 2 premières lignes par identifiant (le premier si une seule ligne)
 # Peut-on le faire en moins d'étapes ??? Avec head ?
@@ -369,7 +369,7 @@ donnees_rbase$un <- NULL
 # On peut aussi découper par identifiant avec split et head(,2) ? À FAIRE
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les deux premières lignes
 deux_premieres_lignes <- donnees_tidyverse %>% 
@@ -380,12 +380,12 @@ deux_premieres_lignes <- donnees_tidyverse %>%
   ungroup()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -395,7 +395,7 @@ deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
 ### Les 2 dernières lignes de chaque identifiant
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Les 2 dernières lignes de chaque identifiant */
 proc sort data = donnees_sas;by identifiant numero_contrat;run;
@@ -405,7 +405,7 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 2 dernières lignes par identifiant
 deux_dernieres_lignes <- donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), 
@@ -421,7 +421,7 @@ deux_dernieres_lignes <- donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)
 #https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les deux dernières lignes
 deux_dernieres_lignes <- donnees_tidyverse %>% 
@@ -432,7 +432,7 @@ deux_dernieres_lignes <- donnees_tidyverse %>%
   ungroup()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 
@@ -440,7 +440,7 @@ deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 # Par ailleurs, utiliser rowid ???
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -450,7 +450,7 @@ deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 ### 2e ligne de l'individu (et rien si l'individu a 1 seule ligne)
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by identifiant date_entree;run;
 data donnees_sas;
@@ -472,7 +472,7 @@ data Deuxieme_Contrat;
 run;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Avec le numéro de contrat
 deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
@@ -482,7 +482,7 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) head(x, 2))), ]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   group_by(identifiant) %>% 
@@ -492,12 +492,12 @@ donnees_tidyverse %>%
   ungroup()
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -507,7 +507,7 @@ deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
 ### L'avant-dernière ligne de l'individu (et rien si l'individu a 1 seul contrat)
 ::: {.panel-tabset group="language"}
 
-### `SAS` {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Nécessite d'avoir le numéro du contrat */
 proc sql;
@@ -516,12 +516,12 @@ proc sql;
 quit;
 ```
 
-### `R base` {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) x[length(x)-1])), ]
 ```
 
-### `tidyverse` {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   group_by(identifiant) %>% 
@@ -530,12 +530,12 @@ donnees_tidyverse %>%
   filter(row_number() == nth(row_number(), -2))
 ```
 
-### `data.table` {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .SD[.N-1], by = identifiant]
 ```
 
-### `arrow/duckdb` {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -548,7 +548,7 @@ donnees_datatable[, .SD[.N-1], by = identifiant]
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Personnes qui ont eu au moins une entrée en 2022 */
 proc sql;
@@ -559,7 +559,7 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 auMoins2022 <- subset(donnees_rbase, identifiant %in% unique(identifiant[lubridate::year(date_entree) %in% c(2022)]))
@@ -574,7 +574,7 @@ auMoins2022 <- subset(
 auMoins2022$cond <- NULL
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 auMoins2022 <- donnees_tidyverse %>% 
@@ -587,7 +587,7 @@ auMoins2022 <- donnees_tidyverse %>%
   filter(any(lubridate::year(date_entree) == 2022), .by = identifiant)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 auMoins2022 <- donnees_datatable[, if(any(lubridate::year(date_entree) %in% 2022)) .SD, by = identifiant]
@@ -596,7 +596,7 @@ auMoins2022 <- donnees_datatable[, if(any(lubridate::year(date_entree) %in% 2022
 auMoins2022 <- donnees_datatable[, if (sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) > 0) .SD, by = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -607,7 +607,7 @@ auMoins2022 <- donnees_datatable[, if (sum(lubridate::year(date_entree) == 2022,
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   create table Qualif_Non_Qualif as
@@ -618,7 +618,7 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -630,7 +630,7 @@ qualif_non_qualif <- subset(
 # https://stackoverflow.com/questions/49669862/how-to-group-by-in-base-r
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 qualif_non_qualif <- donnees_tidyverse %>% 
@@ -643,7 +643,7 @@ qualif_non_qualif <- donnees_tidyverse %>%
   filter(any(niveau == "Qualifié") & any(niveau == "Non qualifié"), .by = identifiant)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 
@@ -662,7 +662,7 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 # https://github.com/Rdatatable/data.table/issues/788
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -673,7 +673,7 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022 */
 proc sql;
@@ -685,7 +685,7 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -698,7 +698,7 @@ deux_contrats <- subset(
   nb == 2 & an >= 1)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 deux_contrats <- donnees_tidyverse %>% 
@@ -712,13 +712,13 @@ deux_contrats <- donnees_tidyverse %>%
   filter(any(lubridate::year(date_entree) == 2022 & n() == 2), .by = identifiant)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) >= 1) .SD, by = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -728,7 +728,7 @@ donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.r
 ## Ajouter le nombre d'observations par CSP
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   create table donnees_sas as
@@ -739,14 +739,14 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
 donnees_rbase <- transform(donnees_rbase, 
                            n = ave(cspf, cspf, FUN = length))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>% add_count(cspf)
 
@@ -757,13 +757,13 @@ donnees_tidyverse <- donnees_tidyverse %>%
   ungroup()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, n := .N, by = cspf]
 donnees_datatable[, n := length(identifiant), by = cspf]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -773,7 +773,7 @@ donnees_datatable[, n := length(identifiant), by = cspf]
 ## Ajouter deux colonnes désignant la note moyenne et la somme de Note_Contenu, par individu
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* 1ère solution */
 proc sort data = donnees_sas;by identifiant;run;
@@ -811,7 +811,7 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
 donnees_rbase <- transform(donnees_rbase, 
@@ -819,7 +819,7 @@ donnees_rbase <- transform(donnees_rbase,
                            note_contenu_somme   = ave(note_contenu, identifiant, FUN = sum,  na.rm = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   group_by(identifiant) %>%
@@ -828,7 +828,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
   ungroup()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, `:=` (note_contenu_moyenne = mean(note_contenu, na.rm = TRUE),
                           note_contenu_somme = sum(note_contenu, na.rm = TRUE)), by = identifiant]
@@ -837,7 +837,7 @@ notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accomp
 donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDcols = notes, keyby = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -847,7 +847,7 @@ donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDc
 ## Ajouter une variable d'entrée initiale par individu
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc sort data = donnees_sas;by Identifiant date_entree;run;
 data donnees_sas;
@@ -860,7 +860,7 @@ data donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -872,7 +872,7 @@ donnees_rbase <- transform(donnees_rbase,
                            premiere_entree = ave(date_entree, identifiant, FUN = function(x) min(x) ))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse <- donnees_tidyverse %>%
   # Pour trier les données de la même façon que SAS
@@ -890,13 +890,13 @@ donnees_tidyverse <- donnees_tidyverse %>%
   ungroup()
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 setorderv(donnees_datatable, c("identifiant", "date_entree"), na.last = FALSE)
 donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -911,7 +911,7 @@ On cherche, pour chaque individu, la ligne où se trouve la valeur maximale de n
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R */
 
@@ -932,7 +932,7 @@ data ligne_max_note_contenu;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
 # PAS AVEC LA STRATEGIE DU GROUP ET FIRST. !!! DISTINGUER LES DEUX CAS !!!
@@ -952,7 +952,7 @@ ligne_max_note_contenu <- donnees_rbase[! duplicated(donnees_rbase$identifiant),
 ligne_max_note_contenu <- do.call(rbind, lapply(split(donnees_rbase, as.factor(donnees_rbase$identifiant)), function(x) {return(x[which.max(x$note_contenu), ])}))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
 
@@ -967,7 +967,7 @@ ligne_max_note_contenu <- donnees_tidyverse %>%
      slice(which.max(note_contenu))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
 
@@ -978,7 +978,7 @@ ligne_max_note_contenu <- donnees_datatable[donnees_datatable[, .I[note_contenu 
 ligne_max_note_contenu <- donnees_datatable[, .SD[which.max(note_contenu)], by = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -991,7 +991,7 @@ Numérote les états successifs identiques d'un même identifiant. À chaque cha
 
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* On suppose que l'on dispose d'une base sur le type de financement de la formation */
 data Financement_sas;
@@ -1021,7 +1021,7 @@ data a;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base sur le type de financement de la formation
 financement_rbase <- data.frame(
@@ -1035,7 +1035,7 @@ financement_rbase$etat <- rep(seq_along(rle(financement_rbase$financement)$value
                               times = rle(financement_rbase$financement)$lengths)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base sur le type de financement de la formation
 financement_tidyverse <- data.frame(
@@ -1050,7 +1050,7 @@ financement_tidyverse %>%
   mutate(etat = consecutive_id(financement))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On suppose que l'on dispose d'une base sur le type de financement de la formation
 financement_datatable <- data.table(
@@ -1063,7 +1063,7 @@ setorder(financement_datatable, identifiant, date)
 financement_datatable[, etat := rleid(financement_datatable), by = identifiant]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```

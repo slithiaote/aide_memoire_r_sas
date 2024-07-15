@@ -3,7 +3,7 @@
 ## Une seule variable de groupement, une seule variable
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Moyenne de note_contenu et nombre de personnes */
 
@@ -40,7 +40,7 @@ proc tabulate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 aggregate(note_contenu ~ cspf, donnees_rbase, function(x) c(Moyenne = mean(x, na.rm = TRUE), Nombre = length(x)))
@@ -65,7 +65,7 @@ sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) weighted.mean(x$not
 # À FAIRE : autre solution ?
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 donnees_tidyverse %>% 
@@ -90,7 +90,7 @@ donnees_tidyverse %>%
   summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE), .by = cspf)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), by = cspf]
@@ -110,7 +110,7 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
                   .SDcols = varNotes]
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -120,7 +120,7 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
 ## Plusieurs variables
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 %let var_notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
 %let var_groupe = cspf sexef;
@@ -152,7 +152,7 @@ proc sql;
 quit;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Plusieurs solutions avec aggregate (plutôt lent)
 aggregate(note_contenu ~ cspf + sexef, donnees_rbase, function(x) c(mean = mean(x), n = length(x)))
@@ -171,7 +171,7 @@ by(donnees_rbase[, variable], donnees_rbase[, varGroupement], function(x) c(mean
 rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], sep = "_", lex.order = TRUE))
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_tidyverse %>% 
   group_by(cspf, sexef) %>% 
@@ -182,7 +182,7 @@ donnees_tidyverse %>%
   summarise(Moyenne = mean(note_contenu, na.rm = TRUE), n = n(), .by = c(cspf, sexef))
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), keyby = c("cspf", "sexef")]
 
@@ -207,7 +207,7 @@ donnees_datatable[, .(Femmes = sum(sexef == "Femme", na.rm = TRUE), Hommes = sum
 # D'autres variations (par exemple, c(x, y) ou list("x", "y") ne fonctionnent pas !)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -217,7 +217,7 @@ donnees_datatable[, .(Femmes = sum(sexef == "Femme", na.rm = TRUE), Hommes = sum
 ## Tableaux croisés à 2 variables de groupement
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc tabulate data = donnees_sas;
   class cspf sexef;
@@ -226,7 +226,7 @@ proc tabulate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau croisé Cspf par Sexef
 varGroupement <- c("cspf", "sexef")
@@ -252,7 +252,7 @@ tableau <- reshape(tableau,
 tableau[is.na(tableau)] <- 0
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau croisé Cspf par Sexef
 varGroupement <- c("cspf", "sexef")
@@ -269,7 +269,7 @@ donnees_tidyverse %>%
   spread(varGroupement[2], Moyenne)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tableau croisé Cspf par Sexef
 varGroupement <- c("cspf", "sexef")
@@ -286,7 +286,7 @@ tab <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), keyby = varGroupemen
 data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var = variable)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -296,7 +296,7 @@ data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var 
 ## Tableaux croisés à 3 variables de groupement ou plus : 1 variable en ligne, 2 en colonne
 ::: {.panel-tabset group="language"}
 
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 /* Notes par croisement de CSP (en ligne) et de Sexe x Niveau */
 %let notes = note_contenu note_formateur note_moyens note_accompagnement note_materiel;
@@ -314,7 +314,7 @@ proc tabulate data = donnees_sas;
 run;
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -349,7 +349,7 @@ tab
 xtabs(cbind(note_contenu, note_materiel) ~ cspf + sexef, donnees_rbase)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -371,7 +371,7 @@ donnees_tidyverse %>%
               values_fill = 0)
 ```
 
-## `data.table` {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1er exemple : CSPF en ligne, et chacune des 5 notes croisées avec le sexe en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -384,7 +384,7 @@ data.table::dcast(donnees_datatable, cspf ~ sexef + niveau, value.var = "note_co
                   fun.aggregate = mean, na.rm = TRUE)
 ```
 
-## `arrow/duckdb` {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
