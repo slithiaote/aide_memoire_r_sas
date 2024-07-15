@@ -821,8 +821,3 @@ requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
 ```
 
 :::
-
-
-# Appendix {.appendix}
-
-## Les fonctions apply

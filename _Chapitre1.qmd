@@ -19,7 +19,7 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 # install.packages("nom_du_package")
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les packages doivent au préalable être installés sur le disque dur
@@ -62,7 +62,7 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 library(lubridate)
 ```
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Chargement des packages
@@ -120,7 +120,7 @@ Pas de documentation spécifique sur `R base` dans Utilit'R.
 
 *Cheatsheet* : <https://dplyr.tidyverse.org/articles/base.html>
 
-## `tidyverse` {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_tidyverse.html>.
 
