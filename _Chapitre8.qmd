@@ -148,6 +148,9 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 :::
 
 ## Remplacer une chaîne de caractères par une autre
+
+On souhaite remplacer le mot qualifie par le mot Qualifié.
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -175,6 +178,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
+
 # [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
 gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 ```
@@ -183,6 +187,7 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
+
 # [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
 aCorriger %>% tolower() %>% str_replace_all("[Q-q]ualifie", "Qualifié")
 ```
@@ -191,6 +196,7 @@ aCorriger %>% tolower() %>% str_replace_all("[Q-q]ualifie", "Qualifié")
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Le mot Qualifié n'a pas d'accent : on le corrige
 aCorriger <- c("Qualifie", "qualifie", "Qualifie", "QUALIFIE")
+
 # [Q-q] permet de représenter Q ou q, et donc de prendre en compte Qualifie et qualifie
 gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 ```
@@ -202,17 +208,17 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 :::
 
-### Extraire des éléments d'une chaîne de caractères
+## Extraire des éléments d'une chaîne de caractères
 
 Le comportement de la fonction substr est différent entre `SAS` et `R` :
 
-- en `SAS`, dans substr(extrait, 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 au nombre total de caractères extrait à partir du 2e => Le résultat est xtr ;
+- en `SAS`, dans substr(extrait, 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 au nombre total de caractères extrait à partir du 2e => Le résultat est xtr
 
 - en `R`, dans substr("extrait", 2, 3), le 2 correspond à la position du 1er caractère à récupérer, le 3 à la position du dernier caractère => Le résultat est "xt".
 
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   set Exemple_texte;
@@ -225,7 +231,7 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de Concatener
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
@@ -239,24 +245,24 @@ extrait <- substr("extrait", 2, 5)
 extrait <- str_sub("extrait", 2, 5)
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de texte
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
 extrait <- substr("extrait", 2, 5)
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 :::
 
-### Enlever les blancs superflus d'une chaîne de caractères
+## Enlever les blancs superflus d'une chaîne de caractères
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   Texte = "              Ce   Texte   mériterait   d être   corrigé                  ";
@@ -277,7 +283,7 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé   
@@ -288,7 +294,7 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- gsub("\\s+", " ", trimws(texte))
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé  
@@ -297,7 +303,7 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- str_squish(texte)
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
 texte  <- "              Ce   Texte   mériterait   d être   corrigé  
@@ -308,22 +314,22 @@ texte  <- "              Ce   Texte   mériterait   d être   corrigé
 texte <- gsub("\\s+", " ", trimws(texte))
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 :::
 
-### Concaténer des chaînes de caractères
+## Concaténer des chaînes de caractères
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
-  Texte1 = "Je m'appelle";
-  Texte2 = "SAS";
-  Texte3 = "Phrase à découper";
+  Texte1 = "Ce texte";
+  Texte2 = "va être";
+  Texte3 = "concaténé";
   Texte4 = "";
 run;
 
@@ -342,7 +348,7 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -356,7 +362,7 @@ paste0(texte1, texte2, texte3)
 paste(texte4, texte3, sep = "-")
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -369,7 +375,7 @@ concatene <- str_flatten(c(texte1, texte2, texte3), collapse = " ")
 str_flatten(c(texte4, texte3), collapse = "-")
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Concaténer des chaînes de caractères
 texte1 <- "Ce texte"
@@ -380,20 +386,20 @@ paste(texte1, texte2, sep = " ")
 paste0(texte1, texte2)
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
 
 :::
 
-### Transformer plusieurs caractères différents
+## Transformer plusieurs caractères différents
 
 Supprimer les accents, cédilles, caractères spéciaux.
 
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 data Exemple_texte;
   set Exemple_texte;
@@ -405,28 +411,28 @@ run;
 proc print data = Exemple_texte;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Transformer plusieurs caractères différents
 texte <- "éèêëàâçîô"
 chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
