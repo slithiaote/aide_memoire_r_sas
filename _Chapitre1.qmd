@@ -60,6 +60,9 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 
 # Cependant, on importe le package lubridate pour faciliter la gestion des dates
 library(lubridate)
+
+# Documentation de R base
+?"[.data.frame"
 ```
 
 ## tidyverse {.unnumbered .unlisted}

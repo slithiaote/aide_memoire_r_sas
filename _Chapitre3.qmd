@@ -1,6 +1,6 @@
 # Préambule
 
-## Chemin du bureau de l'utilisateur 
+## Chemin du bureau de l'utilisateur
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -49,7 +49,7 @@ chemin <- file.path("C:/Users", user, "Desktop")
 
 :::
 
-## Affichage de l'année 
+## Affichage de l'année
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -119,7 +119,7 @@ paste0("Année passée : ", annee_1)
 
 :::
 
-## Construction des instructions if / else 
+## Construction des instructions if / else
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -192,7 +192,7 @@ if (annee >= 2024) {
 
 :::
 
-## Répertoire de travail 
+## Répertoire de travail
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -244,7 +244,7 @@ getwd()
 
 :::
 
-## Autres points à connaître 
+## Autres points à connaître
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
