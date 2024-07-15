@@ -11,7 +11,11 @@ proc sort data = Nb;by cspf Sexef;run;
 proc print data = Nb;run;
 
 /* On transpose le tableau */
-proc transpose data = Nb out = transpose;by cspf;var count;id Sexef;run;
+proc transpose data = Nb out = transpose;
+  by cspf;
+  var count;
+  id Sexef;
+run;
 data transpose;set transpose (drop = _name_ _label_);run;
 proc print data = transpose;run;
 ```
@@ -150,8 +154,8 @@ long_datatable <- melt(wide_datatable,
 ## Passer d'une base en longueur (*long*) à une base en largeur (*wide*)
 
 Le code précédent doit être lancé au préalable.
-Lien utile : <
-#https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
+
+Lien utile : <https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
 
 ::: {.panel-tabset group="language"}
 
