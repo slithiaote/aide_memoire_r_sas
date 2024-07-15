@@ -1,6 +1,9 @@
 # Manipulation des lignes et des colonnes
 
 ## Renommer des variables
+
+On renomme sexe en sexe2, puis on renomme à son tour sexe2 en sexe.
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -62,15 +65,15 @@ data Civilite;
   /* 1ère solution (if) */
   format Civilite $20.;
   if      Sexe = 2 then Civilite = "Mme";
-  else if Sexe = 1 then Civilite = "Mr";
+  else if Sexe = 1 then Civilite = "M";
   else                  Civilite = "Inconnu";
   
   /* 2e solution (do - end) */
   if      Sexe = 2 then do;
-    Civilite2 = "Femme";
+    Civilite2 = "Mme";
   end;
   else if Sexe = 1 then do;
-    Civilite2 = "Homme";
+    Civilite2 = "M";
   end;
   else do;
     Civilite2 = "Inconnu";
@@ -79,8 +82,8 @@ data Civilite;
   /* 3e solution (select) */
   format Civilite3 $20.;
   select;
-    when      (Sexe = 2) Civilite3 = "Femme";
-    when      (Sexe = 1) Civilite3 = "Homme";
+    when      (Sexe = 2) Civilite3 = "Mme";
+    when      (Sexe = 1) Civilite3 = "M";
     otherwise            Civilite3 = "Inconnu";
   end;
   
@@ -117,7 +120,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
-                                      sexe == "1", "M.",
+                                      sexe == "1", "M",
                                       is.na(sexe), "Inconnu")]
 ```
 
@@ -128,9 +131,11 @@ donnees_datatable[, civilite := fcase(sexe == "2", "Mme",
 :::
 
 ## Formater les modalités des valeurs discrètes ou caractères
+
+### Création des formats
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Utilisation des formats */
 proc format;
@@ -149,25 +154,25 @@ proc format;
 run;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexef <- c("1" = "Homme", "2" = "Femme")
 cspf <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexef_format <- c("1" = "Homme", "2" = "Femme")
 cspf_format <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexeform <- c("1" = "Homme", "2" = "Femme")
 cspform <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 Préférer `case_match` quand il s'agit de valeurs déterminées.
 
 ```{r, warning=FALSE, message=FALSE}
@@ -188,13 +193,13 @@ requete_duckdb %>%
 
 :::
 
-## Utiliser les formats (valeurs discrètes ou caractères) 
+### Utiliser les formats (valeurs discrètes ou caractères) 
 
 Nécessite le lancement des formats à l'étape précédente.
 
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 data donnees_sas;
   set donnees_sas;
@@ -207,14 +212,14 @@ data donnees_sas;
 run;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On exprime CSP et sexe en variable formatée
 donnees_rbase$cspf <- cspf[donnees_rbase$csp]
 donnees_rbase$sexef <- sexef[donnees_rbase$sexe]
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On exprime CSP et sexe en variable formatée
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -237,6 +242,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
       csp == "5" ~ "Retraité",
       TRUE       ~ csp)
     )
+
 # Syntaxe pour attribuer une valeur aux NA
 valeurAuxNA <- donnees_tidyverse %>% 
   mutate(sexef = case_when(
@@ -246,13 +252,13 @@ valeurAuxNA <- donnees_tidyverse %>%
     TRUE        ~ sexe))
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On exprime CSP et sexe en variable formatée
 donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -265,6 +271,7 @@ donnees_datatable[, `:=` (cspf = cspform[csp], sexef = sexeform[sexe])]
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* Âge formaté */
+/* Fonctionne aussi sur le principe du format */
 proc format;
   /* Variable continue */
   value agef
@@ -272,6 +279,7 @@ proc format;
   26<-<50 = "2. De 26 à 49 ans"
   50-high = "3. 50 ans ou plus";
 run;
+
 data donnees_sas;
   set donnees_sas;
   /* Âge formaté */
@@ -412,7 +420,7 @@ requete_duckdb %>%
 
 :::
 
-## Convertir le type de plusieurs variables
+## Convertir le type de plusieurs variables À FAIRE
 
 ::: {.panel-tabset group="language"}
 
@@ -501,19 +509,14 @@ requete_duckdb %>%
 
 ### SAS {.unnumbered .unlisted}
 ``` sas
-/* Par nom ou par variable */
-%let var = identifiant Sexe note_contenu;
-data Femmes;
-  /* Sélection de colonnes */
-  set donnees_sas (keep = &var.);
-  /* Sélection de lignes respectant une certaine condition */
-  if Sexe = "2";
-  /* Création de colonne */
-  note2 = note_contenu / 20 * 5;
-  /* Suppression de colonnes */
-  drop note2;
-  /* Selection de colonnes */
-  keep identifiant Sexe note_contenu;
+/* Création et suppressions de plusieurs variables */
+data donnees_sas;
+  set donnees_sas;
+  note_contenu2 = note_contenu / 20 * 5;
+  note_formateur2 = note_formateur / 20 * 5;  
+                           
+  /* Suppression des variables créées */
+  drop note_contenu2 note_formateur2;
 run;
 ```
 
@@ -547,8 +550,10 @@ donnees_tidyverse <- donnees_tidyverse %>%
 # Création et suppressions de plusieurs variables
 donnees_datatable[, c("note_contenu2", "note_formateur2") := list(note_contenu / 20 * 5, note_formateur / 20 * 5)]
 donnees_datatable[, `:=` (note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)]
+
 # Suppression des variables créées
 donnees_datatable[, c("note_contenu2", "note_formateur2") := NULL]
+
 # Ou par référence extérieure
 variable <- c("note_contenu2", "note_formateur2")
 donnees_datatable[, `:=` (note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)]
@@ -578,7 +583,7 @@ requete_duckdb %>%
 %let notes = Note_Contenu   Note_Formateur Note_Moyens     Note_Accompagnement     Note_Materiel;
 /* On supprime d'abord les doubles blancs entre les variables */
 %let notes = %sysfunc(compbl(&notes.));
-/* on affiche les notes dans la log de SAS */
+/* On affiche les notes dans la log de SAS */
 %put &notes;
 
 /* 1ère solution : avec les array */
@@ -594,14 +599,16 @@ run;
 
 /* 2e solution : avec une macro */
 /* De nouvelles variables sont ajoutées dans cet exemple */
-data donnees_sas;
+data Sur100_2;
   set donnees_sas;
+  
   %macro Sur100;
     %do i = 1 %to %sysfunc(countw(&notes.));
 	  %let note = %scan(&notes., &i.);
 	  &note._100 = &note. / 20 * 100;
 	%end;
   %mend Sur100;
+  
   %Sur100;
 run;
 ```
@@ -722,7 +729,7 @@ data Arrondis;
   /* Arrondi à 1 chiffre après la virgule */
   poids_arrondi_1 = round(poids_sondage, 0.1);
   /* Arrondi à 2 chiffre après la virgule */
-  poids_arrondi_2 = round(poids_sondage, 0.2);
+  poids_arrondi_2 = round(poids_sondage, 0.01);
   /* Arrondi à l'entier inférieur */
   poids_inf = floor(poids_sondage);
   /* Arrondi à l'entier supérieur */

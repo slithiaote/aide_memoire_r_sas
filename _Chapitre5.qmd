@@ -770,25 +770,12 @@ requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable
 data Femmes;
   set donnees_sas (where = (Sexe = 2) keep = &cols.);
 run;
+
+/* Autre solution */
 data Femmes;
   set donnees_sas;
   if Sexe = 2;
   keep &cols.;
-run;
-
-/* Par nom ou par variable */
-%let var = identifiant Sexe note_contenu;
-data Femmes;
-  /* Sélection de colonnes */
-  set donnees_sas (keep = &var.);
-  /* Sélection de lignes respectant une certaine condition */
-  if Sexe = "2";
-  /* Création de colonne */
-  note2 = note_contenu / 20 * 5;
-  /* Suppression de colonnes */
-  drop Sexe;
-  /* Selection de colonnes */
-  keep identifiant Sexe note_contenu;
 run;
 ```
 
@@ -818,6 +805,47 @@ femmes <- subset(donnees_datatable, sexe %in% c("2"), cols)
 cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
 requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
 requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
+```
+
+:::
+
+## Sélectionner des lignes selon une condition externe
+
+On souhaite sélectionner des colonnes selon une condition, mais cette condition est située à l'extérieur des opérateurs de manipulation des données.
+
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%let condition = sexe = 2;
+data Femmes;
+  set donnees_sas (where = (&condition.));
+run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+condition <- substitute(sexe == "2")
+femmes <- subset(donnees_rbase, eval(condition))
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+condition <- expr(sexe == "2")
+femmes <- donnees_tidyverse %>% 
+  filter(!!condition)
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+condition <- quote(sexe == "2")
+femmes <- donnees_datatable[condition, , env = list(condition = condition)]
+femmes <- donnees_datatable[eval(condition)]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
 ```
 
 :::
