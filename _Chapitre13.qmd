@@ -93,6 +93,7 @@ donnees_rbase$numero_contrat <- as.numeric(ave(donnees_rbase$identifiant, donnee
 # Autre solution : order pour éviter le as.numeric
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase$numero_contrat <- ave(order(donnees_rbase$date_entree), donnees_rbase$identifiant, FUN = seq_along)
+
 #https://stackoverflow.com/questions/11996135/create-a-sequential-number-counter-for-rows-within-each-group-of-a-dataframe
 #https://stackoverflow.com/questions/13732062/what-are-examples-of-when-seq-along-works-but-seq-produces-unintended-results
 ```
@@ -341,6 +342,16 @@ donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fro
 
 ### SAS {.unnumbered .unlisted}
 ``` sas
+/* Numéro du contrat */
+proc sort data = donnees_sas;by identifiant date_entree;run;
+data donnees_sas;
+  set donnees_sas;
+  by identifiant date_entree;
+  retain num_contrat;
+  if first.identifiant then num_contrat = 1;
+  else                      num_contrat = num_contrat + 1;
+run;
+
 proc sort data = donnees_sas;by identifiant numero_contrat;run;
 proc sql;
   select * from donnees_sas group by identifiant
@@ -395,6 +406,16 @@ deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
 
 ### SAS {.unnumbered .unlisted}
 ``` sas
+/* Numéro du contrat */
+proc sort data = donnees_sas;by identifiant date_entree;run;
+data donnees_sas;
+  set donnees_sas;
+  by identifiant date_entree;
+  retain num_contrat;
+  if first.identifiant then num_contrat = 1;
+  else                      num_contrat = num_contrat + 1;
+run;
+
 proc sort data = donnees_sas;by identifiant numero_contrat;run;
 proc sql;
   select * from donnees_sas group by identifiant
@@ -447,6 +468,7 @@ deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 
 ### SAS {.unnumbered .unlisted}
 ``` sas
+/* Numéro du contrat */
 proc sort data = donnees_sas;by identifiant date_entree;run;
 data donnees_sas;
   set donnees_sas;
@@ -840,6 +862,9 @@ donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDc
 :::
 
 ## Ajouter une variable d'entrée initiale par individu
+
+On souhaite ajouter dans la base une variable représentant la première date d'entrée de l'individu.
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
