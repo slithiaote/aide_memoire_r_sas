@@ -200,9 +200,12 @@ if (annee >= 2024) {
 /* Afficher le répertoire de travail par défaut (la Work) */
 %let chemin_work = %sysfunc(pathname(work));
 %put &chemin_work.;
+
+/* Autre solution */
 proc sql;
   select path from dictionary.libnames where libname = "WORK";
 quit;
+
 /* Définir le répertoire de travail, si besoin */
 /* libname "nom du répertoire"; */
 ```
@@ -245,7 +248,7 @@ getwd()
 ::: {.panel-tabset group="language"}
 
 ## `SAS` {.unnumbered .unlisted}
-Mise en garde : certains codes `SAS` pourraient aussi avec profit être écrits en langage SAS IML (Interactive Matrix Language).
+Mise en garde : certains codes `SAS` pourraient aussi avec profit être écrits en langage `SAS IML` (Interactive Matrix Language).
 Cet aide-mémoire n'ayant pas vocation à être un dictionnaire `SAS`, cette méthode d'écriture n'est pas proposée ici.
 
 

@@ -57,7 +57,7 @@ data donnees_sas;
   format date_sortie ddmmyy10.;
   date_sortie = intnx('day', date_entree, duree);
   /* Âge à l'entrée dans le dispositif */
-Age = intck('year', date_naissance, date_entree);
+  Age = intck('year', date_naissance, date_entree);
 run;
 ```
 
@@ -353,7 +353,20 @@ Les options de la fonction utiles sont :
 
 ### `SAS` {.unnumbered .unlisted}
 ``` sas
-/* À écrire */
+/* Importer un fichier xls */
+/* proc import out = NomBaseImportee 
+   datafile = "CHEMIN DE LA BASE"
+   DBMS = XLS REPLACE;
+  run;*/
+  
+/* Importer un fichier avec séparateur | */
+/* data NomDeLaBase;
+  infile "CHEMIN DE LA BASE IMPORTEE 
+	dlm = "|" missover dsd lrecl=32767 firstobs = 2;
+  informat VARIABLES;
+  format VARIABLES;
+  input VARIABLES;
+run; */
 ```
 
 ### `R base` {.unnumbered .unlisted}

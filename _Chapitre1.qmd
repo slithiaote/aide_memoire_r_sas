@@ -5,13 +5,13 @@
 Des informations sur l'installation des packages en `R` sont disponibles sur le site Utilit'R : <https://book.utilitr.org/01_R_Insee/Fiche_installer_packages.html>.
 
 ::: {.panel-tabset group="language"}
-## `SAS` {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 
 ``` sas
 /* Sans objet pour SAS */
 ```
 
-## `R base` {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Les packages doivent au préalable être installés sur le disque dur
@@ -107,7 +107,7 @@ library(lubridate)
 
 :::
 
-## Documentation Utilit'R
+## Documentation (Utilit'R, *cheatsheets*, etc.)
 
 ::: {.panel-tabset group="language"}
 ## `SAS` {.unnumbered .unlisted}
@@ -118,13 +118,32 @@ Sans objet pour SAS.
 
 Pas de documentation spécifique sur `R base` dans Utilit'R.
 
+*Cheatsheet* : <https://dplyr.tidyverse.org/articles/base.html>
+
 ## `tidyverse` {.unnumbered .unlisted}
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_tidyverse.html>.
 
+*Cheatsheets* :
+
+- général : <https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf>
+- dplyr : <https://rstudio.github.io/cheatsheets/data-transformation.pdf>
+- tidyr : <https://rstudio.github.io/cheatsheets/tidyr.pdf>
+- readr : <https://rstudio.github.io/cheatsheets/data-import.pdf>
+- purrr : <https://rstudio.github.io/cheatsheets/purrr.pdf>
+- stringr : <https://rstudio.github.io/cheatsheets/strings.pdf>
+- ggplot2 : <https://rstudio.github.io/cheatsheets/data-visualization.pdf>
+- forcats : <https://rstudio.github.io/cheatsheets/factors.pdf>
+- lubridate : <https://rstudio.github.io/cheatsheets/lubridate.pdf>
+
 ## `data.table` {.unnumbered .unlisted}
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_datatable.html>.
+
+*Cheatsheets* :
+
+- <https://www.beoptimized.be/pdf/R_Data_Transformation.pdf>
+- <https://paulvanderlaken.com/wp-content/uploads/2017/08/datatable_cheat_sheet_r.pdf>
 
 ## `arrow/duckdb` {.unnumbered .unlisted}
 
@@ -133,3 +152,7 @@ Documentation Utilit'R pour `arrow` : <https://book.utilitr.org/03_Fiches_themat
 Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_duckdb.html>.
 
 :::
+
+## Documentation pour `RStudio`
+
+Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
