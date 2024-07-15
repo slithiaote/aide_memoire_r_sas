@@ -124,18 +124,17 @@ concatener <- data.table::cbind(ajout, donnees_datatable)
 
 ## Empiler deux bases de données
 
-On va empiler la somme des notes en dessous de la base des notes.
+On va empiler la moyenne des notes en dessous de la base des notes.
 
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
 /* On sélectionne un nombre réduit de variables pour simplifier l'exemple */
-%let var = Identifiant Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
-%let var2 = %sysfunc(tranwrd(&var., Identifiant,));
-data Notes;set donnees_sas (keep = &var.);run;
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data Notes;set donnees_sas (keep = identifiant &notes.);run;
 /* Moyenne des notes */
-proc means data = Notes noprint mean;var &var2.;output out = Ajout mean = &var2.;run;
+proc means data = Notes noprint mean;var &notes.;output out = Ajout mean = &notes.;run;
 
 /* On concatène avec les données. Valeur manquante si les variables ne correspondent pas */
 
