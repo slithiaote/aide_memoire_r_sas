@@ -1,11 +1,11 @@
 # Les doublons
 
-## Doublons pour toutes les colonnes 
+## Doublons pour toutes les colonnes
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* On extrait tous les doublons, pas seulement la première occurrence */
+/* On extrait seulement les doublons, pas la première occurrence */
 
 /* On récupère déjà la dernière variable de la base (on en aura besoin plus loin) */
 proc contents data = donnees_sas out = Var noprint;run;
@@ -24,13 +24,13 @@ run;
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 doublons <- donnees_rbase[duplicated(donnees_rbase), ]
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 donnees_tidyverse %>% 
   group_by(across(everything())) %>% 
   filter(n() > 1) %>% 
@@ -47,7 +47,7 @@ doublons <- donnees_tidyverse %>%
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 ```
 
@@ -56,15 +56,14 @@ doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 
 ```
 
-
 :::
 
-## Doublons pour une ou plusieurs colonnes 
+## Doublons pour une ou plusieurs colonnes
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* On extrait tous les doublons, pas seulement la première occurrence */
+/* On extrait seulement les doublons, pas la première occurrence */
 %let var = identifiant;
 proc sort data = donnees_sas;by &var.;run;
 data doublons;
@@ -72,18 +71,20 @@ data doublons;
   by &var.;
   if not first.&var.;
 run;
+
+/* À FAIRE : nodupkey ??? */
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 variable <- "identifiant"
 doublons <- donnees_rbase[duplicated(donnees_rbase[, variable]), ]
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 variable <- "identifiant"
 doublons <- donnees_tidyverse %>%  
   group_by(across(variable)) %>% 
@@ -94,7 +95,7 @@ doublons <- donnees_tidyverse %>%
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On extrait tous les doublons, pas seulement la première occurrence
+# On extrait seulement les doublons, pas la première occurrence
 variable <- "identifiant"
 doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 ```
@@ -104,10 +105,9 @@ doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 
 ```
 
-
 :::
 
-## Récupérer toutes les lignes pour les identifiants en doublon 
+## Récupérer toutes les lignes pour les identifiants en doublon
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -150,10 +150,9 @@ enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
 
 ```
 
-
 :::
 
-## Récupérer toutes les lignes pour les identifiants sans doublon 
+## Récupérer toutes les lignes pour les identifiants sans doublon
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -315,6 +314,14 @@ sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant"
 proc sql;
   create table id as select distinct identifiant from donnees_sas order by identifiant;
 quit;
+
+/* Autre possibilité */
+proc sort data = donnees_sas;by identifiant;run;
+data id;
+  set donnees_sas (keep = identifiant);
+  by identifiant;
+  if first.identifiant;
+run;
 ```
 
 ## R base {.unnumbered .unlisted}
