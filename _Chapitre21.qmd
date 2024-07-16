@@ -83,7 +83,7 @@ donnees_datatable[, lapply(.SD, function(x) c(moyenne = mean(x, na.rm = TRUE), n
                   .SDcols = varNotes]
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -138,7 +138,7 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
                   .SDcols = varNotes]
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
