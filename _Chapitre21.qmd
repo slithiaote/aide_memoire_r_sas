@@ -1,9 +1,11 @@
 # Tableaux de statistiques
 
-## Une seule variable de groupement, une seule variable
+## Moyenne des notes par CSP (variable en ligne)
+
+### Non pondéré
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Moyenne de note_contenu et nombre de personnes */
 
@@ -25,22 +27,9 @@ proc sql;
   group by cspf
   order by cspf;
 quit;
-
-/* Avec la pondération */
-proc sort data = donnees_sas;by cspf;run;
-proc means data = donnees_sas mean n;
-  var note_contenu;class cspf;
-  weight poids_sondage;
-run;
-proc tabulate data = donnees_sas;
-  var note_contenu;
-  class cspf;
-  weight poids_sondage;
-  table (cspf all = "Total"), note_contenu * (mean n);
-run;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 aggregate(note_contenu ~ cspf, donnees_rbase, function(x) c(Moyenne = mean(x, na.rm = TRUE), Nombre = length(x)))
@@ -59,13 +48,9 @@ tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
 with(donnees_rbase, tapply(note_contenu, cspf, mean, na.rm = TRUE))
 tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
 by(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
-
-# Avec la pondération : tapply ne fonctionne pas, il faut découper la base en facteurs avec split
-sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) weighted.mean(x$note_contenu, x$poids_sondage, na.rm = TRUE))
-# À FAIRE : autre solution ?
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 donnees_tidyverse %>% 
@@ -81,16 +66,9 @@ donnees_tidyverse %>%
   summarise(Moyenne = mean(note_contenu, na.rm = TRUE))
 donnees_tidyverse %>% 
   summarise(Moyenne = mean(note_contenu, na.rm = TRUE), .by = cspf)
-
-# Avec la pondération
-donnees_tidyverse %>% 
-  group_by(cspf) %>% 
-  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
-donnees_tidyverse %>% 
-  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE), .by = cspf)
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Moyenne de note_contenu et nombre de personnes
 donnees_datatable[, .(note_contenu_moyenne = mean(note_contenu, na.rm = TRUE), N = .N), by = cspf]
@@ -103,8 +81,58 @@ var_groupe <- "cspf"
 donnees_datatable[, lapply(.SD, function(x) c(moyenne = mean(x, na.rm = TRUE), n = length(x))),
                   by = var_groupe,
                   .SDcols = varNotes]
+```
 
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+### Pondéré
+::: {.panel-tabset group="language"}
+
+### SAS {.unnumbered .unlisted}
+``` sas
+/* Moyenne de note_contenu et nombre de personnes */
+proc sort data = donnees_sas;by cspf;run;
+proc means data = donnees_sas mean n;
+  var note_contenu;class cspf;
+  weight poids_sondage;
+run;
+
+/* Autre possibilité */
+proc tabulate data = donnees_sas;
+  var note_contenu;
+  class cspf;
+  weight poids_sondage;
+  table (cspf all = "Total"), note_contenu * (mean n);
+run;
+```
+
+### R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Avec la pondération : tapply ne fonctionne pas, il faut découper la base en facteurs avec split
+sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) weighted.mean(x$note_contenu, x$poids_sondage, na.rm = TRUE))
+# À FAIRE : autre solution ?
+```
+
+### tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Avec la pondération
+donnees_tidyverse %>% 
+  group_by(cspf) %>% 
+  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE))
+donnees_tidyverse %>% 
+  summarise(Moyenne = weighted.mean(note_contenu, poids_sondage, na.rm = TRUE), .by = cspf)
+```
+
+### data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Avec la pondération
+varNotes <- "note_contenu"
+var_groupe <- "cspf"
 donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.rm = TRUE)),
                   keyby = var_groupe,
                   .SDcols = varNotes]
@@ -117,7 +145,7 @@ donnees_datatable[, lapply(.SD, function(x) weighted.mean(x, poids_sondage, na.r
 
 :::
 
-## Plusieurs variables
+## Moyenne des notes par CSP et Sexe (variables en ligne)
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -293,7 +321,7 @@ data.table::dcast(tab, get(varGroupement[1]) ~ get(varGroupement[2]), value.var 
 
 :::
 
-## Tableaux croisés à 3 variables de groupement ou plus : 1 variable en ligne, 2 en colonne
+## Tableaux croisés à 3 variables de groupement ou plus (1 variable en ligne, 2 en colonne par exemple)
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
