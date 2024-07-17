@@ -121,13 +121,13 @@ Sans objet pour SAS.
 
 Pas de documentation spécifique sur `R base` dans Utilit'R.
 
-*Cheatsheet* : <https://dplyr.tidyverse.org/articles/base.html>
+Aide-mémoire (*Cheatsheet*) : <https://dplyr.tidyverse.org/articles/base.html>
 
 ## tidyverse {.unnumbered .unlisted}
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_tidyverse.html>.
 
-*Cheatsheets* :
+Aide-mémoire (*Cheatsheets*) :
 
 - général : <https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf>
 - dplyr : <https://rstudio.github.io/cheatsheets/data-transformation.pdf>
@@ -143,7 +143,7 @@ Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_t
 
 Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_datatable.html>.
 
-*Cheatsheets* :
+Aide-mémoire (*Cheatsheets*) :
 
 - <https://www.beoptimized.be/pdf/R_Data_Transformation.pdf>
 - <https://paulvanderlaken.com/wp-content/uploads/2017/08/datatable_cheat_sheet_r.pdf>
