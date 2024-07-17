@@ -142,7 +142,7 @@ run;
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
 
 # Date 6 mois après la sortie
-donnees_rbase$date_6mois   <- donnees_rbase$date_sortie + lubridate::month(6)
+donnees_rbase$date_6mois   <- donnees_rbase$date_sortie %m+% months(6)
 donnees_rbase$date_6mois_2 <- donnees_rbase$date_sortie + lubridate::days(round(365.25/2))
 ```
 
@@ -154,7 +154,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 # Date 6 mois après la sortie
 donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(date_6mois = date_sortie + lubridate::month(6))
+  mutate(date_6mois = date_sortie %m+% months(6))
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(date_6mois_2 = date_sortie + lubridate::days(round(365.25/2)))
 ```
@@ -165,7 +165,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 
 # Date 6 mois après la sortie
-donnees_datatable[, date_6mois   := date_sortie + lubridate::month(6)]
+donnees_datatable[, date_6mois   := date_sortie %m+% months(6)]
 donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(365.25/2)]
 ```
 
