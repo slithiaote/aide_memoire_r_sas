@@ -703,7 +703,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_datatable[, mois := sprintf("%02d", lubridate::month(date_entree))]
+# Une fonction month() est déjà implémentée en data.table, l'usage de lubridate est inutile
+donnees_datatable[, mois := sprintf("%02d", data.table::month(date_entree))]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
