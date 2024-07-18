@@ -1,35 +1,55 @@
-# Créer ses propres fonctions
+# Fonctions `SAS` et `R` utiles
 
-Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
-<https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
-
-## Sélection de données
+## Mesurer la durée d'exécution d'un programme
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-%macro Selection (BaseInitiale, BaseFinale, condition);
-  data &BaseFinale.;
-    set BaseInitiale (&condition);
-  run;
-%mend Selection;
-%Selection();
+%let temps_debut = %sysfunc(datetime());
+proc sort data = donnees_sas;by identifiant date_entree;run;
+%let temps_fin = %sysfunc(datetime());
+
+%let duree = %sysevalf((&temps_fin. - &temps_debut.) / 60);
+%put Durée exécution : &duree minutes;
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+system.time(donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ])
 
+# Autre possibilité
+debut <- Sys.time()
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
 ## tidyverse {.unnumbered .unlisted}
-
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+system.time(donnees_tidyverse <- donnees_tidyverse %>% 
+              arrange(identifiant, date_entree))
 
+# Autre possibilité
+debut <- Sys.time()
+donnees_tidyverse <- donnees_tidyverse %>% 
+              arrange(identifiant, date_entree)
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+system.time(setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE))
 
+# Autres possibilités
+debut <- Sys.time()
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+fin <- Sys.time()
+sprintf("Temps d'exécution : %s secondes !", fin - debut)
+
+started.at <- proc.time()
+setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
+timetaken(started.at)
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -39,43 +59,39 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 
 :::
 
-## Fonction calculant une moyenne
+## Exécuter le code d'un autre fichier
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-%macro CalculMoyenne0 (baseDonnees, variables, statistique, condition);
-  proc means data = &baseDonnees. &statistique.;
-    var &variables.;
-  run;
-%mend CalculMoyenne0;
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu);
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum median);
-%CalculMoyenne0(baseDonnees = donnees_sas, variables = note_formateur note_contenu, statistique = mean sum, condition = where sexef = "Femme");
+/* include("chemin") */
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
-  baseDonnees <- subset(baseDonnees, ...)
-  moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
-  moyenne <- data.frame(moyenne)
-  return(moyenne)
-}
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
+
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## tidyverse {.unnumbered .unlisted}
-
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
 
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# encoding permet de gérer l'encodage des caractères accentués
+# echo affiche le script dans la console
+# max.deparse.length permet de s'assurer qu'un texte long est bien visible
 
+# source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -85,4 +101,36 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef
 
 :::
 
-Autres exemples de fonctions possibles : statistiques par groupes (proc tabulate), proc freq, ajout dans la base d'indicatrices de présence en stock à la fin du mois (%local).
+## Nombre de lignes affectées par un changement
+
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+/* Ne semble pas exister nativement */
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ne semble pas exister nativement
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Ne semble pas exister nativement
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_datatable[, sexef2 := tolower(sexef)]
+sprintf("Nombre de lignes modifiées : %d", .Last.updated)
+donnees_datatable[, sexef2 := NULL]
+
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::

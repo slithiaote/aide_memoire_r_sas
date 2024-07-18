@@ -1,100 +1,92 @@
-# Fin du programme
+# Points de vigilance en `SAS`
 
-## Taille des objets en mémoire 
+## Emploi des guillemets et doubles guillemets
+
+Une macro exprimée sous format caractère doit être entourée de "", et non ''.
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* Taille d'une base de données */
-proc sql;
-  select libname, memname, filesize format = sizekmg., filesize format = sizek.
-  from Dictionary.Tables
-  where libname = "WORK" and memname = upcase("donnees_sas") and memtype = "DATA";
-quit;
+/* Quelques points de vigilance en SAS (à ne connaître que si on est amené à modifier le programme SAS, pas utiles sinon) */
+/* Double guillemets pour les macro-variables */
+%let a = Bonjour;
+%put '&a.'; /* Incorrect */
+%put "&a."; /* Correct */
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Taille, en mémoire, d'une base (en Mb)
-format(object.size(donnees_rbase), nsmall = 3, digits = 2, unit = "Mb")
-
-# Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+# Sans objet en R
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Taille, en mémoire, d'une base (en Mb)
-donnees_tidyverse %>% 
-  object.size() %>% 
-  format(nsmall = 3, digits = 2, unit = "Mb")
-
-# Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+# Sans objet en R
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Liste des bases de données en mémoire
-data.table::tables() 
-
-# Taille, en mémoire, d'une base (en Mb)
-format(object.size(donnees_datatable), nsmall = 3, digits = 2, unit = "Mb")
-
-# Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+# Sans objet en R
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Sans objet en R
 ```
-
 
 :::
 
-## Supprimer des bases
+## Macro-variable définie avec un statut global avant son appel dans le cadre d'un statut local
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-/* Supprimer une base */
-proc datasets lib = work nolist;delete donnees_sas;run;
+%macro test;
+  %let reponse = oui;
+%mend test;
+%test;
 
-/* Supprimer toutes les bases dans la work */
-proc datasets lib = work nolist kill;run;
+/* 1. Erreur car &reponse. n'est défini que dans le cas d'un environnement local */ 
+%put &reponse.;
+
+/* 2. Défini auparavant dans un environnement global, elle change de valeur à l'appel de la fonction */
+%let reponse = non;
+%put Reponse : &reponse.;
+%test;
+%put Reponse après la macro : &reponse.;
+
+/* 3. Problème corrigé, en imposant la variable à local dans la macro */
+%macro test2;
+  %local reponse;
+  %let reponse = oui;
+%mend test2;
+
+%let reponse = non;
+%put Reponse : &reponse.;
+%test2;
+%put Reponse après la macro : &reponse.;
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Supprimer une base
-#rm(donnees_rbase)
-
-# Supprimer toutes les bases et tous les objets de la mémoire vive
-#rm(list = ls())
+# Sans objet en R
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Supprimer une base
-#rm(donnees_tidyverse)
-
-# Supprimer toutes les bases et tous les objets de la mémoire vive
-#rm(list = ls())
+# Sans objet en R
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Supprimer une base
-#rm(donnees_datatable)
-
-# Supprimer toutes les bases et tous les objets de la mémoire vive
-#rm(list = ls())
+# Sans objet en R
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+# Sans objet en R
 ```
 
 :::
