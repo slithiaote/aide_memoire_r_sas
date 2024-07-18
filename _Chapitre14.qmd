@@ -607,10 +607,11 @@ auMoins2022 <- donnees_tidyverse %>%
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
-auMoins2022 <- donnees_datatable[, if(any(lubridate::year(date_entree) %in% 2022)) .SD, by = identifiant]
+# Une fonction year() est déjà implémentée en data.table, l'usage de lubridate est inutile
+auMoins2022 <- donnees_datatable[, if(any(data.table::year(date_entree) %in% 2022)) .SD, by = identifiant]
 
 # Autre solution
-auMoins2022 <- donnees_datatable[, if (sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) > 0) .SD, by = identifiant]
+auMoins2022 <- donnees_datatable[, if (sum(data.table::year(date_entree) == 2022, na.rm = TRUE) > 0) .SD, by = identifiant]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -732,7 +733,8 @@ deux_contrats <- donnees_tidyverse %>%
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
-donnees_datatable[, if (.N == 2 & sum(lubridate::year(date_entree) == 2022, na.rm = TRUE) >= 1) .SD, by = identifiant]
+# Une fonction year() est déjà implémentée en data.table, l'usage de lubridate est inutile
+donnees_datatable[, if (.N == 2 & sum(data.table::year(date_entree) == 2022, na.rm = TRUE) >= 1) .SD, by = identifiant]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
