@@ -713,7 +713,7 @@ Les deux pipes fonctionnent de la même manière mais diffèrent sur les points 
 
 # Conseils divers
 
-Il est conseillé d'éviter de nommer des variables temporaires `var`, car ce nom désigne la fonction `R` permettant de calculer une variance.
+Il est déconseillé de nommer des variables temporaires `var`, car ce nom désigne la fonction `R` permettant de calculer une variance.
 
 ```{r, warning=FALSE, message=FALSE}
 # Exemple : variance d'un échantillon aléatoire de 1000 observations tiré d'une loi normale centrée réduite
