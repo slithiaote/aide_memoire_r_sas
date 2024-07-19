@@ -42,7 +42,7 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 ## Fonction calculant un indicateur statistique
 ::: {.panel-tabset group="language"}
 
-Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes auparavant.
+Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes.
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
