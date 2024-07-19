@@ -39,8 +39,10 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 
 :::
 
-## Fonction calculant une moyenne
+## Fonction calculant un indicateur statistique
 ::: {.panel-tabset group="language"}
+
+Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes auparavant.
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
@@ -59,6 +61,7 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
   baseDonnees <- subset(baseDonnees, ...)
   moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
+  names(moyenne) <- paste(names(moyenne), statistique, sep = "_")
   moyenne <- data.frame(moyenne)
   return(moyenne)
 }
