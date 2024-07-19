@@ -107,7 +107,6 @@ library(lubridate)
 #library(duckdb)
 #library(arrow)
 ```
-
 :::
 
 ## Documentation (Utilit'R, *cheatsheets*, etc.)
@@ -129,15 +128,15 @@ Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_t
 
 Aide-mémoire (*Cheatsheets*) :
 
-- général : <https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf>
-- dplyr : <https://rstudio.github.io/cheatsheets/data-transformation.pdf>
-- tidyr : <https://rstudio.github.io/cheatsheets/tidyr.pdf>
-- readr : <https://rstudio.github.io/cheatsheets/data-import.pdf>
-- purrr : <https://rstudio.github.io/cheatsheets/purrr.pdf>
-- stringr : <https://rstudio.github.io/cheatsheets/strings.pdf>
-- ggplot2 : <https://rstudio.github.io/cheatsheets/data-visualization.pdf>
-- forcats : <https://rstudio.github.io/cheatsheets/factors.pdf>
-- lubridate : <https://rstudio.github.io/cheatsheets/lubridate.pdf>
+-   général : <https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf>
+-   dplyr : <https://rstudio.github.io/cheatsheets/data-transformation.pdf>
+-   tidyr : <https://rstudio.github.io/cheatsheets/tidyr.pdf>
+-   readr : <https://rstudio.github.io/cheatsheets/data-import.pdf>
+-   purrr : <https://rstudio.github.io/cheatsheets/purrr.pdf>
+-   stringr : <https://rstudio.github.io/cheatsheets/strings.pdf>
+-   ggplot2 : <https://rstudio.github.io/cheatsheets/data-visualization.pdf>
+-   forcats : <https://rstudio.github.io/cheatsheets/factors.pdf>
+-   lubridate : <https://rstudio.github.io/cheatsheets/lubridate.pdf>
 
 ## data.table {.unnumbered .unlisted}
 
@@ -145,15 +144,14 @@ Documentation Utilit'R : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_d
 
 Aide-mémoire (*Cheatsheets*) :
 
-- <https://www.beoptimized.be/pdf/R_Data_Transformation.pdf>
-- <https://paulvanderlaken.com/wp-content/uploads/2017/08/datatable_cheat_sheet_r.pdf>
+-   <https://www.beoptimized.be/pdf/R_Data_Transformation.pdf>
+-   <https://paulvanderlaken.com/wp-content/uploads/2017/08/datatable_cheat_sheet_r.pdf>
 
 ## arrow/duckdb {.unnumbered .unlisted}
 
 Documentation Utilit'R pour `arrow` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_arrow.html>.
 
 Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_duckdb.html>.
-
 :::
 
 ## Documentation pour `RStudio`
@@ -162,11 +160,11 @@ Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudi
 
 Quatre raccourcis clavier sont notamment très utiles :
 
-+-----------------------------+-----------------------------------------------------------------+
-| Raccourci                   |                          Résultat                               |
-+=============================+=================================================================+
-| Alt et -                    |                             <-                                  |
-| Ctrl et Shift et m          |                            %>%                                  |
-| Alt et -                    | Exécuter le code de la ligne où se trouve le curseur            |
-| Alt et -                    | Exécuter le code jusqu'à la ligne où se trouve le curseur       |
-+-----------------------------+-----------------------------------------------------------------+
+| Raccourci          | Effet                                                     |
+|--------------------------|----------------------------------------------|
+| Alt et -           | -\>                                                       |
+| Ctrl et Shift et m | %\>%                                                      |
+| Ctrl et Entrée     | Exécuter le code de la ligne où se trouve le curseur      |
+| Alt et Entrée      | Exécuter le code jusqu'à la ligne où se trouve le curseur |
+
+: Raccourcis `RStudio`.
