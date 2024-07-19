@@ -159,3 +159,10 @@ Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thema
 ## Documentation pour `RStudio`
 
 Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
+
+Quatre raccourcis clavier sont notamment très utiles :
+
+- symbole <-                      : presser simultanément sur les touches Alt et -
+- symbole %>% (ou |>)             : presser simultanément sur les touches Ctrl-Shift-m
+- Exécuter le code de la ligne où se trouve le curseur : presser simultanément sur les touches Ctrl et Entrée
+- Exécuter le code jusqu'à la ligne où se trouve le curseur : presser simultanément sur les touches Alt et Entrée
