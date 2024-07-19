@@ -1,4 +1,4 @@
-# Créer ses propres fonctions
+# Créer ses propres fonctions (À FAIRE)
 
 Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
 <https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
@@ -58,6 +58,19 @@ Cet exemple de fonction propose de calculer un indicateur statistique au choix (
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ..., selection = TRUE) {
+  baseDonnees <- eval(substitute(subset(baseDonnees, selection)))
+  moyenne <- lapply(baseDonnees[, variable], get(statistique), ...)
+  names(moyenne) <- paste(names(moyenne), statistique, sep = "_")
+  moyenne <- data.frame(moyenne)
+  return(moyenne)
+}
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median", na.rm = TRUE)
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", na.rm = TRUE, selection = sexef == "Femme")
+CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "quantile", na.rm = TRUE, probs = seq(0, 1, 0.1), selection = sexef == "Femme")
+
+# Ancienne fonction
 CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
   baseDonnees <- subset(baseDonnees, ...)
   moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
