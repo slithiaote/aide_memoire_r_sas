@@ -679,6 +679,11 @@ options(error=NULL)
 diag(as.matrix(mtcars))
 ```
 
+```{r, warning=FALSE, message=FALSE}
+# S'assurer qu'un objet R existe déjà
+exists("mtcars")
+```
+
 # Le pipe sur R
 
 Cet opérateur permet d'enchaîner les opérations et d'avoir un code plus lisible.
