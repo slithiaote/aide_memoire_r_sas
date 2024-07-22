@@ -16,7 +16,7 @@ format:
     embed-resources: true
     page-layout: full
     code-tools: true
-    css: styles.css
+	
 # format : native    
 
 editor: visual
