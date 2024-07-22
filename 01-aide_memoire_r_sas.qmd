@@ -1,13 +1,15 @@
 ---
-title: "Aide-mémoire `SAS` - `R`"
+title: "Aide-mémoire `SAS` - `R` - `pandas`"
 lang : fr
 author:
   - name: Nassab ABDALLAH
-    affiliation: Dares/SCS, <nassab.abdallah@travail.gouv.fr>
+    affiliation: Dares/SD-STRP/SCS, <nassab.abdallah@travail.gouv.fr>
   - name: Damien EUZENAT
-    affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
+    affiliation: Dares/SD-SEPEFP/DIP, <damien.euzenat@travail.gouv.fr>
   - name: Sébastien LI-THIAO-TE
-    affiliation: Dares/DFA, <sebastien.li-thiao-te@travail.gouv.fr>
+    affiliation: Dares/SD-SEPEFP/DFA, <sebastien.li-thiao-te@travail.gouv.fr>
+  - name: Clotilde NIETGE
+    affiliation: Dares/SD-EMT/DE, <clotilde.nietge@travail.gouv.fr>
 
 format:
   html:
@@ -34,7 +36,7 @@ syntax-definitions:
 
 # Summary for listings and search engines
 description: |
-  Un aide-mémoire pour les statisticiens traduisant des codes standards en `SAS` et en `R`, suivant 4 environnements (`R base`, `tidyverse`, `data.table`, `arrow/duckdb`).
+  Un aide-mémoire pour les statisticiens traduisant des codes standards en `SAS`, en `R`, suivant 4 environnements (`R base`, `tidyverse`, `data.table`, `arrow/duckdb`) et en `python pandas`.
 
 # Date published
 date: "`r Sys.Date()`"
@@ -47,6 +49,7 @@ output:
 categories:
   - SAS
   - R
+  - Pandas
 ---
 
 L'aide-mémoire a pour but de fournir des codes écrits en `SAS` et d'en donner la traduction en `R` de différentes manières possibles :
@@ -59,9 +62,11 @@ L'aide-mémoire a pour but de fournir des codes écrits en `SAS` et d'en donner 
 
 -   `arrow/duckdb`
 
+et en `python pandas`.
+
 Les codes traduits sont typiques de la production statistique ou la réalisation d'études descriptives.
 
-Ce document s'adresse notamment aux utilisateurs de `SAS` qui veulent connaître la traduction du code `SAS` en `R`, aux utilisateurs de `R` qui ont besoin de comprendre le code `SAS`, ainsi qu'aux utilisateurs d'un environnement `R` qui sont intéressés par la traduction dans un autre environnement `R`.
+Ce document vise à faciliter la compréhension ou la traduction de codes ainsi que le passage d'un langage présenté à un autre. Il s'adresse notamment aux utilisateurs d'un de ces langages qui souhaitent comprendre ou traduire des codes écrits dans un autre langage.
 
 Il se veut complémentaire de la documentation en ligne en français Utilit'R, née à l'Insee (<https://www.book.utilitr.org/>). Le lecteur est invité à s'y référer pour obtenir des informations importantes sur l'utilisation de `R` et qui ne sont pas discutées dans ce document, comme l'importation de données en `R` (<https://www.book.utilitr.org/03_fiches_thematiques/fiche_import_fichiers_plats>). 
 
