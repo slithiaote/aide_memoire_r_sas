@@ -47,6 +47,15 @@ chemin <- file.path("C:/Users", user, "Desktop")
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On récupère déjà l'identifiant de l'utilisateur
+user = os.getenv('USERNAME')
+
+# Chemin en texte
+chemin = "C:/Users/" + str(user) + "/Desktop"
+```
+
 :::
 
 ## Affichage de l'année
@@ -115,6 +124,18 @@ paste0("Année passée : ", annee_1)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+# Année courante
+annee = datetime.now().year
+# Afficher l'année actuelle
+print("Année :", annee)
+
+# Année passée
+annee_1 <- annee - 1
+print("Année passée :", annee_1)
 ```
 
 :::
@@ -190,6 +211,14 @@ if (annee >= 2024) {
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+if annee >= 2024:
+    print("Nous sommes en 2024 ou après !")
+else:
+    print("Nous sommes avant 2024 !")
+```
+
 :::
 
 ## Répertoire de travail
@@ -240,6 +269,12 @@ getwd()
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+# Afficher le répertoire de travail
+os.getcwd()
 ```
 
 :::
