@@ -63,6 +63,16 @@ requete_duckdb %>% glimpse() # préférer glimpse()
 # requete_duckdb %>% View() 
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+# Informations sur les variables
+# donnees_python.info()
+
+# Statistiques descriptives des variables de la base
+# donnees_python.describe()
+```
+
 :::
 
 ## Afficher le type des variables
@@ -100,6 +110,13 @@ On ne peut pas appliquer directement la fonction `class` sur un objet de type `c
 ```{r, warning=FALSE, message=FALSE}
 purrr::map(requete_duckdb %>% select(c(1,2)) %>% head() %>% collect(), class)
 class(requete_duckdb)
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+### Afficher le type des variables :
+donnees_python.dtypes
 ```
 
 :::
@@ -169,6 +186,13 @@ requete_duckdb %>% slice_max(duree, n=4, with_ties=FALSE) # with_ties = TRUE ret
 
 En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne respecte pas toujours l'ordre indiqué par `arrange`) ou `top_n` (superseded). La fonction `slice` en fonctionne pas : elle ne peut pas respecter l'ordre.
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+x = 10
+donnees_python.head(x)
+```
+
 :::
 
 ## Extraire les x dernières lignes de la base (10 par défaut)
@@ -222,6 +246,14 @@ Mêmes remarques que pour les premières lignes : il n'y a pas d'ordre a priori 
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% slice_min(duree, n=5, with_ties=FALSE) # with_ties = TRUE retourne les cas d'égalité, donc plus de 5 lignes
+```
+
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+x = 10
+donnees_python.head(x)
 ```
 
 :::
@@ -281,6 +313,14 @@ requete_duckdb %>% count() # correct
 
 #Nombre de colonnes
 requete_duckdb %>%  ncol()
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+donnees_python.shape
+print('Nombre de lignes : ' + str(donnees_python.shape[0]))
+print('Nombre de colonnes : ' + str(donnees_python.shape[1]))
 ```
 
 :::
@@ -344,6 +384,12 @@ sort(colnames(donnees_datatable))
 requete_duckdb %>% colnames()
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+donnees_python.columns
+```
+
 :::
 
 ## Mettre les noms des variables en minuscule
@@ -378,6 +424,12 @@ colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+donnees_python.columns = donnees_python.columns.str.lower()
 ```
 
 :::
@@ -430,6 +482,12 @@ requete_duckdb %>% distinct(identifiant) %>% count()
 ```
 Note : on a vu que `nrow` ne fonctionne pas en DuckDB. 
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+(donnees_python['identifiant']).nunique()
+```
+
 :::
 
 ## Quelle est la position de la variable date_entree ?
@@ -473,6 +531,16 @@ pos <- match(variable, requete_duckdb %>% colnames())
 sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+# Attention, Python commence à compter à partir de 0
+# Si date_entree est la première colonne, alors on affichera 0
+variable = "date_entree"
+pos = donnees_python.columns.get_loc(variable)
+print(f"La variable {variable} se trouve en colonne n°{pos} !")
+```
+
 :::
 
 ## Variables qui débutent par le mot Note
@@ -509,6 +577,16 @@ names(donnees_datatable)[grepl("^note", names(donnees_datatable), ignore.case = 
 
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+import re
+
+# Obtenir les noms des colonnes qui commencent par "note" en ignorant la casse
+columns_with_note = list(filter(lambda col: re.match(r'^note', col, re.IGNORECASE), donnees_python.columns))
+columns_with_note
 ```
 
 :::
@@ -550,6 +628,13 @@ names(donnees_datatable)[grepl("naissance$", names(donnees_datatable), ignore.ca
 
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+columns_with_naissance = list(filter(lambda col: re.search(r'naissance$', col, re.IGNORECASE), donnees_python.columns))
+columns_with_naissance
 ```
 
 :::
