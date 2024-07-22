@@ -487,6 +487,8 @@ proc sql;select Name from Variables where upcase(substr(Name, 1, 4)) = "NOTE";ru
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("^note", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+
+# Autre possibilité
 names(donnees_rbase)[grepl("^note", names(donnees_rbase), ignore.case = TRUE)]
 ```
 
@@ -498,6 +500,8 @@ names(donnees_tidyverse) %>% str_subset("^note")
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("^note", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+
+# Autre possibilité
 names(donnees_datatable)[grepl("^note", names(donnees_datatable), ignore.case = TRUE)]
 ```
 
@@ -524,6 +528,8 @@ run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("naissance$", names(donnees_rbase), ignore.case = TRUE, value = TRUE)
+
+# Autre possibilité
 names(donnees_rbase)[grepl("naissance$", names(donnees_rbase), ignore.case = TRUE)]
 ```
 
@@ -535,6 +541,8 @@ names(donnees_tidyverse) %>% str_subset("naissance$")
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 grep("naissance$", names(donnees_datatable), ignore.case = TRUE, value = TRUE)
+
+# Autre possibilité
 names(donnees_datatable)[grepl("naissance$", names(donnees_datatable), ignore.case = TRUE)]
 ```
 
