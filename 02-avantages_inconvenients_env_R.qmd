@@ -6,6 +6,7 @@ author:
     affiliation: Dares/SCS, <nassab.abdallah@travail.gouv.fr>
   - name: Damien EUZENAT
     affiliation: Dares/DIP, <damien.euzenat@travail.gouv.fr>
+    
 format:
   html:
     toc: true
@@ -16,7 +17,7 @@ format:
     embed-resources: true
     page-layout: full
     code-tools: true
-	
+
 # format : native    
 
 editor: visual
