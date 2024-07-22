@@ -45,7 +45,7 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 
 ## pandas {.unnumbered .unlisted}
 
-```{python, warning=FALSE, message=FALSE}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
 # Commande à écrire dans le prompt d'Anaconda
 # Pour installer un package :
 # pip install nom_du_package
@@ -118,7 +118,7 @@ library(lubridate)
 
 ## pandas {.unnumbered .unlisted}
 
-```{python, warning=FALSE, message=FALSE}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
 import pandas as pd
 import numpy as np
 from datetime import datetime
