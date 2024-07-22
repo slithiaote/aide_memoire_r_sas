@@ -86,9 +86,7 @@ id <- donnees_rbase[["identifiant"]] ; class(id)
 id <- donnees_rbase[, "identifiant"] ; class(id)
 
 # Résultat sous forme de data.frame
-id <- donnees_rbase[, "identifiant"] ; class(id)
 id <- donnees_rbase["identifiant"] ; class(id)
-
 # Attention, utilisation du drop = FALSE étrange
 # En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
 id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
@@ -210,8 +208,9 @@ data Colonnes;set donnees_sas (drop = &var.);run;
 variable <- c("identifiant", "sexe", "note_contenu")
 exclusion_var <- donnees_rbase[, setdiff(names(donnees_rbase), variable)]
 
-# Ne fonctionne pas !
+# Ne fonctionnent pas !
 #exclusion_var <- donnees_rbase[, -c(variable)]
+#exclusion_var <- donnees_rbase[, !c(variable)]
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -257,12 +256,16 @@ data Col3;set donnees_sas (keep = &nom_col.);run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 col3 <- donnees_rbase[, 3]
+
+# Autre possibilité
 col3 <- donnees_rbase[3]
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 col3 <- donnees_tidyverse %>% pull(3)
+
+# Autre possibilité
 col3 <- donnees_tidyverse %>% select(3)
 ```
 
@@ -300,6 +303,9 @@ quit;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 cols <- c("identifiant", "note_contenu", "sexe")
 colonnes <- donnees_rbase[, cols]
+
+# Autre possibilité
+colonnes <- donnees_rbase[cols]
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -362,7 +368,9 @@ data donnees_sas_Notes;set donnees_sas (keep = &var_notes.);run;
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- donnees_rbase[grepl("^note", names(donnees_rbase))]
+varNotes <- donnees_rbase[grepl("^note", names(donnees_rbase), ignore.case = TRUE)]
+
+# Autre possibilité
 varNotes <- donnees_rbase[substr(tolower(names(donnees_rbase)), 1, 4) == "note"]
 ```
 
@@ -400,7 +408,9 @@ data Selection_Variables;set donnees_sas (drop = Note:);run;
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-varNotes <- donnees_rbase[! grepl("^note", names(donnees_rbase))]
+varNotes <- donnees_rbase[! grepl("^note", names(donnees_rbase), ignore.case = TRUE)]
+
+# Autre possibilité
 varNotes <- donnees_rbase[substr(tolower(names(donnees_rbase)), 1, 4) != "note"]
 ```
 
