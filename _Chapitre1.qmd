@@ -158,13 +158,14 @@ Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thema
 
 Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
 
-Quatre raccourcis clavier sont notamment très utiles :
+Cinq raccourcis clavier sont notamment très utiles :
 
-| Raccourci          | Effet                                                     |
+| Raccourci          | Effet                                                                       |
 |--------------------------|----------------------------------------------|
-| Alt et -           | -\>                                                       |
-| Ctrl et Shift et m | %\>%                                                      |
-| Ctrl et Entrée     | Exécuter le code de la ligne où se trouve le curseur      |
-| Alt et Entrée      | Exécuter le code jusqu'à la ligne où se trouve le curseur |
+| Alt et -           | -\>                                                                         |
+| Ctrl et Shift et m | %\>%                                                                        |
+| Ctrl et Entrée     | Exécuter le code sélectionné ou de la ligne où se trouve le curseur         |
+| Alt et Entrée      | Exécuter le code jusqu'à la ligne où se trouve le curseur                   |
+| Ctrl et Shift et a | Reformater automatiquement le code sélectionné pour qu'il soit plus lisible |
 
-: Raccourcis `RStudio`.
+: Raccourcis `RStudio`
