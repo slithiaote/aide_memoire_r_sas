@@ -52,7 +52,7 @@ categories:
   - Pandas
 ---
 
-L'aide-mémoire a pour but de fournir des codes écrits en `SAS` et d'en donner la traduction en `R` de différentes manières possibles :
+L'aide-mémoire a pour but de fournir des codes écrits en `SAS` et d'en donner la traduction en différents environnements `R` :
 
 -   `R base`
 
