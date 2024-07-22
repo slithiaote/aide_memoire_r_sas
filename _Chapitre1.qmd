@@ -42,6 +42,14 @@ Des informations sur l'installation des packages en `R` sont disponibles sur le 
 # Pour installer un package :
 # install.packages("nom_du_package")
 ```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE}
+# Commande à écrire dans le prompt d'Anaconda
+# Pour installer un package :
+# pip install nom_du_package
+```
 :::
 
 ## Importation des packages
@@ -106,6 +114,14 @@ library(lubridate)
 ```{r, warning=FALSE, message=FALSE}
 #library(duckdb)
 #library(arrow)
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE}
+import pandas as pd
+import numpy as np
+from datetime import datetime
 ```
 :::
 
