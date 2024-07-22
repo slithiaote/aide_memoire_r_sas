@@ -90,14 +90,12 @@ x
 # Les {} permettent de réaliser une affectation (<-) au sein d'un traitement plus complexe !
 # Exemple ici : sommer les positions paires multipliées par 2 et les positions impaires multipliées par 3
 sum({x <- 1:6 ; x[1:length(x) %% 2 == 0] <- x[1:length(x) %% 2 == 0] * 2 ; x[1:length(x) %% 2 != 0] <- x[1:length(x) %% 2 != 0] * 3 ; x})
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Afficher ou non la valeur de l'objet affecté pendant l'affectation
 x <- pi
 (x <- pi)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE, error=TRUE}
@@ -107,7 +105,6 @@ x <- 0.5
 0 < x & x < 1
 # Incorrect
 0 < x < 1
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -115,7 +112,6 @@ x <- 0.5
 seq(0:10)
 0:10
 seq(0, 10)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -128,7 +124,6 @@ seq_len(n)
 n <- 0
 1:n
 seq_len(n)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -137,7 +132,6 @@ x <- c() ;length(x)
 for(i in 1:length(x)) print(i)
 for(i in seq_along(x)) print(i)
 for(i in seq(along=x)) print(i)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -148,7 +142,6 @@ sum({l <- 1:1000 ; l[l %% 3 == 0 | l %% 5 == 0]})
 sum({l <- 1:1000 ; l[seq_along(l) %% 3 == 0 | seq_along(l) %% 5 == 0]})
 sum(l<-(1:1000)[l %% 3 == 0 | l %% 5 == 0])
 sum((1:1000)[(1:1000 %% 3) == 0 | (1:1000 %% 5) == 0])
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -158,7 +151,6 @@ sum((1:1000)[(1:1000 %% 3) == 0 | (1:1000 %% 5) == 0])
 # Nan = not a number
 0/0
 log(-1)
-
 ```
 
 # Principe de vectorisation
@@ -169,49 +161,41 @@ La fonction s'applique à tous les éléments du vecteur !!
 # Exemple de vecteur
 valeurs <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 valeurs <- 1:10
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Valeurs au carré
 valeurs ** 2
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # logarithme des valeurs
 log(valeurs)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Maximum des valeurs
 max(valeurs)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Limite des valeurs
 range(valeurs)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 mean(valeurs)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 mean(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Inattendu
 mean(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -221,7 +205,6 @@ n <- 10
 1:n-1
 # Correct
 1:(n-1)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -234,14 +217,12 @@ mapply(min, x1, x2)
 # Maximum : 2 possibilités
 pmax(x1, x2)
 mapply(max, x1, x2)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Calculer (x - min) / (max - min) pour chaque élément x d'un vecteur
 x <- c(1,2,3)
 sapply(x, function(xi, mn, mx) {(xi - mn) / (mx - mn)}, mn = min(x), mx = max(x))
-
 ```
 
 # Principe de coercion
@@ -253,25 +234,21 @@ Dans les comparaisons, les objets R sont successivement convertis en logical, in
 TRUE == 1
 TRUE == 2
 FALSE == 0
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # TRUE est convertit en character
 TRUE == "1"
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # 5 est convertit en character
 5 < '7'
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # 50 est convertit en character
 50 < '7'
-
 ```
 
 # Principe de recycling
@@ -295,7 +272,6 @@ x + y
 ```{r, warning=FALSE, message=FALSE}
 # Conditions if / else
 x <- 1
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -305,34 +281,29 @@ print("x est égal à 1")
 } else {
 print("x est différent de 1")
 }
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 if (identical(x, 1)) {print("x est égal à 1")
 } else {print("x est différent de 1")}
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 if (identical(x, 1)) print("x est égal à 1") else
 print("x est différent de 1")
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 if (identical(x, 1)) print("x est égal à 1") else print("x est différent de 1")
-
 ```
 
 ```{r, warning=FALSE, message=FALSE, error=TRUE}
 # Incorrect
 if (identical(x, 1)) print("x est égal à 1")
 else print("x est différent de 1")
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -350,7 +321,6 @@ stop("salut")
 }
 }
 condition("Anglais")
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -364,21 +334,18 @@ stop("salut")
 )
 }
 condition("Français")
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Penser au print
 for(i in 1:5) i
 for(i in 1:5) print(i)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Différences print et cat
 cat("Salut !\nComment vas-tu ?")
 print("Salut !\nComment vas-tu ?")
-
 ```
 
 # Les valeurs manquantes
@@ -395,7 +362,6 @@ x
 # Pour les valeurs manquantes, toujours utiliser is.na et non ==
 NA == c(3, 1, 3, NA)
 is.na(c(3, 1, 3, NA))
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -403,31 +369,26 @@ is.na(c(3, 1, 3, NA))
 x1 <- 1:6
 x1 == c(1, 5)
 x1 %in% c(1, 5)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Sélection de données en cas de valeurs manquantes
 xna <- c(1, NA, 3, 2, 4, 2)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Avec ce code, les NA sont conservés
 xna[xna == 2]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Code sans les NA
 xna[!is.na(xna) & xna == 2]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Code compact sans les NA
 xna[which(xna == 2)]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -455,7 +416,6 @@ x <- 1:3
 x[c(0, 4)] <- c(-1, 9)
 # Marche !!
 for(i in 0:3) print(x[i])
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -463,7 +423,6 @@ for(i in 0:3) print(x[i])
 x <- c(a = 1, b = 2, a = 3)
 x["a"]
 x[names(x) %in% "a"]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -472,7 +431,6 @@ x <- data.frame(X1 = c(1,2), X2 = c(3,4), x3 = c(5,6))
 is.data.frame(x[, c(1,2)])
 is.data.frame(x[, c(1)])
 is.data.frame(x[, c(1), drop = FALSE])
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -480,19 +438,16 @@ is.data.frame(x[, c(1), drop = FALSE])
 x <- data.frame(x1 = c(1,2), x2 = c(3,4), x3 = c(5,6))
 subset(x, select = x1)
 subset(x, select = -x1)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Correct
 subset(x, x1 == 1)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Incorrect
 subset(x, x1 = 1)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE, error=TRUE}
@@ -505,7 +460,6 @@ df$`1`
 
 # Incorrect
 df$1
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -514,7 +468,6 @@ assign('objet', 3:5)
 objet
 for(i in 1:5) assign(paste('objet', i, sep = '_'), i)
 objet_5
-
 ```
 
 # Les listes
@@ -525,7 +478,6 @@ liste <- list(1, 2)
 # Il faut passer par cette syntaxe
 liste <- c(liste, list(3))
 liste
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -533,32 +485,27 @@ liste
 liste <- list("2" = 2, "0" = 0, "1" = 1)
 liste
 liste[order(names(liste))]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Extraction de listes
 liste <- list(nombres = 1:5, lettres = letters[1:5])
 liste$nombres
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # On veut faire appel à un élement de la liste à partir d'une variable extérieure
 var <- "nombres"
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Ne marche pas, car nombres est en caractère
 liste$var
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # Fonctionne
 liste[[var]]
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -568,7 +515,6 @@ liste["nombres"]
 is.list(liste["nombres"])
 liste[["nombres"]]
 is.list(liste[["nombres"]])
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -577,7 +523,12 @@ liste <- list(nombres = 1:5, lettres = letters[1:5])
 liste[-1]
 liste["nombres"] <- NULL
 liste
+```
 
+```{r, warning=FALSE, message=FALSE}
+# Dernier élément de chaque composante d'une liste
+liste <- list(1:26, letters)
+lapply(liste, tail, 1)
 ```
 
 # Différences entre sort(), order(), rank()
