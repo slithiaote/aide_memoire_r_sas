@@ -127,7 +127,7 @@ paste0("Année passée : ", annee_1)
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 # Année courante
 annee = datetime.now().year
 # Afficher l'année actuelle
@@ -212,7 +212,7 @@ if (annee >= 2024) {
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 if annee >= 2024:
     print("Nous sommes en 2024 ou après !")
 else:
@@ -272,7 +272,7 @@ getwd()
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = False}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 # Afficher le répertoire de travail
 os.getcwd()
 ```
