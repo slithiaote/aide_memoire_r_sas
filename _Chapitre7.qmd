@@ -215,7 +215,7 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On exprime CSP et sexe en variable formatée
-donnees_rbase$cspf <- cspf[donnees_rbase$csp]
+donnees_rbase$cspf  <- cspf[donnees_rbase$csp]
 donnees_rbase$sexef <- sexef[donnees_rbase$sexe]
 ```
 
@@ -292,16 +292,21 @@ run;
 # Âge formaté
 # L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
 agef <- cut(donnees_rbase$age, 
-            breaks = c(0, 25, 49, Inf),
-            right = TRUE,
-            labels = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
+            breaks         = c(0, 25, 49, Inf),
+            right          = TRUE,
+            labels         = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
             ordered_result = TRUE)
 
-# Autre solution
+# Autres solutions
 donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
 # 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
 donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
 donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
+
+donnees_rbase$agef <- ifelse(donnees_rbase$age < 26, "1. De 15 à 25 ans",
+                             ifelse(26 <= donnees_rbase$age & donnees_rbase$age < 50, "2. De 26 à 49 ans",
+                                    ifelse(donnees_rbase$age >= 50, "3. 50 ans ou plus",
+                                           NA_integer_)))
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -524,7 +529,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Création et suppressions de plusieurs variables
 donnees_rbase <- transform(donnees_rbase, 
-                           note_contenu2 = note_contenu / 20 * 5,
+                           note_contenu2   = note_contenu / 20 * 5,
                            note_formateur2 = note_formateur / 20 * 5)
 
 # Suppression des variables créées
