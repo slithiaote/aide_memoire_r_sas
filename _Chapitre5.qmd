@@ -67,6 +67,18 @@ En DuckDB, il y a une vraie différence entre `select` et `pull`. Dans le premie
 requete_duckdb %>% select(3)
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+pos = 0 # Contrairement à R, le compte commence à partir de 0 en Python
+
+# Résultat sous forme de vecteur caractère
+donnees_python.iloc[:, pos]
+
+# Résultat sous forme de data.frame
+donnees_python.iloc[:, [pos]]
+```
+
 :::
 
 ## Sélectionner des colonnes par nom
@@ -127,6 +139,17 @@ requete_duckdb %>% select("identifiant")
 requete_duckdb %>% select(any_of("identifiant"))
 ```
 Note : on déconseille l'utilisation de `select` sur des chaînes de caractère : certaines fonction du tidyvers nécessient de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple).
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Résultat sous forme de vecteur caractère
+donnees_python["identifiant"]
+donnees_python.identifiant
+
+# Résultat sous forme de data.frame
+donnees_python[["identifiant"]]
+```
 
 :::
 
@@ -192,6 +215,18 @@ variable <- c("identifiant","duree")
 requete_duckdb %>% select(any_of(variable))
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+variable = 'identifiant'
+
+# Résultat sous forme de vecteur caractère
+donnees_python[nom_var]
+
+# Résultat sous forme de data.frame
+donnees_python[[nom_var]]
+```
+
 :::
 
 ## Sauf certaines variables
@@ -233,6 +268,14 @@ Les opérateurs `-` et `!` fonctionnent.
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(!identifiant)
 requete_duckdb %>% select(-all_of(variable))
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+variable = ["identifiant", "sexe_red", "note_contenu"]
+donnees_python.drop(columns=variable, axis = 0)
+# En ajoutant l'argument inplace = True à la fonction .drop(), la base de données est directement modifiée en supprimant les variables du vecteur
 ```
 
 :::
@@ -278,6 +321,14 @@ col3 <- donnees_datatable[, 3]
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(3)
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Attention, en Python, la position de la 3e colonne est 2
+pos = 3
+donnees_python.iloc[:, pos-1]
 ```
 
 :::
@@ -346,6 +397,14 @@ requete_duckdb %>% select(any_of(cols))
 requete_duckdb %>% select({{ cols }})
 requete_duckdb %>% select(!!cols)
 ```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+cols = ["identifiant", "note_contenu", "sexe"]
+colonnes = donnees_python[cols]
+```
+
 :::
 
 ## Sélectionner les colonnes qui débutent par le mot Note
@@ -396,6 +455,12 @@ sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(starts_with("note"))
 ```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNotes = donnees_python[list(filter(lambda col: re.match(r'^note', col, re.IGNORECASE), donnees_python.columns))]
+```
 :::
 
 ## Sélectionner les colonnes qui ne débutent pas par le mot Note
@@ -432,6 +497,14 @@ sel <- donnees_datatable[, .SD, .SDcols = -patterns("^note")]
 requete_duckdb %>% select(-starts_with("note"))
 requete_duckdb %>% select(!starts_with("note"))
 ```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNotes = donnees_python.drop(columns=list(filter(lambda col: re.match(r'^note', col, re.IGNORECASE), donnees_python.columns)), 
+                               axis = 0)
+```
+
 :::
 
 ## Sélectionner l'ensemble des variables numériques de la base
@@ -462,6 +535,12 @@ sel <- donnees_datatable[, .SD, .SDcols = is.numeric]
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select_if(is.numeric)
 # requete_duckdb %>% select(where(is.numeric))
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNumeriques = donnees_python.select_dtypes(include='number')
 ```
 :::
 
@@ -500,5 +579,11 @@ var_dates <- donnees_datatable[, .SD, .SDcols = is.Date]
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select_if(is.Date)
 # requete_duckdb %>% select(where(is.Date))
+```
+
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varDates = donnees_python.select_dtypes(include=['datetime64[ns]'])
 ```
 :::

@@ -191,6 +191,9 @@ En DuckDB et/ou sur un serveur SQL, on déconseille les fonctions `head` (qui ne
 ```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
 x = 10
 donnees_python.head(x)
+# Autre méthode : la spécificité de Python est que l'on commence à compter à partir de 0
+# La première ligne se situe en position 0
+donnees_python.iloc[0:x, :]
 ```
 
 :::
