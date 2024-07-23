@@ -27,6 +27,8 @@ run;
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee,"-12-31"), origin = "1970-01-01")
 lubridate::ymd(paste0(annee,"-12-31"))
+lubridate::dmy(paste0("31/12/", annee))
+lubridate::mdy(paste0("12.31.", annee))
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -35,6 +37,8 @@ lubridate::ymd(paste0(annee,"-12-31"))
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee,"-12-31"))
 lubridate::ymd(paste0(annee,"-12-31"))
+lubridate::dmy(paste0("31/12/", annee))
+lubridate::mdy(paste0("12.31.", annee))
 ```
 
 ## data.table {.unnumbered .unlisted}
@@ -43,6 +47,8 @@ lubridate::ymd(paste0(annee,"-12-31"))
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee,"-12-31"))
 lubridate::ymd(paste0(annee,"-12-31"))
+lubridate::dmy(paste0("31/12/", annee))
+lubridate::mdy(paste0("12.31.", annee))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -65,6 +71,11 @@ data donnees_sas;
   /* Durée (en année) entre 2 dates */
   /* Âge à l'entrée dans le dispositif */
   Age = intck('year', date_naissance, date_entree);
+  /* En mois */
+  Age_mois = intck('month', date_naissance, date_entree);
+  /* En jours */
+  Age_jours   = intck('days', date_naissance, date_entree);
+  Age_jours_2 = date_entree - date_naissance;
 run;
 ```
 
@@ -73,6 +84,13 @@ run;
 # Durée (en année) entre 2 dates
 # Âge à l'entrée dans le dispositif
 donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
+
+# En mois
+donnees_rbase$age_mois <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "months"))
+
+# En jours
+donnees_rbase$age_jours   <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "days"))
+donnees_rbase$age_jours_2 <- donnees_rbase$date_entree - donnees_rbase$date_naissance
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -81,6 +99,16 @@ donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_en
 # Âge à l'entrée dans le dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
+
+# En mois
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(age_mois = as.period(interval(start = date_naissance, end = date_entree))$month)
+
+# En jours
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(age_jours = as.period(interval(start = date_naissance, end = date_entree))$day)
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(age_jours_2 = date_entree - date_naissance)
 ```
 
 ### data.table {.unnumbered .unlisted}
