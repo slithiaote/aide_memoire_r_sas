@@ -260,10 +260,19 @@ quit;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Tri par ordre croissant de identifiant et décroissant de date_entree
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE, decreasing = c(FALSE, TRUE), method = "radix"), ]
+donnees_rbase <- donnees_rbase[
+  order(donnees_rbase$identifiant, donnees_rbase$date_entree, 
+        na.last = FALSE, 
+        decreasing = c(FALSE, TRUE), 
+        method = "radix"
+        )
+  , ]
 
 # Autre possibilité : - devant la variable (uniquement pour les variables numériques)
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$duree, na.last = FALSE), ]
+donnees_rbase <- donnees_rbase[
+  order(donnees_rbase$identifiant, -donnees_rbase$duree, 
+        na.last = FALSE)
+  , ]
 ```
 
 ### tidyverse {.unnumbered .unlisted}
