@@ -97,6 +97,9 @@ proc transpose data = Wide out = Long;by Identifiant;var &notes.;run;
 ```
 
 ## R base {.unnumbered .unlisted}
+
+Lien utile : <https://stats.oarc.ucla.edu/r/faq/how-can-i-reshape-my-data-in-r/>.
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # On souhaite mettre les notes en ligne et non en colonne
 varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel")
@@ -140,10 +143,10 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 wide_datatable <- donnees_datatable[, lapply(.SD, mean, na.rm = TRUE), by = identifiant, .SDcols = varNotes]
 
 long_datatable <- melt(wide_datatable,
-                       id.vars = c("identifiant"),
-                       measure.vars = varNotes,
+                       id.vars       = c("identifiant"),
+                       measure.vars  = varNotes,
                        variable.name = "type_note",
-                       value.name = "note")
+                       value.name    = "note")
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -201,7 +204,7 @@ wide_rbase <- reshape(long_rbase,
 # Passer de long à wide : on souhaite revenir à la situation initiale
 # Mise en garde : ne pas écrire value_from !
 wide_tidyverse <- pivot_wider(long_tidyverse, 
-                              names_from = type_note,
+                              names_from  = type_note,
                               values_from = note)
 ```
 
