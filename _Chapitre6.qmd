@@ -36,7 +36,7 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
 ### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 donnees_python.iloc[2] # En Python, la troisieme ligne est en position 2
 ```
 
@@ -85,7 +85,7 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
 ### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 top3 = donnees_python.iloc[:3, :3]
 ```
 
@@ -136,7 +136,7 @@ requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
 ### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 en2023 = donnees_python[donnees_python['date_entree'].dt.year == 2023]
 ```
 
@@ -176,7 +176,7 @@ entre2021_2023 <- donnees_datatable[between(data.table::year(date_entree), 2021,
 ### arrow/duckdb {.unnumbered .unlisted}
 
 ### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 en2021_2023 = donnees_python[(donnees_python['date_entree'].dt.year >= 2021) &
                             (donnees_python['date_entree'].dt.year <= 2023)]
 ```
@@ -232,7 +232,7 @@ requete_duckdb %>%
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 avant2023_femme = donnees_python[(donnees_python['date_entree'].dt.year < 2023) &
                             (donnees_python['sexe'] == "2")]
 ```
@@ -297,7 +297,7 @@ requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 variable = "identifiant"
 sel = "087"
 donnees_python[donnees_python[variable] == sel]
@@ -352,7 +352,7 @@ requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 cols = ["identifiant", "note_contenu", "sexe", "date_naissance"]
 femmes = donnees_python[donnees_python["sexe"] == "2"][cols]
 ```
@@ -399,7 +399,7 @@ femmes <- donnees_datatable[eval(condition)]
 ```
 
 ## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 condition = lambda df: df['sexe'] == "2"
 femmes = donnees_python[condition(donnees_python)]
 ```
