@@ -183,6 +183,9 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Femmes entrées avant 2023
 avant2023_femme <- subset(donnees_rbase, lubridate::year(date_entree) < 2023 & sexe == "2")
+
+# Autre solution
+avant2023_femme <- with(donnees_rbase, donnees_rbase[which(lubridate::year(date_entree) < 2023 & sexe == "2"), ])
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -234,6 +237,9 @@ run;
 variable <- "identifiant"
 sel <- "087"
 donnees_rbase[donnees_rbase[, variable] %in% sel, ]
+
+# Autre solution
+subset(donnees_rbase, get(variable) %in% sel)
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -334,6 +340,10 @@ run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 condition <- substitute(sexe == "2")
+femmes <- subset(donnees_rbase, eval(condition))
+
+# Autre solution
+condition <- quote(sexe == "2")
 femmes <- subset(donnees_rbase, eval(condition))
 ```
 
