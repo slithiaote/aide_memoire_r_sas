@@ -15,7 +15,7 @@ website:
     align: center
     style: "docked"
     contents:
-      - href: 01-aide_memoire_r_sas_pandas.qmd
+      - href: 01-aide_memoire_r_sas.qmd
         text: "Aide-mémoire"
       - href: 03-mise_en_garde.qmd
         text: "Mise en garde"
