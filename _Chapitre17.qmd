@@ -1,6 +1,6 @@
 # Les jointures de bases
 
-Pour fonctionner, les codes de cette partie nécessitent l'importation des bases d'exemple de la section "Importation de bases pour la jointure".
+Pour fonctionner, les codes de cette partie nécessitent l'importation des bases d'exemple de la section "Importation de bases pour les jointures".
 
 ## Importation de bases pour les jointures 
 ::: {.panel-tabset group="language"}
