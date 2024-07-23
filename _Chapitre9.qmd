@@ -87,7 +87,10 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # 1ère lettre en majuscule, autres lettres en minuscule
-donnees_rbase$niveau <- paste0(toupper(substr(donnees_rbase$niveau, 1, 1)), tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau))))
+donnees_rbase$niveau <- paste0(
+  toupper(substr(donnees_rbase$niveau, 1, 1)),
+  tolower(substr(donnees_rbase$niveau, 2, length(donnees_rbase$niveau)))
+  )
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -238,7 +241,7 @@ proc print data = Exemple_texte;run;
 extrait <- substr("extrait", 2, 5)
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Extraire les 2e, 3e et 4e caractères de Concatener
 # 2 correspond à la position du 1er caractère à récupérer, 5 la position du dernier caractère
@@ -354,9 +357,10 @@ proc print data = Exemple_texte;run;
 texte1 <- "Ce texte"
 texte2 <- "va être"
 texte3 <- "concaténé"
+texte4 <- ""
 
 concatene <- paste(texte1, texte2, texte3, sep = " ")
-paste0(texte1, texte2, texte3)
+paste0(texte1, " ", texte2, " ", texte3)
 
 # Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
 paste(texte4, texte3, sep = "-")
@@ -368,6 +372,7 @@ paste(texte4, texte3, sep = "-")
 texte1 <- "Ce texte"
 texte2 <- "va être"
 texte3 <- "concaténé"
+texte4 <- ""
 
 concatene <- str_flatten(c(texte1, texte2, texte3), collapse = " ")
 
@@ -381,9 +386,13 @@ str_flatten(c(texte4, texte3), collapse = "-")
 texte1 <- "Ce texte"
 texte2 <- "va être"
 texte3 <- "concaténé"
+texte4 <- ""
 
-paste(texte1, texte2, sep = " ")
-paste0(texte1, texte2)
+concatene <- paste(texte1, texte2, texte3, sep = " ")
+paste0(texte1, " ", texte2, " ", texte3)
+
+# Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
+paste(texte4, texte3, sep = "-")
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
