@@ -35,6 +35,12 @@ DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un fi
 requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+donnees_python.iloc[2] # En Python, la troisieme ligne est en position 2
+```
+
+
 :::
 
 ### 3 premières lignes et 3 premières colonnes
@@ -76,6 +82,11 @@ DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un fi
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+top3 = donnees_python.iloc[:3, :3]
 ```
 
 :::
@@ -124,6 +135,11 @@ DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un fi
 requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+en2023 = donnees_python[donnees_python['date_entree'].dt.year == 2023]
+```
+
 :::
 
 ### Entrées entre 2021 et 2023
@@ -158,6 +174,12 @@ entre2021_2023 <- donnees_datatable[between(data.table::year(date_entree), 2021,
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+en2021_2023 = donnees_python[(donnees_python['date_entree'].dt.year >= 2021) &
+                            (donnees_python['date_entree'].dt.year <= 2023)]
+```
 
 :::
 
@@ -207,6 +229,12 @@ avant2023_femme <- subset(donnees_datatable, data.table::year(date_entree) < 202
 # Femmes entrées avant 2023
 requete_duckdb %>% 
   filter(lubridate::year(date_entree) < 2023 & sexe == "2")
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+avant2023_femme = donnees_python[(donnees_python['date_entree'].dt.year < 2023) &
+                            (donnees_python['sexe'] == "2")]
 ```
 :::
 
@@ -267,6 +295,14 @@ sel <- "087"
 # À FAIRE : peut-on faire plus simplement ?
 requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable))
 ```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+variable = "identifiant"
+sel = "087"
+donnees_python[donnees_python[variable] == sel]
+donnees_python[donnees_python[variable].isin([sel])]
+```
 :::
 
 ## Sélectionner des lignes et des colonnes
@@ -315,6 +351,12 @@ requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
 requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+cols = ["identifiant", "note_contenu", "sexe", "date_naissance"]
+femmes = donnees_python[donnees_python["sexe"] == "2"][cols]
+```
+
 :::
 
 ## Sélectionner des lignes selon une condition externe
@@ -354,6 +396,12 @@ femmes <- donnees_datatable[eval(condition)]
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
+condition = lambda df: df['sexe'] == "2"
+femmes = donnees_python[condition(donnees_python)]
 ```
 
 :::
