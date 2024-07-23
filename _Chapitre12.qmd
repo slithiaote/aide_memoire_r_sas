@@ -328,6 +328,7 @@ run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Sous forme de data.frame
 unique(donnees_rbase["identifiant"])
+
 # Sous forme de vecteur
 unique(donnees_rbase[, "identifiant"])
 unique(donnees_rbase[["identifiant"]])
