@@ -100,13 +100,9 @@ donnees_rbase$age_jours_2 <- donnees_rbase$date_entree - donnees_rbase$date_nais
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
 
-# En mois
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(age_mois = as.period(interval(start = date_naissance, end = date_entree))$month)
+# En mois : À FAIRE
 
-# En jours
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(age_jours = as.period(interval(start = date_naissance, end = date_entree))$day)
+# En jours : À FAIRE
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(age_jours_2 = date_entree - date_naissance)
 ```
@@ -115,7 +111,14 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Durée (en année) entre 2 dates
 # Âge à l'entrée dans le dispositif
-donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
+donnees_datatable[, age := floor(lubridate::time_length(difftime(date_entree, date_naissance), "years"))]
+
+# En mois
+donnees_datatable[, age_mois := floor(lubridate::time_length(difftime(date_entree, date_naissance), "months"))]
+
+# En jours
+donnees_datatable[, age_jours := floor(lubridate::time_length(difftime(date_entree, date_naissance), "days"))]
+donnees_datatable[, age_jours_2 := date_entree - date_naissance]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
@@ -171,6 +174,7 @@ donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees
 
 # Date 6 mois après la sortie
 donnees_rbase$date_6mois   <- donnees_rbase$date_sortie %m+% months(6)
+donnees_rbase$date_6mois   <- lubridate::add_with_rollback(donnees_rbase$date_sortie, months(6))
 donnees_rbase$date_6mois_2 <- donnees_rbase$date_sortie + lubridate::days(round(365.25/2))
 ```
 
@@ -184,6 +188,8 @@ donnees_tidyverse <- donnees_tidyverse %>%
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(date_6mois = date_sortie %m+% months(6))
 donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(date_6mois = lubridate::add_with_rollback(date_sortie, months(6)))
+donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(date_6mois_2 = date_sortie + lubridate::days(round(365.25/2)))
 ```
 
@@ -194,6 +200,7 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 
 # Date 6 mois après la sortie
 donnees_datatable[, date_6mois   := date_sortie %m+% months(6)]
+donnees_datatable[, date_6mois   := lubridate::add_with_rollback(date_sortie, months(6))]
 donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(365.25/2)]
 ```
 
