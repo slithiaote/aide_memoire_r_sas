@@ -134,7 +134,7 @@ annee = datetime.now().year
 print("Année :", annee)
 
 # Année passée
-annee_1 <- annee - 1
+annee_1 = annee - 1
 print("Année passée :", annee_1)
 ```
 
