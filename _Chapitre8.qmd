@@ -56,6 +56,20 @@ lubridate::mdy(paste0("12.31.", annee))
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Pour créer une date avec l'année courante
+annee = datetime.now().year
+
+# Méthode 1 : Utiliser pandas pour créer une date
+pd.to_datetime(f"{annee}-12-31")
+pd.to_datetime(f"31/12/{annee}", dayfirst=True, format="%d/%m/%Y")
+pd.to_datetime(f"12.31.{annee}", format="%m.%d.%Y")
+
+# Méthode 2 : Utiliser datetime pour créer une date
+datetime.strptime(f"{annee}-12-31", "%Y-%m-%d")
+```
+
 :::
 
 ## Manipuler des dates
@@ -140,6 +154,13 @@ requete_duckdb %>%
   select(age, agef)
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['age_jours'] = (donnees_python['date_entree'] - donnees_python['date_naissance']).dt.days
+# Remplacer les valeurs NaN par 0
+donnees_python['age_jours'] = np.floor(donnees_python['age_jours'].fillna(0)).astype(int)
+```
+
 :::
 
 ### Ajouter une durée à une date
@@ -221,6 +242,15 @@ requete_duckdb %>%
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
     age >= 50 ~ "3. 50 ans ou plus")) %>% 
   select(age, agef)
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+
+# Date de sortie du dispositif
+donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
 ```
 
 :::
