@@ -364,7 +364,7 @@ class(donnees_datatable)
 
 ## pandas {.unnumbered .unlisted}
 
-```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 type(donnees_python)
 ```
 
