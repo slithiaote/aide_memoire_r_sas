@@ -36,6 +36,11 @@ donnees_datatable[, csp_maj := toupper(cspf)]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['csp_maj'] = donnees_python['cspf'].str.upper()
+```
+
 :::
 
 ### Minuscule
@@ -69,6 +74,11 @@ donnees_datatable[, csp_min := tolower(cspf)]
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['csp_min'] = donnees_python['cspf'].str.lower()
 ```
 
 :::
@@ -111,6 +121,11 @@ donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(subs
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['niveau'] = donnees_python['cspf'].str.capitalize()
+```
+
 :::
 
 ## Nombre de caractères dans une chaîne de caractères
@@ -146,6 +161,11 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['taille_id'] = donnees_python['identifiant'].str.len()
 ```
 
 :::
@@ -209,6 +229,12 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+aCorriger = ["Qualifie", "qualifie", "Qualifie", "QUALIFIE"]
+[re.sub(r'[qQ]ualifie', 'Qualifié', mot.lower()) for mot in aCorriger]
+```
+
 :::
 
 ## Extraire des éléments d'une chaîne de caractères
@@ -258,6 +284,12 @@ extrait <- substr("extrait", 2, 5)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# La position 1 en Python correspond au 2eme élément
+extrait = "extrait"[1:5]
 ```
 
 :::
@@ -320,6 +352,13 @@ texte <- gsub("\\s+", " ", trimws(texte))
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Enlever les blancs au début et à la fin de la chaîne de caractère
+texte = "              Ce   Texte   mériterait   d être   corrigé   "
+texte = re.sub(r'\s+', ' ', texte).strip()
 ```
 
 :::
@@ -400,6 +439,20 @@ paste(texte4, texte3, sep = "-")
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Concaténer des chaînes de caractères
+texte1 = "Ce texte"
+texte2 = "va être"
+texte3 = "concaténé"
+texte4 = ""
+
+concatene = ' '.join([texte1, texte2, texte3])
+
+# Effet des valeurs manquantes : le délimiteur (ici -) apparaît avec la concaténation avec le caractère manquant
+'-'.join([texte4, texte3])
+```
+
 :::
 
 ## Transformer plusieurs caractères différents
@@ -444,6 +497,13 @@ chartr("éèêëàâçîô", "eeeeaacio", texte)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+texte = "éèêëàâçîô"
+texte.replace("éèêëàâçîô", "eeeeaacio")
 ```
 
 :::
@@ -501,6 +561,12 @@ unlist(strsplit(texte, split = " "))
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+texte = "Mon texte va être coupé !"
+texte.split()
+```
+
 :::
 
 ## Inverser une chaîne de caractères
@@ -547,6 +613,12 @@ inverserTexte(texte)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+texte = "Mon texte va être inversé !"
+texte[::-1]
 ```
 
 :::
