@@ -256,7 +256,7 @@ requete_duckdb %>% slice_min(duree, n=5, with_ties=FALSE) # with_ties = TRUE ret
 
 ```{python, warning=FALSE, message=FALSE, , results='hide', python.reticulate = FALSE}
 x = 10
-donnees_python.head(x)
+donnees_python.tail(x)
 ```
 
 :::
