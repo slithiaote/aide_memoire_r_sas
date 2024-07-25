@@ -32,7 +32,8 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Numéro de l'observation : 2 manières différentes
-donnees_rbase$num_observation <- seq(1 : nrow(donnees_rbase))
+donnees_rbase$num_observation <- seq(1, nrow(donnees_rbase))
+donnees_rbase$num_observation <- seq_len(nrow(donnees_rbase))
 donnees_rbase$num_observation <- row.names(donnees_rbase)
 ```
 
@@ -288,9 +289,12 @@ run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
-donnees_rbase$premier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, fromLast = FALSE), 1, 0)
-donnees_rbase$dernier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, fromLast = TRUE), 1, 0)
-donnees_rbase$ni_prem_ni_der  <- ifelse(! c(! duplicated(donnees_rbase$identifiant, fromLast = FALSE) | ! duplicated(donnees_rbase$identifiant, fromLast = TRUE)), 1, 0)
+donnees_rbase$premier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, fromLast = FALSE), 
+                                        1, 0)
+donnees_rbase$dernier_contrat <- ifelse(! duplicated(donnees_rbase$identifiant, fromLast = TRUE), 
+                                        1, 0)
+donnees_rbase$ni_prem_ni_der  <- ifelse(! c(! duplicated(donnees_rbase$identifiant, fromLast = FALSE) | ! duplicated(donnees_rbase$identifiant, fromLast = TRUE)), 
+                                        1, 0)
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -323,9 +327,12 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable <- donnees_datatable[order(identifiant, date_entree, na.last = FALSE)]
-donnees_datatable[, premier_contrat := fifelse(! duplicated(identifiant, fromLast = FALSE), 1, 0)]
-donnees_datatable[, dernier_contrat := fifelse(! duplicated(identifiant, fromLast = TRUE), 1, 0)]
-donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fromLast = FALSE) | ! duplicated(identifiant, fromLast = TRUE)), 1, 0)]
+donnees_datatable[, premier_contrat := fifelse(! duplicated(identifiant, fromLast = FALSE), 
+                                               1, 0)]
+donnees_datatable[, dernier_contrat := fifelse(! duplicated(identifiant, fromLast = TRUE), 
+                                               1, 0)]
+donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fromLast = FALSE) | ! duplicated(identifiant, fromLast = TRUE)), 
+                                               1, 0)]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -361,22 +368,26 @@ quit;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Peut-on le faire en moins d'étapes ??? Avec head ?
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+
+# En utilisant la fonction by
+deux_premieres_lignes <- Reduce(rbind, by(donnees_rbase, donnees_rbase["identifiant"], head, 2))
+
+# En utilisant la fonction split pour découper par identifiant, et en ne retenant que les deux premières lignes des groupes créés
+deux_premieres_lignes <- do.call(rbind, 
+                                 lapply(
+                                   split(donnees_rbase, donnees_rbase$identifiant), head, 2
+                                   ))
+
+# On peut aussi utiliser les numéros de contrat
 donnees_rbase$un <- 1L
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
 donnees_rbase$numero_contrat <- ave(donnees_rbase$un, donnees_rbase$identifiant, FUN = cumsum)
 deux_premieres_lignes <- donnees_rbase[which(donnees_rbase$numero_contrat <= 2), ]
 donnees_rbase$un <- NULL
 
-# REVOIR
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
-#donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) seq_along(z) == 2L)]
-#ind <- donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) length(z) == 1L | seq_along(z) == 2L)]
-
 # Version en R Base
 #https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
-
-# On peut aussi découper par identifiant avec split et head(,2) ? À FAIRE
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -491,12 +502,15 @@ run;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Avec le numéro de contrat
-deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
-
-# Autre solution
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)), donnees_rbase$identifiant, function(x) head(x, 2))), ]
+
+# Avec le numéro de contrat
+donnees_rbase$un <- 1L
+# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
+donnees_rbase$numero_contrat <- ave(donnees_rbase$un, donnees_rbase$identifiant, FUN = cumsum)
+deuxieme_ligne <- donnees_rbase[donnees_rbase$numero_contrat == 2, ]
+donnees_rbase$un <- NULL
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -565,7 +579,7 @@ donnees_datatable[, .SD[.N-1], by = identifiant]
 
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Personnes qui ont eu au moins une entrée en 2022 */
 proc sql;
@@ -576,7 +590,7 @@ proc sql;
 quit;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 auMoins2022 <- subset(donnees_rbase, identifiant %in% unique(identifiant[lubridate::year(date_entree) %in% c(2022)]))
@@ -591,7 +605,7 @@ auMoins2022 <- subset(
 auMoins2022$cond <- NULL
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 auMoins2022 <- donnees_tidyverse %>% 
@@ -604,7 +618,7 @@ auMoins2022 <- donnees_tidyverse %>%
   filter(any(lubridate::year(date_entree) == 2022), .by = identifiant)
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont eu au moins une entrée en 2022
 # Une fonction year() est déjà implémentée en data.table, l'usage de lubridate est inutile
@@ -614,7 +628,7 @@ auMoins2022 <- donnees_datatable[, if(any(data.table::year(date_entree) %in% 202
 auMoins2022 <- donnees_datatable[, if (sum(data.table::year(date_entree) == 2022, na.rm = TRUE) > 0) .SD, by = identifiant]
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -625,7 +639,7 @@ auMoins2022 <- donnees_datatable[, if (sum(data.table::year(date_entree) == 2022
 
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 proc sql;
   create table Qualif_Non_Qualif as
@@ -636,7 +650,7 @@ proc sql;
 quit;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -645,10 +659,9 @@ qualif_non_qualif <- subset(
             qualif     = ave(niveau, identifiant, FUN = function(x) sum(ifelse(x == "Qualifié", 1, 0), na.rm = TRUE)), 
             non_qualif = ave(niveau, identifiant, FUN = function(x) sum(ifelse(x == "Non Qualifié", 1, 0), na.rm = TRUE))),
   qualif >= 1 & non_qualif >= 1)
-# https://stackoverflow.com/questions/49669862/how-to-group-by-in-base-r
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 qualif_non_qualif <- donnees_tidyverse %>% 
@@ -661,7 +674,7 @@ qualif_non_qualif <- donnees_tidyverse %>%
   filter(any(niveau == "Qualifié") & any(niveau == "Non qualifié"), .by = identifiant)
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi à la fois une formation qualifiée et une formation non qualifiée
 
@@ -680,7 +693,7 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 # https://github.com/Rdatatable/data.table/issues/788
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -691,7 +704,7 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 
 ::: {.panel-tabset group="language"}
 
-## SAS {.unnumbered .unlisted}
+### SAS {.unnumbered .unlisted}
 ``` sas
 /* Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022 */
 proc sql;
@@ -703,7 +716,7 @@ proc sql;
 quit;
 ```
 
-## R base {.unnumbered .unlisted}
+### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
@@ -716,7 +729,7 @@ deux_contrats <- subset(
   nb == 2 & an >= 1)
 ```
 
-## tidyverse {.unnumbered .unlisted}
+### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 deux_contrats <- donnees_tidyverse %>% 
@@ -730,14 +743,14 @@ deux_contrats <- donnees_tidyverse %>%
   filter(any(lubridate::year(date_entree) == 2022 & n() == 2), .by = identifiant)
 ```
 
-## data.table {.unnumbered .unlisted}
+### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
 # Une fonction year() est déjà implémentée en data.table, l'usage de lubridate est inutile
 donnees_datatable[, if (.N == 2 & sum(data.table::year(date_entree) == 2022, na.rm = TRUE) >= 1) .SD, by = identifiant]
 ```
 
-## arrow/duckdb {.unnumbered .unlisted}
+### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
 ```
