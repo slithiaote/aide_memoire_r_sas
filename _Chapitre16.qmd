@@ -38,8 +38,8 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 
 # Il n'existe pas de fonction lag dans le R de base (à notre connaissance)
 # Il faut soit utiliser un package, soit utiliser cette astuce
+donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ seq(1, length(donnees_rbase$date_sortie) - 1)])
 donnees_rbase$date_sortie_1 <- c(as.Date(NA), donnees_rbase$date_sortie[ 1:(length(donnees_rbase$date_sortie) - 1)])
-# Peut-on aussi utiliser tail(..., -1) ?
 
 # Autres solutions
 #https://stackoverflow.com/questions/3558988/basic-lag-in-r-vector-dataframe
