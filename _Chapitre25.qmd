@@ -69,18 +69,6 @@ CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median", na.rm = TRUE)
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", na.rm = TRUE, selection = sexef == "Femme")
 CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "quantile", na.rm = TRUE, probs = seq(0, 1, 0.1), selection = sexef == "Femme")
-
-# Ancienne fonction
-CalculMoyenne0 <- function(baseDonnees, variable, statistique = "mean", ...) {
-  baseDonnees <- subset(baseDonnees, ...)
-  moyenne <- lapply(baseDonnees[, variable], get(statistique), na.rm = TRUE)
-  names(moyenne) <- paste(names(moyenne), statistique, sep = "_")
-  moyenne <- data.frame(moyenne)
-  return(moyenne)
-}
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"))
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), statistique = "median")
-CalculMoyenne0(donnees_rbase, c("note_formateur", "note_contenu"), "mean", sexef == "Femme")
 ```
 
 ## tidyverse {.unnumbered .unlisted}
