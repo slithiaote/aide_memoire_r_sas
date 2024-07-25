@@ -2,7 +2,7 @@
 
 ## Moyenne des notes par CSP (variable en ligne)
 
-### Non pondéré
+### Moyenne non pondérée
 ::: {.panel-tabset group="language"}
 
 ### SAS {.unnumbered .unlisted}
@@ -48,6 +48,9 @@ tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
 with(donnees_rbase, tapply(note_contenu, cspf, mean, na.rm = TRUE))
 tapply(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
 by(donnees_rbase$note_contenu, donnees_rbase$cspf, mean, na.rm = TRUE)
+
+# Découpage avec la fonction split (très pratique en R base !)
+sapply(split(donnees_rbase, donnees_rbase$cspf), function(x) mean(x$note_contenu, na.rm = TRUE))
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -90,7 +93,7 @@ donnees_datatable[, lapply(.SD, function(x) c(moyenne = mean(x, na.rm = TRUE), n
 
 :::
 
-### Pondéré
+### Moyenne pondérée
 ::: {.panel-tabset group="language"}
 
 ### SAS {.unnumbered .unlisted}
@@ -195,8 +198,11 @@ aggregate(formule, donnees_rbase, function(x) c(moyenne = mean(x, na.rm = TRUE),
 # Avec by
 by(donnees_rbase[, variable], donnees_rbase[, varGroupement], function(x) c(mean = mean(x, na.rm = TRUE), n = length(x)))
 
-# Avec rowsum (à ne pas confondre avec rowSums) : on ne peut calculer que la somme
+# Avec rowsum (à ne pas confondre avec rowSums)
+# Somme
 rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], sep = "_", lex.order = TRUE))
+# Moyenne
+rowsum(donnees_rbase[, variable], interaction(donnees_rbase[, varGroupement], sep = "_")) / as.vector(table(interaction(donnees_rbase[, varGroupement])))
 ```
 
 ## tidyverse {.unnumbered .unlisted}
