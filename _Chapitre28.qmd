@@ -19,7 +19,7 @@ quit;
 format(object.size(donnees_rbase), nsmall = 3, digits = 2, unit = "Mb")
 
 # Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+sort( sapply(ls(), function(x) object.size(get(x)) ), decreasing = TRUE ) / 10**9
 ```
 
 ## tidyverse {.unnumbered .unlisted}
@@ -30,7 +30,7 @@ donnees_tidyverse %>%
   format(nsmall = 3, digits = 2, unit = "Mb")
 
 # Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+sort( sapply(ls(), function(x) object.size(get(x)) ), decreasing = TRUE ) / 10**9
 ```
 
 ## data.table {.unnumbered .unlisted}
@@ -42,7 +42,7 @@ data.table::tables()
 format(object.size(donnees_datatable), nsmall = 3, digits = 2, unit = "Mb")
 
 # Taille des objets en mémoire, en Gb
-sort(sapply(ls(), function(x){object.size(get(x))}), decreasing = TRUE)/10**9
+sort( sapply(ls(), function(x) object.size(get(x)) ), decreasing = TRUE ) / 10**9
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
