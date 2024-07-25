@@ -562,7 +562,6 @@ run;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-library(collapse)
 var(donnees_rbase$note_contenu)
 ```
 
@@ -628,6 +627,8 @@ La variance pondérée se calcule par la formule :
 $$
 \frac{\sum_i{w_i \times (x_i - \bar{x}) ^2}}{\sum_i{w_i}} = \frac{\sum_i{w_ix_i^2}} {\sum_i{w_i}} - \bar{x}^2
 $$
+
+où $x_i$ désigne la variable et $w_i$ le poids.
 
 On la calcule "manuellement" en `R` pour confirmer le résultat.
 
@@ -716,7 +717,7 @@ run;
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 
-# Et les quantiles
+# Et les quantiles (déciles et quartiles)
 quantile(donnees_rbase$note_moyenne, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE)
 
 # Intervalle inter-quartile
@@ -730,7 +731,7 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
 
-# Et les quantiles
+# Et les quantiles (déciles et quartiles)
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
   quantile(probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE)
@@ -747,7 +748,7 @@ donnees_tidyverse %>%
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
 
-# Et les quantiles
+# Et les quantiles (déciles et quartiles)
 donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
 
 # Intervalle inter-quartile
@@ -799,7 +800,7 @@ library(collapse)
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_rbase$note_moyenne <- rowMeans(donnees_rbase[, notes], na.rm = TRUE)
 
-# Les quantiles
+# Les quantiles (déciles et quartiles)
 collapse::fquantile(donnees_rbase$note_moyenne, w = donnees_rbase$poids_sondage,
                     probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75))
 ```
@@ -815,7 +816,7 @@ varNotes <- c("note_contenu", "note_formateur", "note_moyens", "note_accompagnem
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(note_moyenne = rowMeans(across(all_of(varNotes)), na.rm = TRUE))
 
-# Les quantiles
+# Les quantiles (déciles et quartiles)
 donnees_tidyverse %>%
   pull(note_moyenne) %>% 
   collapse::fquantile(probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), w = donnees_tidyverse$poids_sondage)
@@ -831,7 +832,7 @@ library(collapse)
 notes <- c("note_contenu","note_formateur","note_moyens","note_accompagnement","note_materiel")
 donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes]
 
-# Les quantiles
+# Les quantiles (déciles et quartiles)
 donnees_datatable[, lapply(.SD, function(x) collapse::fquantile(x, w = poids_sondage,
                                                                 probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75)
                                                                 )),
