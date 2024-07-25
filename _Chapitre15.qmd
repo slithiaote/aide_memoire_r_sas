@@ -200,7 +200,7 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNo
 
 :::
 
-### Moyenne des moyennes des lignes
+### Moyenne des moyennes par ligne
 
 ::: {.panel-tabset group="language"}
 
