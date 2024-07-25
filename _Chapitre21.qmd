@@ -418,7 +418,7 @@ donnees_datatable[, descr::crosstab(cspf, sexef, weight = poids_sondage, prop.r 
 
 Lien vers la documentation :
 
-- <https://cran.r-project.org/web/packages/descr/descr.pdf>
+- <https://ardata-fr.github.io/flextable-book/crosstabs.html>
 - <https://cran.r-project.org/web/packages/flextable/flextable.pdf>
 
 ::: {.panel-tabset group="language"}
