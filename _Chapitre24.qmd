@@ -70,7 +70,7 @@ timetaken(started.at)
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # encoding permet de gérer l'encodage des caractères accentués
-# echo affiche le script dans la console
+# echo = TRUE affiche le script dans la console
 # max.deparse.length permet de s'assurer qu'un texte long est bien visible
 
 # source("chemin", encoding = "utf-8", echo = TRUE, max.deparse.length = 1e3)
