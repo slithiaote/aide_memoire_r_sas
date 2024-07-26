@@ -1,7 +1,7 @@
 # Sélection de colonnes
 
-## Sélectionner des colonnes par position
-::: {.panel-tabset group="language"}
+## Selectionner une colonne par sa position 
+::::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
@@ -63,9 +63,40 @@ id <- donnees_datatable[pos] ; class(id)
 
 En DuckDB, il y a une vraie différence entre `select` et `pull`. Dans le premier cas, les calculs restent du côté DuckDB, et c'est donc le moteur SQL qui continue à exécuter les calculs. Avec `pull`, le résultat est un `tibble` et les données sont transférées à la session R.
 
+:::: {.columns}
+
+::: {.column width="49%"}
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(3)
+# # Source:   SQL [?? x 1]
+# # Database: DuckDB v0.10.2 [sebastien.li-thiao-t@Windows 10 x64:R 4.3.2/:memory:]
+#   csp  
+#   <chr>
+# 1 1    
+# 2 1    
+# 3 1    
+# 4 1    
+# # ℹ more rows
 ```
+
+:::
+
+::: {.column width="2%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="49%"}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% pull(3)
+#  [1] "1" "1" "1" "1" "1" "1" "3" "3" "3" "2" "3" "5" "5" "3" "3" "3" "4" "4" "4"
+# [20] "4" "4" "2" "2" "1" "4" "4" "4"
+```
+
+:::
+
+::::
 
 ## pandas {.unnumbered .unlisted}
 
@@ -79,9 +110,11 @@ donnees_python.iloc[:, pos]
 donnees_python.iloc[:, [pos]]
 ```
 
-:::
+:::::
 
-## Sélectionner des colonnes par nom
+
+
+## Selectionner une colonne par son nom 
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -100,7 +133,10 @@ id <- donnees_rbase[, "identifiant"] ; class(id)
 # Résultat sous forme de data.frame
 id <- donnees_rbase["identifiant"] ; class(id)
 # Attention, utilisation du drop = FALSE étrange
-# En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
+# En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie
+# un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
+class(donnees_rbase[, "identifiant", drop = FALSE])
+id <- donnees_rbase["identifiant"] ; class(id)
 id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
 ```
 
@@ -135,10 +171,10 @@ id <- donnees_datatable[, "identifiant"] ; class(id)
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% select(identifiant)
-requete_duckdb %>% select("identifiant")
+requete_duckdb %>% select("identifiant") # déconseillé
 requete_duckdb %>% select(any_of("identifiant"))
 ```
-Note : on déconseille l'utilisation de `select` sur des chaînes de caractère : certaines fonction du tidyvers nécessient de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple).
+Note : certaines fonction du tidyverse nécessitent de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple). On conseille de le faire aussi pour `select`.
 
 ## pandas {.unnumbered .unlisted}
 
@@ -153,7 +189,7 @@ donnees_python[["identifiant"]]
 
 :::
 
-## Sélectionner des colonnes par un vecteur de noms
+## Selection de colonnes par un vecteur contenant des chaînes de caractères
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -522,8 +558,8 @@ varNumeriques <- donnees_rbase[, sapply(donnees_rbase, is.numeric), drop = FALSE
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-varNumeriques <- donnees_tidyverse %>% select(where(is.numeric))
 varNumeriques <- donnees_tidyverse %>% select_if(is.numeric)
+varNumeriques <- donnees_tidyverse %>% select(where(is.numeric))
 ```
 
 ## data.table {.unnumbered .unlisted}
