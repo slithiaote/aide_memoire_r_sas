@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.5.55">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="author" content="Damien EUZENAT">
 <meta name="description" content="Spécificités de SAS par rapport à R.">
 
-<title>Aide-mémoire SAS - R - Spécificités de SAS par rapport à R</title>
+<title>Spécificités de SAS par rapport à R – Aide-mémoire SAS - R - pandas</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -115,13 +115,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04-specificites_sas_r.html">Spécificités de SAS et R</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Recherche" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Aide-mémoire SAS - R</a> 
+      <a href="./">Aide-mémoire SAS - R - pandas</a> 
         <div class="sidebar-tools-main">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Basculer le mode sombre"><i class="bi"></i></a>
 </div>
@@ -146,6 +146,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accueil</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01-aide_memoire_r_sas.html" class="sidebar-item-text sidebar-link">
@@ -244,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modifié</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">24 mai 2024</p>
+      <p class="date-modified">2 juillet 2024</p>
     </div>
   </div>
     
@@ -258,8 +264,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Voici une liste non-exhaustive de spécificités de SAS par rapport à R à connaître.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 42%">
-<col style="width: 57%">
+<col style="width: 43%">
+<col style="width: 56%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -269,12 +275,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>SAS n’est pas sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne une même variable en SAS.</td>
-<td>R est sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne deux variables différentes en R.</td>
+<td><code>SAS</code> n’est pas sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne une même variable en <code>SAS</code>.</td>
+<td><code>R</code> est sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne deux variables différentes en <code>R</code>.</td>
 </tr>
 <tr class="even">
-<td>SAS est un logiciel propriétaire.</td>
-<td><p>R est un logiciel libre :</p>
+<td><code>SAS</code> est un logiciel propriétaire.</td>
+<td><p><code>R</code> est un logiciel libre :</p>
 <ul>
 <li><p>gratuit</p></li>
 <li><p>librement reproductible</p></li>
@@ -284,15 +290,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td>SAS est un langage centralisé.</td>
-<td>R un langage décentralisé.</td>
+<td><code>R</code> un langage décentralisé.</td>
 </tr>
 <tr class="even">
 <td>SAS tend à ne proposer qu’une ou deux solutions.</td>
-<td>R propose plusieurs façons de procéder (différents environnements, différents packages, etc.)</td>
+<td><code>R</code> propose plusieurs façons de procéder (différents environnements, différents packages, etc.)</td>
 </tr>
 <tr class="odd">
-<td>Une telle distinction n’a pas lieu pour SAS.</td>
-<td>R est le langage / logiciel, à ne pas confondre avec RStudio, qui est uniquement un IDE (Integrated Development Environment, interface graphique), parmi d’autres.</td>
+<td>Le langage et l’IDE (Integrated Development Environment, interface graphique) ne sont pas séparés en <code>SAS</code>.</td>
+<td><code>R</code> est le langage / logiciel, à ne pas confondre avec RStudio, qui est uniquement un IDE (Integrated Development Environment, interface graphique), parmi d’autres.</td>
 </tr>
 <tr class="even">
 <td></td>
@@ -310,26 +316,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="logiciel-libre" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="logiciel-libre"><span class="header-section-number">1</span> Logiciel libre</h2>
-<p>De par son statut de logiciel libre, de multiples extensions existent (packages). L’usage des packages :</p>
+<p>De par son statut de logiciel libre, de multiples extensions en <code>R</code> existent (packages). L’usage des packages :</p>
 <ul>
 <li>peut être un atout, car les packages permettent de réaliser plus facilement des choses complexes ;</li>
 <li>peut aussi être source de problèmes, d’abord de maintenance du fait des dépendances (une mise-à-jour peut casser les dépendances), ensuite du fait que des packages peuvent disparaître ou ne plus être maintenus au cours du temps, engendrant des coûts de maintenance de code ;</li>
 <li>peut engendrer des problèmes de rétrocompatibilité (un code écrit dans le passé ne fonctionne plus suite à une mise-à-jour) : il convient d’être conscient de ces considérations avant d’utiliser aveuglément des packages.</li>
 </ul>
+<p>Pour en savoir plus sur les packages en <code>R</code> :</p>
+<ul>
+<li><a href="https://book.utilitr.org/01_R_Insee/Fiche_installer_packages.html" class="uri">https://book.utilitr.org/01_R_Insee/Fiche_installer_packages.html</a></li>
+<li><a href="https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html" class="uri">https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html</a></li>
+</ul>
 </section>
 <section id="gestion-de-la-mémoire" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="gestion-de-la-mémoire"><span class="header-section-number">2</span> Gestion de la mémoire</h2>
-<p>La gestion de la mémoire est différente entre les logiciels. R importe l’ensemble des données en mémoire vive, SAS en copie une partie sur le disque dur. Ceci a plusieurs implications pour le travail statistique :</p>
+<p>La gestion de la mémoire est différente entre les logiciels. <code>R</code> importe l’ensemble des données en mémoire vive, <code>SAS</code> en copie une partie sur le disque dur. Ceci a plusieurs implications pour le travail statistique :</p>
 <ul>
-<li>si le volume des données excède la mémoire vive, il n’est pas possible de les traiter nativement en R. Il faut alors utiliser des stratégies alternatives ;</li>
-<li>il faut être parcimonieux sur le nombre de colonnes à inclure dans les bases de données en R. Par exemple, il vaut mieux recréer dans le programme les variables explicatives faciles à obtenir plutôt que les inclure dans la base de données, où elles occupent de la place et accaparent de la mémoire vive.</li>
+<li>si le volume des données excède la mémoire vive, il n’est pas possible de les traiter nativement en <code>R</code>. Il faut alors utiliser des stratégies alternatives ;</li>
+<li>il faut être parcimonieux sur le nombre de colonnes à inclure dans les bases de données en <code>R</code>. Par exemple, il vaut mieux recréer dans le programme les variables explicatives faciles à obtenir plutôt que les inclure dans la base de données, où elles occupent de la place et accaparent de la mémoire vive.</li>
 </ul>
+<p>Pour en savoir plus sur la façon dont <code>R</code> gère les données en mémoire vive : <a href="https://adv-r.hadley.nz/names-values.html" class="uri">https://adv-r.hadley.nz/names-values.html</a>.</p>
 <p>Quelles solutions adopter dans le cas où les données à manipuler ne tiennent pas en mémoire vive de l’ordinateur ?</p>
 <ul>
 <li>chercher à réduire la taille de la base de données en supprimant des colonnes inutiles ;</li>
 <li>chercher à modifier le processus de production pour le rendre moins gourmand en mémoire ;</li>
 <li>augmenter la mémoire vive de son ordinateur ;</li>
-<li>utiliser les packages Arrow et DuckDb qui peuvent gérer des données excédant la mémoire vive.</li>
+<li>utiliser les packages <code>data.table</code>, optimisé pour les grosses volumétries, et <code>arrow / duckdb</code> qui peuvent gérer des données excédant la mémoire vive.</li>
 </ul>
 
 
@@ -517,18 +529,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -560,7 +561,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -619,7 +642,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -980,7 +1003,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Date published</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "`r Sys.Date()`"</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> "05/24/2024"</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> "07/02/2024"</span></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="an">output:</span></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">  rmdformats::robobook:</span></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight: tango</span></span>
@@ -993,55 +1016,62 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>Voici une liste non-exhaustive de spécificités de SAS par rapport à R à connaître.</span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>| SAS                                                                                                                       | R                                                                                                                                                                  |</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>+===========================================================================================================================+====================================================================================================================================================================+</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>| SAS n'est pas sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne une même variable en SAS. | R est sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne deux variables différentes en R.                                           |</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>| SAS est un logiciel propriétaire.                                                                                         | R est un logiciel libre :                                                                                                                                          |</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           |                                                                                                                                                                    |</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | -   gratuit                                                                                                                                                        |</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           |                                                                                                                                                                    |</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | -   librement reproductible                                                                                                                                        |</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           |                                                                                                                                                                    |</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | -   modifiable et diffusable                                                                                                                                       |</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           |                                                                                                                                                                    |</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | -   son code source est ouvert                                                                                                                                     |</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>| SAS est un langage centralisé.                                                                                            | R un langage décentralisé.                                                                                                                                         |</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>| SAS tend à ne proposer qu'une ou deux solutions.                                                                          | R propose plusieurs façons de procéder (différents environnements, différents packages, etc.)                                                                      |</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>| Une telle distinction n'a pas lieu pour SAS.                                                                              | R est le langage / logiciel, à ne pas confondre avec RStudio, qui est uniquement un IDE (Integrated Development Environment, interface graphique), parmi d'autres. |</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | Vectorisation plutôt que boucle.                                                                                                                                   |</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>| Macro                                                                                                                     | Fonctions                                                                                                                                                          |</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>|                                                                                                                           | Gestion de la mémoire spécifique : shallow / deep copy                                                                                                             |</span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>+---------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>| SAS                                                                                                                           | R                                                                                                                                                                    |</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>+===============================================================================================================================+======================================================================================================================================================================+</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>| <span class="in">`SAS`</span> n'est pas sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne une même variable en <span class="in">`SAS`</span>. | <span class="in">`R`</span> est sensible à la casse. Un même nom de variable en majuscule et en minuscule désigne deux variables différentes en <span class="in">`R`</span>.                                         |</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>| <span class="in">`SAS`</span> est un logiciel propriétaire.                                                                                           | <span class="in">`R`</span> est un logiciel libre :                                                                                                                                          |</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               |                                                                                                                                                                      |</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | -   gratuit                                                                                                                                                          |</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               |                                                                                                                                                                      |</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | -   librement reproductible                                                                                                                                          |</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               |                                                                                                                                                                      |</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | -   modifiable et diffusable                                                                                                                                         |</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               |                                                                                                                                                                      |</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | -   son code source est ouvert                                                                                                                                       |</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>| SAS est un langage centralisé.                                                                                                | <span class="in">`R`</span> un langage décentralisé.                                                                                                                                         |</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>| SAS tend à ne proposer qu'une ou deux solutions.                                                                              | <span class="in">`R`</span> propose plusieurs façons de procéder (différents environnements, différents packages, etc.)                                                                      |</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>| Le langage et l'IDE (Integrated Development Environment, interface graphique) ne sont pas séparés en <span class="in">`SAS`</span>.                   | <span class="in">`R`</span> est le langage / logiciel, à ne pas confondre avec RStudio, qui est uniquement un IDE (Integrated Development Environment, interface graphique), parmi d'autres. |</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | Vectorisation plutôt que boucle.                                                                                                                                     |</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>| Macro                                                                                                                         | Fonctions                                                                                                                                                            |</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>|                                                                                                                               | Gestion de la mémoire spécifique : shallow / deep copy                                                                                                               |</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>+-------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+</span>
 <span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logiciel libre</span></span>
 <span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>De par son statut de logiciel libre, de multiples extensions existent (packages). L'usage des packages :</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>De par son statut de logiciel libre, de multiples extensions en <span class="in">`R`</span> existent (packages). L'usage des packages :</span>
 <span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>peut être un atout, car les packages permettent de réaliser plus facilement des choses complexes ;</span>
 <span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>peut aussi être source de problèmes, d'abord de maintenance du fait des dépendances (une mise-à-jour peut casser les dépendances), ensuite du fait que des packages peuvent disparaître ou ne plus être maintenus au cours du temps, engendrant des coûts de maintenance de code ;</span>
 <span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>peut engendrer des problèmes de rétrocompatibilité (un code écrit dans le passé ne fonctionne plus suite à une mise-à-jour) : il convient d'être conscient de ces considérations avant d'utiliser aveuglément des packages.</span>
 <span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gestion de la mémoire</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>Pour en savoir plus sur les packages en <span class="in">`R`</span> :</span>
 <span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>La gestion de la mémoire est différente entre les logiciels. R importe l'ensemble des données en mémoire vive, SAS en copie une partie sur le disque dur. Ceci a plusieurs implications pour le travail statistique :</span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>si le volume des données excède la mémoire vive, il n'est pas possible de les traiter nativement en R. Il faut alors utiliser des stratégies alternatives ;</span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>il faut être parcimonieux sur le nombre de colonnes à inclure dans les bases de données en R. Par exemple, il vaut mieux recréer dans le programme les variables explicatives faciles à obtenir plutôt que les inclure dans la base de données, où elles occupent de la place et accaparent de la mémoire vive.</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="ot">&lt;https://book.utilitr.org/01_R_Insee/Fiche_installer_packages.html&gt;</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="ot">&lt;https://book.utilitr.org/03_Fiches_thematiques/Fiche_comment_choisir_un_package.html&gt;</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gestion de la mémoire</span></span>
 <span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>Quelles solutions adopter dans le cas où les données à manipuler ne tiennent pas en mémoire vive de l'ordinateur ?</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>La gestion de la mémoire est différente entre les logiciels. <span class="in">`R`</span> importe l'ensemble des données en mémoire vive, <span class="in">`SAS`</span> en copie une partie sur le disque dur. Ceci a plusieurs implications pour le travail statistique :</span>
 <span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>chercher à réduire la taille de la base de données en supprimant des colonnes inutiles ;</span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>chercher à modifier le processus de production pour le rendre moins gourmand en mémoire ;</span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>augmenter la mémoire vive de son ordinateur ;</span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>utiliser les packages Arrow et DuckDb qui peuvent gérer des données excédant la mémoire vive.</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>si le volume des données excède la mémoire vive, il n'est pas possible de les traiter nativement en <span class="in">`R`</span>. Il faut alors utiliser des stratégies alternatives ;</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>il faut être parcimonieux sur le nombre de colonnes à inclure dans les bases de données en <span class="in">`R`</span>. Par exemple, il vaut mieux recréer dans le programme les variables explicatives faciles à obtenir plutôt que les inclure dans la base de données, où elles occupent de la place et accaparent de la mémoire vive.</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>Pour en savoir plus sur la façon dont <span class="in">`R`</span> gère les données en mémoire vive : <span class="ot">&lt;https://adv-r.hadley.nz/names-values.html&gt;</span>.</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>Quelles solutions adopter dans le cas où les données à manipuler ne tiennent pas en mémoire vive de l'ordinateur ?</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>chercher à réduire la taille de la base de données en supprimant des colonnes inutiles ;</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>chercher à modifier le processus de production pour le rendre moins gourmand en mémoire ;</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>augmenter la mémoire vive de son ordinateur ;</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>utiliser les packages <span class="in">`data.table`</span>, optimisé pour les grosses volumétries, et <span class="in">`arrow / duckdb`</span> qui peuvent gérer des données excédant la mémoire vive.</span></code><button title="Copier vers le presse-papier" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">

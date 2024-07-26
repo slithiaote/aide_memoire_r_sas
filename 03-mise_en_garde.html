@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.5.55">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="author" content="Damien EUZENAT">
 <meta name="description" content="Comment utiliser cet aide-mémoire ?">
 
-<title>Aide-mémoire SAS - R - Mise en garde</title>
+<title>Mise en garde – Aide-mémoire SAS - R - pandas</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -115,13 +115,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03-mise_en_garde.html">Mise en garde</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Recherche" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Aide-mémoire SAS - R</a> 
+      <a href="./">Aide-mémoire SAS - R - pandas</a> 
         <div class="sidebar-tools-main">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Basculer le mode sombre"><i class="bi"></i></a>
 </div>
@@ -146,6 +146,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Accueil</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./01-aide_memoire_r_sas.html" class="sidebar-item-text sidebar-link">
@@ -182,7 +188,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Sur cette page</h2>
    
   <ul>
-  <li><a href="#comment-utiliser-cet-aide-mémoire" id="toc-comment-utiliser-cet-aide-mémoire" class="nav-link active" data-scroll-target="#comment-utiliser-cet-aide-mémoire"><span class="header-section-number">1</span> Comment utiliser cet aide-mémoire ?</a></li>
+  <li><a href="#que-trouver-dans-cet-aide-mémoire" id="toc-que-trouver-dans-cet-aide-mémoire" class="nav-link active" data-scroll-target="#que-trouver-dans-cet-aide-mémoire"><span class="header-section-number">1</span> Que trouver dans cet aide-mémoire ?</a></li>
+  <li><a href="#comment-utiliser-cet-aide-mémoire" id="toc-comment-utiliser-cet-aide-mémoire" class="nav-link" data-scroll-target="#comment-utiliser-cet-aide-mémoire"><span class="header-section-number">2</span> Comment utiliser cet aide-mémoire ?</a></li>
   </ul>
 </nav>
 </nav>
@@ -242,7 +249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modifié</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">24 mai 2024</p>
+      <p class="date-modified">2 juillet 2024</p>
     </div>
   </div>
     
@@ -253,30 +260,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="comment-utiliser-cet-aide-mémoire" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Comment utiliser cet aide-mémoire ?</h1>
-<p>Sont présentés dans cet aide-mémoire des programmes statistiques courants pour la gestion de données statistiques, traduits dans les langages SAS et R (environnements <code>R-Base</code>, <code>Tidyverse</code> et <code>data.table</code> et <code>Arrow/DuckDb</code>). Ces tâches sont standards dans l’analyse statistique et réalisables en un petit nombre d’instructions.</p>
-<p>Cet aide-mémoire vise à faciliter la traduction des programmes statistiques entre ces différents langages (de SAS vers R, et d’un environnement R à un autre), et leur appropriation.</p>
+<section id="que-trouver-dans-cet-aide-mémoire" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Que trouver dans cet aide-mémoire ?</h1>
+<p>Cet aide-mémoire vise à faciliter la traduction des programmes statistiques entre ces différents langages (de <code>SAS</code> vers <code>R</code>, et d’un environnement <code>R</code> à un autre), ainsi que leur appropriation.</p>
+<p>Y sont présentés des codes informatiques courants pour la gestion de données statistiques, traduits dans les langages <code>SAS</code> et <code>R</code>. Ces tâches sont standards dans l’analyse statistique et réalisables en un petit nombre d’instructions.</p>
 <p>Il est présenté sous forme de tâches élémentaires statistiques (sélection de lignes ou de colonnes d’une base de données, repérage des doublons, etc.).</p>
-<p>Quatre grands environnements R sont traités : <code>R-Base</code>, <code>Tidyverse</code> et <code>data.table</code> et <code>Arrow/DuckDb</code>). Ils ne doivent pas être vus comme des concurrents, mais comme des compléments :</p>
+<p>Quatre grands environnements <code>R</code> sont traités : <code>R base</code>, <code>tidyverse</code>, <code>data.table</code> et <code>arrow / duckdb</code>. Ils ne doivent pas être vus comme des concurrents, mais comme des compléments :</p>
 <ul>
 <li>certaines tâches peuvent être plus ou moins facilement réalisées avec l’un ou l’autre ;</li>
 <li>ils présentent chacun des avantages et des inconvénients ;</li>
 <li>ils laissent le choix de la stratégie de codage.</li>
 </ul>
-<p>Ce guide est destiné à vous permettre de jongler plus facilement entre les environnements.</p>
-<p>Plusieurs solutions pour réaliser la même tâche sont proposées dans ce guide :</p>
-<ul>
-<li>certaines solutions peuvent être plus concises, mais moins claires ;</li>
-<li>d’autres plus ou moins rapides en fonction des données et des matériels et logiciels utilisés ;</li>
-<li>certaines façons de procéder sont plus efficaces que d’autres en R, mais cela peut dépendre des données et du matériel utilisé.</li>
-</ul>
+<p>Ce guide est aussi destiné à permettre de jongler plus facilement entre ces différents environnements.</p>
+</section>
+<section id="comment-utiliser-cet-aide-mémoire" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Comment utiliser cet aide-mémoire ?</h1>
 <p>L’attention du lecteur est attirée sur le fait que :</p>
 <ol type="1">
-<li><p>ce guide n’est pas exhaustif. Ainsi, les environnements peuvent proposer des solutions <em>ad-hoc</em> simplifiant grandement la résolution de problèmes moins courants et qui ne sont pas présents dans les autres environnements (ex. des <em>rolling joins</em> de data.table) ;</p></li>
+<li><p>ce guide n’est pas exhaustif. Ainsi, certains environnements peuvent proposer des solutions <em>ad-hoc</em> simplifiant grandement la résolution de problèmes moins courants et qui n’ont pas d’équivalents simples dans tous les autres environnements (ex. des <em>rolling joins</em> de <code>data.table</code>). Elles ne sont pas traitées dans cet aide-mémoire ;</p></li>
 <li><p>ce guide ne traite pas de ces stratégies, et le lecteur est invité à se documenter sur les environnements pour en savoir plus ;</p></li>
-<li><p>l’exercice de traduction de SAS vers R peut s’apparenter à la traduction d’un texte en langue étrangère. De même qu’une traduction littérale d’un texte en peut parfois être de mauvaise qualité, la traduction littérale d’une masse de codes SAS en codes R au moyen de cet aide-mémoire peut produire des résultats décevants. En effet, toute bonne traduction nécessite au moins <em>a minima</em> d’adapter le code SAS à une “nouvelle langue”, celle de R. La partie sur les spécificités de SAS par rapport à R peut vous aider sur ce point.</p></li>
+<li><p>l’exercice de traduction de <code>SAS</code> vers <code>R</code> peut s’apparenter à la traduction d’un texte en langue étrangère. De même qu’une traduction littérale d’un texte en peut parfois être de mauvaise qualité, la traduction littérale d’une masse de codes <code>SAS</code> en codes <code>R</code> au moyen de cet aide-mémoire peut produire des résultats décevants. En effet, toute bonne traduction nécessite au moins <em>a minima</em> d’adapter le code <code>SAS</code> à une “nouvelle langue”, celle de <code>R</code>. La partie sur les spécificités de <code>SAS</code> par rapport à <code>R</code> peut vous aider sur ce point.</p></li>
 </ol>
+<p>En outre, plusieurs solutions pour réaliser la même tâche peuvent être proposées :</p>
+<ul>
+<li>certaines solutions peuvent être plus concises, mais moins claires ;</li>
+<li>certaines façons de procéder sont plus efficaces que d’autres en <code>R</code>, mais cela peut dépendre des données et du matériel utilisé.</li>
+</ul>
 
 
 <!-- -->
@@ -463,18 +472,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -506,7 +504,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -565,7 +585,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -926,7 +946,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Date published</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "`r Sys.Date()`"</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> "05/24/2024"</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> "07/02/2024"</span></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="an">output:</span></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">  rmdformats::robobook:</span></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight: tango</span></span>
@@ -936,35 +956,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">  - R</span></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># Comment utiliser cet aide-mémoire ?</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># Que trouver dans cet aide-mémoire ?</span></span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>Sont présentés dans cet aide-mémoire des programmes statistiques courants pour la gestion de données statistiques, traduits dans les langages SAS et R (environnements <span class="in">`R-Base`</span>, <span class="in">`Tidyverse`</span> et <span class="in">`data.table`</span> et <span class="in">`Arrow/DuckDb`</span>). Ces tâches sont standards dans l'analyse statistique et réalisables en un petit nombre d'instructions.</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>Cet aide-mémoire vise à faciliter la traduction des programmes statistiques entre ces différents langages (de <span class="in">`SAS`</span> vers <span class="in">`R`</span>, et d'un environnement <span class="in">`R`</span> à un autre), ainsi que leur appropriation.</span>
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>Cet aide-mémoire vise à faciliter la traduction des programmes statistiques entre ces différents langages (de SAS vers R, et d'un environnement R à un autre), et leur appropriation.</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>Y sont présentés des codes informatiques courants pour la gestion de données statistiques, traduits dans les langages <span class="in">`SAS`</span> et <span class="in">`R`</span>. Ces tâches sont standards dans l'analyse statistique et réalisables en un petit nombre d'instructions.</span>
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>Il est présenté sous forme de tâches élémentaires statistiques (sélection de lignes ou de colonnes d'une base de données, repérage des doublons, etc.).</span>
 <span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>Quatre grands environnements R sont traités : <span class="in">`R-Base`</span>, <span class="in">`Tidyverse`</span> et <span class="in">`data.table`</span> et <span class="in">`Arrow/DuckDb`</span>). Ils ne doivent pas être vus comme des concurrents, mais comme des compléments :</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>Quatre grands environnements <span class="in">`R`</span> sont traités : <span class="in">`R base`</span>, <span class="in">`tidyverse`</span>, <span class="in">`data.table`</span> et <span class="in">`arrow / duckdb`</span>. Ils ne doivent pas être vus comme des concurrents, mais comme des compléments :</span>
 <span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>certaines tâches peuvent être plus ou moins facilement réalisées avec l'un ou l'autre ;</span>
 <span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>ils présentent chacun des avantages et des inconvénients ;</span>
 <span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>ils laissent le choix de la stratégie de codage.</span>
 <span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>Ce guide est destiné à vous permettre de jongler plus facilement entre les environnements.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>Ce guide est aussi destiné à permettre de jongler plus facilement entre ces différents environnements.</span>
 <span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>Plusieurs solutions pour réaliser la même tâche sont proposées dans ce guide :</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>certaines solutions peuvent être plus concises, mais moins claires ;</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>d'autres plus ou moins rapides en fonction des données et des matériels et logiciels utilisés ;</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>certaines façons de procéder sont plus efficaces que d'autres en R, mais cela peut dépendre des données et du matériel utilisé.</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>L'attention du lecteur est attirée sur le fait que :</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>1)  ce guide n'est pas exhaustif. Ainsi, les environnements peuvent proposer des solutions *ad-hoc* simplifiant grandement la résolution de problèmes moins courants et qui ne sont pas présents dans les autres environnements (ex. des *rolling joins* de data.table) ;</span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>2)  ce guide ne traite pas de ces stratégies, et le lecteur est invité à se documenter sur les environnements pour en savoir plus ;</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>3)  l'exercice de traduction de SAS vers R peut s'apparenter à la traduction d'un texte en langue étrangère. De même qu'une traduction littérale d'un texte en peut parfois être de mauvaise qualité, la traduction littérale d'une masse de codes SAS en codes R au moyen de cet aide-mémoire peut produire des résultats décevants. En effet, toute bonne traduction nécessite au moins *a minima* d'adapter le code SAS à une "nouvelle langue", celle de R. La partie sur les spécificités de SAS par rapport à R peut vous aider sur ce point.</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="fu"># Comment utiliser cet aide-mémoire ?</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>L'attention du lecteur est attirée sur le fait que :</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>1)  ce guide n'est pas exhaustif. Ainsi, certains environnements peuvent proposer des solutions *ad-hoc* simplifiant grandement la résolution de problèmes moins courants et qui n'ont pas d'équivalents simples dans tous les autres environnements (ex. des *rolling joins* de <span class="in">`data.table`</span>). Elles ne sont pas traitées dans cet aide-mémoire ;</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>2)  ce guide ne traite pas de ces stratégies, et le lecteur est invité à se documenter sur les environnements pour en savoir plus ;</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>3)  l'exercice de traduction de <span class="in">`SAS`</span> vers <span class="in">`R`</span> peut s'apparenter à la traduction d'un texte en langue étrangère. De même qu'une traduction littérale d'un texte en peut parfois être de mauvaise qualité, la traduction littérale d'une masse de codes <span class="in">`SAS`</span> en codes <span class="in">`R`</span> au moyen de cet aide-mémoire peut produire des résultats décevants. En effet, toute bonne traduction nécessite au moins *a minima* d'adapter le code <span class="in">`SAS`</span> à une "nouvelle langue", celle de <span class="in">`R`</span>. La partie sur les spécificités de <span class="in">`SAS`</span> par rapport à <span class="in">`R`</span> peut vous aider sur ce point.</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>En outre, plusieurs solutions pour réaliser la même tâche peuvent être proposées :</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>certaines solutions peuvent être plus concises, mais moins claires ;</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>certaines façons de procéder sont plus efficaces que d'autres en <span class="in">`R`</span>, mais cela peut dépendre des données et du matériel utilisé.</span></code><button title="Copier vers le presse-papier" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
