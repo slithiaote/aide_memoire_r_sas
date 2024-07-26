@@ -1,58 +1,494 @@
-# Sélection de lignes
+# Sélectionner des lignes et des colonnes 
 
-## Sélectionner des lignes
+## Selectionner une colonne par sa position 
+::::: {.panel-tabset group="language"}
 
-### 3e ligne
-
-::: {.panel-tabset group="language"}
-
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
-data Ligne3;set donnees_sas (firstobs = 3 obs = 3);run;
+%let pos = 1;
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :nom_col separated by " "
+  from Var
+  where varnum = &pos.;
+run;
+data Colonnes;set donnees_sas (keep = &nom_col.);run;
+proc datasets lib = Work nolist;delete Var;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-ligne3 <- donnees_rbase[3, ]
+pos <- 1
+# Résultat sous forme de vecteur caractère
+id <- donnees_rbase[[pos]] ; class(id)
+id <- donnees_rbase[, pos] ; class(id)
+# Résultat sous forme de data.frame
+id <- donnees_rbase[pos] ; class(id)
+id <- donnees_rbase[, pos, drop = FALSE] ; class(id)
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-ligne3 <- donnees_tidyverse %>% slice(3)
+# Sous forme de vecteur
+id <- donnees_tidyverse %>% pull(1)
+class(id)
+pos <- 1
+id <- donnees_tidyverse %>% pull(all_of(pos))
+class(id)
+# Sous forme de tibble
+id <- donnees_tidyverse %>% select(1)
+class(id)
+pos <- 1
+id <- donnees_tidyverse %>% select(all_of(pos))
+class(id)
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-ligne3 <- donnees_datatable[3, ]
-ligne3 <- donnees_datatable[3]
+pos <- 1
+# Résultat sous forme de vecteur caractère
+id <- donnees_datatable[[pos]] ; class(id)
+# Résultat sous forme de data.table
+id <- donnees_datatable[pos] ; class(id)
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
-DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
+En DuckDB, il y a une vraie différence entre `select` et `pull`. Dans le premier cas, les calculs restent du côté DuckDB, et c'est donc le moteur SQL qui continue à exécuter les calculs. Avec `pull`, le résultat est un `tibble` et les données sont transférées à la session R.
+
+:::: {.columns}
+
+::: {.column width="49%"}
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
+requete_duckdb %>% select(3)
 ```
-
-### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
-donnees_python.iloc[2] # En Python, la troisieme ligne est en position 2
-```
-
 
 :::
 
-### 3 premières lignes et 3 premières colonnes
+::: {.column width="2%"}
+<!-- empty column to create gap -->
+:::
 
+::: {.column width="49%"}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% pull(3)
+```
+
+:::
+
+::::
+
+:::::
+
+
+## Sélectionner la 3e colonne 
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
 proc contents data = donnees_sas out = Var noprint;run;
 proc sql noprint;
   select name into :nom_col separated by " "
   from Var
+  where varnum = 3;
+run;
+data Col3;set donnees_sas (keep = &nom_col.);run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_rbase[, 3]
+col3 <- donnees_rbase[3]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_tidyverse %>% pull(3)
+col3 <- donnees_tidyverse %>% select(3)
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+col3 <- donnees_datatable[, 3]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(3)
+```
+
+:::
+
+
+## Selectionner une colonne par son nom 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+data Colonnes;set donnees_sas (keep = identifiant);run;
+data Colonnes;set donnees_sas;keep identifiant;run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Résultat sous forme de vecteur caractère
+id <- donnees_rbase$identifiant ; class(id)
+id <- donnees_rbase[["identifiant"]] ; class(id)
+id <- donnees_rbase[, "identifiant"] ; class(id)
+# Résultat sous forme de data.frame
+class(donnees_rbase[, "identifiant"])
+# Attention, utilisation du drop = FALSE étrange
+# En fait, l'affectation par [] a pour option par défaut drop = TRUE. Ce qui implique que si l'affectation renvoie
+# un data.frame d'1 seule colonne, l'objet sera transformé en objet plus simple (vecteur en l'occurrence)
+class(donnees_rbase[, "identifiant", drop = FALSE])
+id <- donnees_rbase["identifiant"] ; class(id)
+id <- donnees_rbase[, "identifiant", drop = FALSE] ; class(id)
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sous forme de vecteur
+id <- donnees_tidyverse %>% pull(identifiant)
+id <- donnees_tidyverse %>% pull("identifiant")
+# Sous forme de tibble
+id <- donnees_tidyverse %>% select(identifiant)
+id <- donnees_tidyverse %>% select("identifiant")
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Résultat sous forme de vecteur caractère
+id <- donnees_datatable$identifiant ; class(id)
+id <- donnees_datatable[["identifiant"]] ; class(id)
+id <- donnees_datatable[, identifiant] ; class(id)
+# Résultat sous forme de data.table
+id <- donnees_datatable[, "identifiant"] ; class(id)
+id <- donnees_datatable[, .("identifiant")] ; class(id)
+id <- donnees_datatable[, list("identifiant")] ; class(id)
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(identifiant)
+requete_duckdb %>% select("identifiant") # déconseillé
+requete_duckdb %>% select(any_of("identifiant"))
+```
+Note : certaines fonction du tidyverse nécessitent de passer par les opérateurs `any_of` ou `all_of` pour ce genre d'opérations (`distinct` par exemple). On conseille de le faire aussi pour `select`.
+
+:::
+
+## Sélectionner plusieurs colonnes 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%let var = identifiant note_contenu sexe;
+data Colonnes;set donnees_sas (keep = &var.);run;
+proc sql;
+  create table Colonnes as
+  select %sysfunc(tranwrd(&var., %str( ), %str(, )))
+  from donnees_sas;
+quit;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+colonnes <- donnees_rbase[, cols]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs possibilités
+colonnes <- donnees_tidyverse %>% select(all_of(cols))
+colonnes <- donnees_tidyverse %>% select(any_of(cols))
+colonnes <- donnees_tidyverse %>% select({{cols}})
+colonnes <- donnees_tidyverse %>% select(!!cols)
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs écritures possibles
+# Peut-être l'écriture la plus simple, à privilégier
+colonnes <- donnees_datatable[, mget(cols)]
+# Ecriture cohérente avec la logique data.table
+colonnes <- donnees_datatable[, .SD, .SDcols = cols]
+# Ecriture un peu contre-intuitve. Attention ! L'écriture est bien ..cols, et non ..(cols) !!
+# Les syntaxes donnees_datatable[, ..(cols)] et donnees_datatable[, .(cols)] ne fonctionnent pas
+colonnes <- donnees_datatable[, ..cols]
+# Ecriture avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
+# Avec with = FALSE : désactive la possibilité de se référer à des colonnes sans les guillemets
+colonnes <- donnees_datatable[, cols, with = FALSE]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+cols <- c("identifiant", "note_contenu", "sexe")
+# Plusieurs possibilités
+requete_duckdb %>% select(all_of(cols))
+requete_duckdb %>% select(any_of(cols))
+requete_duckdb %>% select({{cols}})
+requete_duckdb %>% select(!!cols)
+```
+:::
+
+## Selection de colonnes par un vecteur contenant des chaînes de caractères
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%let var = identifiant Sexe note_contenu;
+data Colonnes;
+  /* Sélection de colonnes */
+  set donnees_sas (keep = &var.);
+  /* Selection de colonnes */
+  keep &var.;
+run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+# Résultat sous forme de vecteur caractère
+id <- donnees_rbase[, variable] ; class(id)
+id <- donnees_rbase[[variable]] ; class(id)
+# Résultat sous forme de data.frame
+id <- donnees_rbase[variable] ; class(id)
+id <- donnees_rbase[, variable, drop = FALSE] ; class(id)
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+# Sous forme de vecteur
+id <- donnees_tidyverse %>% pull(all_of(variable))
+# Sous forme de tibble
+id <- donnees_tidyverse %>% select(all_of(variable))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Résultat sous forme de vecteur caractère
+variable <- "identifiant"
+id <- donnees_datatable[[variable]] ; class(id)
+# Résultat sous forme de data.table
+id <- donnees_datatable[, .(variable)] ; class(id)
+id <- donnees_datatable[, list(variable)] ; class(id)
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE}
+variable <- c("identifiant","duree")
+requete_duckdb %>% select(any_of(variable))
+```
+
+:::
+
+## Sauf certaines variables 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%let var = identifiant Sexe note_contenu;
+data Colonnes;set donnees_sas (drop = &var.);run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- c("identifiant", "sexe", "note_contenu")
+# Ne fonctionne pas !
+#exclusion_var <- donnees_rbase[, -c(variable)]
+exclusion_var <- donnees_rbase[, setdiff(names(donnees_rbase), variable)]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- c("identifiant", "sexe", "note_contenu")
+exclusion_var <- donnees_tidyverse %>% select(!all_of(variable))
+exclusion_var <- donnees_tidyverse %>% select(-all_of(variable))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- c("identifiant", "sexe", "note_contenu")
+exclusion_var <- donnees_datatable[, !..variable]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+Les opérateurs `-` et `!` fonctionnent.
+
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(!identifiant)
+requete_duckdb %>% select(-all_of(variable))
+```
+
+:::
+
+
+## Sélectionner les colonnes qui débutent par le mot Note 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+/* 1ère solution */
+data Selection_Variables;set donnees_sas (keep = Note:);run;
+/* 2e solution */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql;
+  select name into :var_notes separated by " "
+  from Var where substr(upcase(name), 1, 4) = "NOTE" order by varnum;
+run;
+proc datasets lib = Work nolist;delete Var;run;
+data donnees_sas_Notes;set donnees_sas (keep = &var_notes.);run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- donnees_rbase[grepl("^note", names(donnees_rbase))]
+varNotes <- donnees_rbase[substr(tolower(names(donnees_rbase)), 1, 4) == "note"]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- donnees_tidyverse %>% select(starts_with("note"))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# 1ère méthode
+cols <- names(donnees_datatable)[substr(names(donnees_datatable), 1, 4) == "note"]
+sel <- donnees_datatable[, .SD, .SDcols = cols]
+# 2e méthode
+sel <- donnees_datatable[, .SD, .SDcols = patterns("^note")]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(starts_with("note"))
+```
+:::
+## Sélectionner les colonnes qui ne débutent pas par le mot Note 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+data Selection_Variables;set donnees_sas (drop = Note:);run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- donnees_rbase[! grepl("^note", names(donnees_rbase))]
+varNotes <- donnees_rbase[substr(tolower(names(donnees_rbase)), 1, 4) != "note"]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNotes <- donnees_tidyverse %>% select(-starts_with("note"))
+varNotes <- donnees_tidyverse %>% select(!starts_with("note"))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- names(donnees_datatable)[substr(names(donnees_datatable), 1, 4) == "note"]
+sel <- donnees_datatable[, .SD, .SDcols = -cols]
+sel <- donnees_datatable[, .SD, .SDcols = -patterns("^note")]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select(-starts_with("note"))
+requete_duckdb %>% select(!starts_with("note"))
+```
+:::
+## Sélectionner l'ensemble des variables numériques de la base 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+data Colonnes;set donnees_sas (keep = _numeric_);run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNumeriques <- donnees_rbase[, sapply(donnees_rbase, is.numeric), drop = FALSE]
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varNumeriques <- donnees_tidyverse %>% select_if(is.numeric)
+varNumeriques <- donnees_tidyverse %>% select(where(is.numeric))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+sel <- donnees_datatable[, .SD, .SDcols = is.numeric]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select_if(is.numeric)
+# requete_duckdb %>% select(where(is.numeric))
+```
+:::
+## Sélectionner l'ensemble des variables de format "Date" 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :nom_col separated by " "
+  from Var where format not in ("$", "");
+run;
+data Colonnes;set donnees_sas (keep = &nom_col.);run;
+proc datasets lib = Work nolist;delete Var;run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varDates <- donnees_rbase[, sapply(donnees_rbase, is.Date), drop = FALSE]
+varDates <- Filter(is.Date, donnees_rbase)
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+varDates <- donnees_tidyverse %>% select_if(is.Date)
+varDates <- donnees_tidyverse %>% select(where(is.Date))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+var_dates <- donnees_datatable[, .SD, .SDcols = is.Date]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+requete_duckdb %>% select_if(is.Date)
+# requete_duckdb %>% select(where(is.Date))
+```
+:::
+
+
+## Sélectionner des lignes 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+/* 3e ligne */
+data Ligne3; set donnees_sas (firstobs = 3 obs = 3); run;
+
+/* Sélection des 3 premières lignes et des 3 premières colonnes de la base */
+proc contents data = donnees_sas out = Var noprint;run;
+proc sql noprint;
+  select name into :nom_col separated by " " from Var
   where 1 <= varnum <= 3;
 run;
 data Top3;
@@ -61,22 +497,36 @@ run;
 proc datasets lib = Work nolist;delete Var;run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sélection des 3 premières lignes et des 3 premières colonnes de la base
 top3 <- donnees_rbase[1:3, 1:3]
+
+# 3e ligne
+ligne3 <- donnees_rbase[3, ]
+
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sélection des 3 premières lignes et des 3 premières colonnes de la base
 top3 <- donnees_tidyverse %>% slice(1:3) %>% select(1:3)
+
+# 3e ligne
+ligne3 <- donnees_tidyverse %>% slice(3)
+
 ```
 
-### data.table {.unnumbered .unlisted}
+## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 top3 <- donnees_datatable[1:3, 1:3]
+
+# 3e ligne
+ligne3 <- donnees_datatable[3, ]
+ligne3 <- donnees_datatable[3]
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
+## arrow/duckdb {.unnumbered .unlisted}
 
 DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
 
@@ -84,26 +534,48 @@ DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un fi
 requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
 ```
 
-### pandas {.unnumbered .unlisted}
+## pandas {.unnumbered .unlisted}
+
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python.iloc[2] # En Python, la troisieme ligne est en position 2
 top3 = donnees_python.iloc[:3, :3]
 ```
 
 :::
 
-### Entrées en 2023
+## Sélection de ligne par une valeur connue / la valeur d'une variable
 
 ::: {.panel-tabset group="language"}
 
-### SAS {.unnumbered .unlisted}
+## SAS {.unnumbered .unlisted}
 ``` sas
+%let var = identifiant;
+%let sel = 087;
+
+data Selection;
+  set donnees_sas;
+  if &var. in ("&sel.");
+run;
+
+/* Autre solution */
+data Selection;
+  set donnees_sas (where = (&var. in ("&sel.")));
+run;
+
 data En2023;
   set donnees_sas (where = (year(date_entree) = 2023));
 run;
 ```
 
-### R base {.unnumbered .unlisted}
+## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+variable <- "identifiant"
+sel <- "087"
+donnees_rbase[donnees_rbase[, variable] %in% sel, ]
+
+# Autre solution
+subset(donnees_rbase, get(variable) %in% sel)
+
 # ATTENTION, solution qui ne fonctionne pas toujours bien ! En effet, les valeurs manquantes sont sélectionnées !
 en2023 <- donnees_rbase[lubridate::year(donnees_rbase$date_entree) == 2023, ]
 
@@ -111,38 +583,64 @@ en2023 <- donnees_rbase[lubridate::year(donnees_rbase$date_entree) == 2023, ]
 en2023 <- donnees_rbase[lubridate::year(donnees_rbase$date_entree) %in% c(2023), ]
 en2023 <- donnees_rbase[which(lubridate::year(donnees_rbase$date_entree) == 2023), ]
 en2023 <- subset(donnees_rbase, lubridate::year(donnees_rbase$date_entree) == 2023)
+
 ```
 
-### tidyverse {.unnumbered .unlisted}
+## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse %>% filter(identifiant %in% c("087")) %>% select(identifiant)
+donnees_tidyverse %>% filter(identifiant == "087") %>% select(identifiant)
+
+# Essayons désormais par variable
+variable <- "identifiant"
+sel <- "087"
+donnees_tidyverse %>% filter(if_any(variable, ~ .x %in% sel)) %>% select(all_of(variable))
+donnees_tidyverse %>% filter(get(variable) %in% sel) %>% select(all_of(variable))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Sélection de lignes
+# Entrées en 2023
 en2023 <- donnees_tidyverse %>% filter(lubridate::year(date_entree) == 2023)
-```
-
-### data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
 # Pas de problème avec les valeurs manquantes comme pour la syntaxe en R-Base
 # Une fonction year() est déjà implémentée en data.table, l'usage de lubridate est inutile
 en2023 <- donnees_datatable[data.table::year(date_entree) == 2023, ]
 en2023 <- donnees_datatable[data.table::year(date_entree) == 2023]
 en2023 <- subset(donnees_datatable, data.table::year(date_entree) == 2023)
+
+variable <- "identifiant"
+sel <- "087"
+donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
+donnees_datatable[get(variable) %chin% sel, ]
 ```
 
-### arrow/duckdb {.unnumbered .unlisted}
-
-DuckDB, moteur SQL, ne respecte pas l'ordre des lignes. Il faut passer par un filtre ou choisir explicitement un ordre.
+## arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% filter(lubridate::year(date_entree) == 2023)
+requete_duckdb %>% filter(identifiant %in% c("087")) %>% select(identifiant)
+requete_duckdb %>% filter(identifiant == "087") %>% select(identifiant)
+# Essayons désormais par variables
+variable <- "identifiant"
+sel <- "087"
+requete_duckdb %>% select(any_of(variable))
 ```
 
-### pandas {.unnumbered .unlisted}
+## pandas {.unnumbered .unlisted}
+
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 en2023 = donnees_python[donnees_python['date_entree'].dt.year == 2023]
+
+variable = "identifiant"
+sel = "087"
+donnees_python[donnees_python[variable] == sel]
+donnees_python[donnees_python[variable].isin([sel])]
 ```
 
 :::
 
-### Entrées entre 2021 et 2023
+
+## Entrées entre 2021 et 2023
 
 ::: {.panel-tabset group="language"}
 
@@ -174,6 +672,9 @@ entre2021_2023 <- donnees_datatable[between(data.table::year(date_entree), 2021,
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
+```{r}
+requete_duckdb %>% filter(between(lubridate::year(date_entree), 2021, 2023))
+```
 
 ### pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
@@ -183,7 +684,8 @@ en2021_2023 = donnees_python[(donnees_python['date_entree'].dt.year >= 2021) &
 
 :::
 
-## Sélectionner des lignes suivant de multiples conditions
+
+## Sélectionner des lignes : multiples conditions 
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -200,6 +702,7 @@ data Avant2023_Femme;
   set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
 run;
 ```
+
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -229,9 +732,8 @@ avant2023_femme <- subset(donnees_datatable, data.table::year(date_entree) < 202
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-# Femmes entrées avant 2023
 requete_duckdb %>% 
-  filter(lubridate::year(date_entree) < 2023 & sexe == "2")
+  filter(lubridate::year(date_entree) < 2023 & sexe == "2") # Femmes entrées avant 2023
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -239,131 +741,9 @@ requete_duckdb %>%
 avant2023_femme = donnees_python[(donnees_python['date_entree'].dt.year < 2023) &
                             (donnees_python['sexe'] == "2")]
 ```
-:::
-
-## Sélectionner des lignes par référence : lignes de l'identifiant "087"
-::: {.panel-tabset group="language"}
-
-## SAS {.unnumbered .unlisted}
-``` sas
-%let var = identifiant;
-%let sel = 087;
-
-data Selection;
-  set donnees_sas;
-  if &var. in ("&sel.");
-run;
-
-/* Autre solution */
-data Selection;
-  set donnees_sas (where = (&var. in ("&sel.")));
-run;
-```
-
-## R base {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-sel <- "087"
-donnees_rbase[donnees_rbase[, variable] %in% sel, ]
-
-# Autre solution
-subset(donnees_rbase, get(variable) %in% sel)
-```
-
-## tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse %>% filter(identifiant %in% c("087")) %>% select(identifiant)
-donnees_tidyverse %>% filter(identifiant == "087") %>% select(identifiant)
-
-# Essayons désormais par variable
-variable <- "identifiant"
-sel <- "087"
-donnees_tidyverse %>% filter(if_any(variable, ~ .x %in% sel)) %>% select(all_of(variable))
-donnees_tidyverse %>% filter(get(variable) %in% sel) %>% select(all_of(variable))
-```
-
-## data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-variable <- "identifiant"
-sel <- "087"
-donnees_datatable[donnees_datatable[[variable]] %chin% sel, ]
-donnees_datatable[get(variable) %chin% sel, ]
-```
-
-## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-requete_duckdb %>% filter(identifiant %in% c("087")) %>% select(identifiant)
-requete_duckdb %>% filter(identifiant == "087") %>% select(identifiant)
-
-# Essayons désormais par variables
-variable <- "identifiant"
-sel <- "087"
-# À FAIRE : peut-on faire plus simplement ?
-requete_duckdb %>% filter(.data[[variable]] %in% sel) %>% select(all_of(variable))
-```
-
-## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
-variable = "identifiant"
-sel = "087"
-donnees_python[donnees_python[variable] == sel]
-donnees_python[donnees_python[variable].isin([sel])]
-```
-:::
-
-## Sélectionner des lignes et des colonnes
-::: {.panel-tabset group="language"}
-
-## SAS {.unnumbered .unlisted}
-``` sas
-%let cols = identifiant note_contenu sexe;
-data Femmes;
-  set donnees_sas (where = (Sexe = 2) keep = &cols.);
-run;
-
-/* Autre solution */
-data Femmes;
-  set donnees_sas;
-  if Sexe = 2;
-  keep &cols.;
-run;
-```
-
-## R base {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
-femmes <- donnees_rbase[donnees_rbase$sexe %in% c("2"), cols]
-femmes <- subset(donnees_rbase, sexe %in% c("2"), cols)
-```
-
-## tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
-femmes <- donnees_tidyverse %>% filter(sexe == "2") %>% select(all_of(cols))
-femmes <- donnees_tidyverse %>% filter(sexe == "2") %>% select({{ cols }})
-```
-
-## data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
-femmes <- donnees_datatable[sexe == "2", ..cols]
-femmes <- subset(donnees_datatable, sexe %in% c("2"), cols)
-```
-
-## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
-requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
-requete_duckdb %>% filter(sexe == "2") %>% select({{ cols }})
-```
-
-## pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
-cols = ["identifiant", "note_contenu", "sexe", "date_naissance"]
-femmes = donnees_python[donnees_python["sexe"] == "2"][cols]
-```
 
 :::
+
 
 ## Sélectionner des lignes selon une condition externe
 
@@ -405,7 +785,8 @@ femmes <- donnees_datatable[eval(condition)]
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+filter_condition <- . %>% filter(sexe == "2")
+requete_duckdb %>% filter_condition()
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -415,3 +796,77 @@ femmes = donnees_python[condition(donnees_python)]
 ```
 
 :::
+
+
+## Sélection de lignes et de variables 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%let cols = identifiant note_contenu sexe;
+data Femmes;
+  set donnees_sas (where = (Sexe = 2) keep = &cols.);
+run;
+
+/* Autre solution */
+data Femmes;
+  set donnees_sas;
+  if Sexe = 2;
+  keep &cols.;
+run;
+
+/* Par nom ou par variable */
+%let var = identifiant Sexe note_contenu;
+data Femmes;
+  /* Sélection de colonnes */
+  set donnees_sas (keep = &var.);
+  /* Sélection de lignes respectant une certaine condition */
+  if Sexe = "2";
+  /* Création de colonne */
+  note2 = note_contenu / 20 * 5;
+  /* Suppression de colonnes */
+  drop Sexe;
+  /* Selection de colonnes */
+  keep identifiant Sexe note_contenu;
+run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
+femmes <- donnees_rbase[donnees_rbase$sexe %in% c("2"), cols]
+femmes <- subset(donnees_rbase, sexe %in% c("2"), cols)
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
+femmes <- donnees_tidyverse %>% filter(sexe == "2") %>% select(all_of(cols))
+femmes <- donnees_tidyverse %>% filter(sexe == "2") %>% select({{cols}})
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
+femmes <- donnees_datatable[sexe == "2", ..cols]
+femmes <- subset(donnees_datatable, sexe %in% c("2"), cols)
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+cols <- c("identifiant", "note_contenu", "sexe", "date_naissance")
+requete_duckdb %>% filter(sexe == "2") %>% select(all_of(cols))
+requete_duckdb %>% filter(sexe == "2") %>% select({{cols}})
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+cols = ["identifiant", "note_contenu", "sexe", "date_naissance"]
+femmes = donnees_python[donnees_python["sexe"] == "2"][cols]
+```
+
+:::
+
+
+
+
