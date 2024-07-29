@@ -296,7 +296,7 @@ donnees_python[enDate] = donnees_python[enDate].apply(pd.to_datetime, format='%d
 # A FAIRE
 
 # Âge à l'entrée dans le dispositif
-donnees_python['age'] = (donnees_python['date_entree'] - donnees_python['date_naissance']).astype('<m8[Y]')
+donnees_python['age'] = np.floor((donnees_python['date_entree'] - donnees_python['date_naissance']).dt.days / 365.25).astype('Int64')
 ```
 
 :::

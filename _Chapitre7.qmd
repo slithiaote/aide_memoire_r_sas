@@ -84,6 +84,16 @@ requete_duckdb %>%
 requete_duckdb %>% select(-contains("date"), -starts_with("note"))
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Création de la colonne note2
+donnees_python['note2'] = donnees_python['note_contenu'] / 20 * 5
+
+# Suppression de variables :
+donnees_python.drop(['note2'], axis = 1, inplace = True)
+```
+
+
 :::
 
 ## Créer et supprimer plusieurs variables
@@ -163,6 +173,17 @@ requete_duckdb %>%
 variable <- c("note_contenu", "note_formateur")
 requete_duckdb %>% 
   select(-any_of(variable))
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Création des colonnes note_contenu2 et note_formateur2
+donnees_python = donnees_python.assign(
+                                    note_contenu2 = donnees_python['note_contenu'] / 20 * 5,
+                                    note_formateur2 = donnees_python['note_formateur'] / 20 * 5
+                                    )
+# Suppression des variables nouvellement crées
+donnees_python.drop(columns=['note_contenu2', 'note_formateur2'], axis = 1, inplace = True)
 ```
 
 :::
@@ -254,6 +275,18 @@ requete_duckdb %>%
                                     "Inconnu")))
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Avec un mapping : 
+mapping = {'2': 'Mme', '1': 'M'}
+donnees_python['civilite'] = donnees_python['sexe'].map(mapping).filna('Inconnu')
+
+# Avec une fonction apply/lambda et les condition IF/ELSE :
+donnees_python['civilite'] = donnees_python['sexe'].apply(
+    lambda x: 'Mme' if x == '2' else ('M' if x == '1' else 'Inconnu')
+)
+```
+
 :::
 
 
@@ -315,6 +348,12 @@ requete_duckdb %>%
 
 Note : l'opération n'est pas persistante, i.e. l'objet `requete_duckdb` n'est pas modifié
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python_cor = donnees_python.copy()
+donnees_python_cor.loc[donnees_python_cor['identifiant'] == '168', 'note_contenu'] = 8
+```
+
 :::
 
 
@@ -370,6 +409,15 @@ En dplyr/arrow/duckdb, le renommage n'est pas persistant, i.e. la variable `requ
 ```{r, warning=FALSE, message=FALSE}
 # On renomme la variable sexe en sexe_red
 requete_duckdb %>% rename(sexe_red = sexe)
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Renommer la colonne sexe en sexe_red
+donnees_python = donnees_python.rename(columns={'sexe': 'sexe_red'})
+
+# On la renomme en sexe
+donnees_python = donnees_python.rename(columns={'sexe_red': 'sexe'})
 ```
 :::
 
@@ -456,6 +504,18 @@ requete_duckdb %>%
 ```
 
 Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Transformer la variable sexe en numérique
+donnees_python['sexe_numerique'] = pd.to_numeric(donnees_python['sexe'])
+
+# Transformer la variable sexe_numerique en caractère
+donnees_python['sexe_caractere'] = donnees_python['sexe_numerique'].astype(str)
+
+# Transformer une date d'un format caractère à un format Date
+donnees_python['date_r'] = pd.to_datetime('01/01/2000', format='%d/%m/%Y')
+```
 :::
 
 ## Changer le type de plusieurs variables À FAIRE
@@ -543,6 +603,22 @@ format_cspf <- . %>% mutate(cspf = case_match(
   .default = csp))
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On créée les formats sous type de dictionnaire
+sexef_format = {
+                "1": "Homme", 
+                "2": "Femme"
+                }
+cspf_format = {
+    "1": "Cadre", 
+    "2": "Profession intermédiaire", 
+    "3": "Employé", 
+    "4": "Ouvrier", 
+    "5": "Retraité"
+}
+```
+
 :::
 
 ### Utiliser les formats (valeurs discrètes ou caractères) 
@@ -624,6 +700,13 @@ requete_duckdb %>%
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['sexef'] = donnees_python['sexe'].map(sexef_format)
+# On peut aussi utiliser replace : donnees_python['sexef'] = donnees_python['sexe'].replace(sexef_format)
+donnees_python['cspf'] = donnees_python['csp'].map(cspf_format)
+```
+
 :::
 
 
@@ -675,6 +758,16 @@ donnees_datatable[, mois := sprintf("%02d", data.table::month(date_entree))]
 requete_duckdb %>% 
   mutate(mois = stringr::str_pad(as.character(month(date_entree)), width = 2L, pad = "0")) %>% 
   select(mois, date_entree)
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Extraire le mois et l'année
+donnees_python['mois'] = donnees_python['date_entree'].dt.month
+donnees_python['annee'] = donnees_python['date_entree'].dt.year
+
+# Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
+donnees_python['mois'] = donnees_python['mois'].fillna(0).astype(int).apply(lambda x: f"{x:02d}")
 ```
 :::
 
@@ -763,6 +856,15 @@ requete_duckdb %>%
   select(sexe, sexef, csp, cspf)
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Pour les bins : [0, 26, 51] correspond à [0, 26[, [26, 51[, etc
+donnees_python['agef'] = pd.cut(donnees_python['age'], 
+                                   bins=[0, 26, 51, float('inf')], 
+                                   labels=["1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"], 
+                                   right=False)
+```
+
 :::
 
 ## Arrondir une valeur numérique
@@ -840,6 +942,24 @@ requete_duckdb %>%
     poids_ceiling = ceiling(as.numeric(poids_sondage)),
     ) %>% 
   select(starts_with("poids"))
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Arrondi à l'entier le plus proche
+donnees_python['poids_arrondi_0'] = donnees_python['poids_sondage'].round(0)
+
+# Arrondi à 1 chiffre après la virgule
+donnees_python['poids_arrondi_1'] = donnees_python['poids_sondage'].round(1)
+
+# Arrondi à 2 chiffres après la virgule
+donnees_python['poids_arrondi_2'] = donnees_python['poids_sondage'].round(2)
+
+# Arrondi à l'entier inférieur
+donnees_python['poids_inf'] = np.floor(donnees_python['poids_sondage'])
+
+# Arrondi à l'entier supérieur
+donnees_python['poids_sup'] = np.ceil(donnees_python['poids_sondage'])
 ```
 :::
 
@@ -931,6 +1051,19 @@ for (j in notes) {
 requete_duckdb %>% 
   mutate(across(starts_with("note"), ~ as.numeric(.x)/20*100)) %>% 
   select(starts_with("note"))
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sélectionner les colonnes dont les noms commencent par "note"
+notes = [col for col in donnees_python.columns if col.startswith('note')]
+
+# Transformer les colonnes sélectionnées
+sur100 = donnees_python[notes] / 20 * 100
+
+# Ajouter les nouvelles colonnes avec un suffixe "_100"
+for col in notes:
+    donnees_python[f"{col}_100"] = sur100[col]
 ```
 :::
 
@@ -1078,5 +1211,24 @@ requete_duckdb %>%
     age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
     age >= 50 ~ "3. 50 ans ou plus")) %>% 
   select(age, agef)
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Calculer la durée en jours pour six mois
+sixmois = 365.25 / 2
+
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_python['duree_inf_6_mois'] = np.where(donnees_python['duree'] < sixmois, 1, 0)
+
+# Calculer la date de sortie du dispositif
+donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
+
+# Créer une date spécifique (31 décembre de l'année en cours)
+donnees_python['date_specifique'] = pd.to_datetime(donnees_python['date_entree'].dt.year.fillna(0).astype(int).astype(str) + "-12-31", format='%Y-%m-%d', errors='coerce')
+
+# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
+donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
+
 ```
 :::
