@@ -68,6 +68,15 @@ requete_duckdb %>%
   relocate(identifiant, date_entree)
 ```
 
+### pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+colTri = ["identifiant", "date_entree"]
+
+cols = colTri + [col for col in donnees_python.columns if col not in colTri]
+donnees_python = donnees_python[cols]
+```
+
 :::
 
 ### Mettre la variable poids_sondage au début de la base
@@ -100,6 +109,13 @@ setcolorder(donnees_datatable, "poids_sondage")
 
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+```
+
+### pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+cols = ['poids_sondage'] + [col for col in donnees_python.columns if col != 'poids_sondage']
+donnees_python = donnees_python[cols]
 ```
 
 :::
@@ -146,6 +162,18 @@ setcolorder(donnees_datatable, "poids_sondage", after = "date_naissance")
 ```{r, warning=FALSE, message=FALSE}
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+# Trouver l'index de la colonne 'date_naissance'
+date_naissance_index = donnees_python.columns.get_loc('date_naissance')
+
+# Sélectionner toutes les colonnes jusqu'à 'date_naissance' inclus
+varAvant = list(donnees_python.columns[:date_naissance_index + 1]) + ['poids_sondage']
+
+# Réorganiser les colonnes du DataFrame
+donnees_python = donnees_python[varAvant + [col for col in donnees_python.columns if col not in varAvant]]
+```
+
 :::
 
 ### Mettre la variable poids_sondage à la fin de la base
@@ -183,6 +211,12 @@ setcolorder(donnees_datatable, c(setdiff(colnames(donnees_datatable), "poids_son
 
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+cols = [col for col in donnees_python.columns if col != 'poids_sondage'] + ['poids_sondage']
+donnees_python = donnees_python[cols]
 ```
 
 :::
@@ -235,6 +269,12 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+# Mettre les na en premier
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], na_position='first')
 ```
 
 :::
@@ -294,6 +334,11 @@ setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], na_position='first', ascending=[True, False])
 ```
 
 :::
@@ -372,6 +417,19 @@ requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, No
 requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+# Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'])
+
+# SAS considère les valeurs manquantes comme des nombres négatifs faibles.
+# Pour mimer le tri par ordre croissant en SAS : ajouter l'option na_position = 'first'
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], na_position='first')
+
+# Pour mimer le tri par ordre décroissant en SAS :
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], ascending=[True, False])
+```
+
 :::
 
 ## Trier par ordre croissant de toutes les variables de la base 
@@ -403,6 +461,11 @@ tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
+donnees_python = donnees_python.sort_values(by=list(donnees_python.columns), na_position='first')
 ```
 
 :::
