@@ -750,6 +750,7 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = notes
 
 # Et les quantiles (déciles et quartiles)
 donnees_datatable[, quantile(.SD, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
+donnees_datatable[, lapply(.SD, quantile, probs = c(seq(0, 1, 0.1), 0.25, 0.5, 0.75), na.rm = TRUE), .SDcols = "note_moyenne"]
 
 # Intervalle inter-quartile
 donnees_datatable[, IQR(note_moyenne, na.rm = TRUE)]
