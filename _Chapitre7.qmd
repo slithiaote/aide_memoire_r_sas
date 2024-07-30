@@ -93,7 +93,6 @@ donnees_python['note2'] = donnees_python['note_contenu'] / 20 * 5
 donnees_python.drop(['note2'], axis = 1, inplace = True)
 ```
 
-
 :::
 
 ## Créer et supprimer plusieurs variables
@@ -536,7 +535,6 @@ requete_duckdb %>%
 
 :::
 
-
 ## Formater les modalités des valeurs discrètes ou caractères
 
 ### Création des formats
@@ -604,6 +602,7 @@ format_cspf <- . %>% mutate(cspf = case_match(
 ```
 
 ### pandas {.unnumbered .unlisted}
+
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 # On créée les formats sous type de dictionnaire
 sexef_format = {

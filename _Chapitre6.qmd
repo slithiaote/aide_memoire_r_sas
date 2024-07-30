@@ -163,7 +163,6 @@ donnees_python[donnees_python[variable].isin([sel])]
 
 :::
 
-
 ## Entrées entre 2021 et 2023
 
 ::: {.panel-tabset group="language"}
@@ -208,7 +207,6 @@ en2021_2023 = donnees_python[(donnees_python['date_entree'].dt.year >= 2021) &
 
 :::
 
-
 ## Sélectionner des lignes : multiples conditions 
 ::: {.panel-tabset group="language"}
 
@@ -226,7 +224,6 @@ data Avant2023_Femme;
   set donnees_sas (where = (year(date_entree) < 2023 and sexe = 2));
 run;
 ```
-
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -267,7 +264,6 @@ avant2023_femme = donnees_python[(donnees_python['date_entree'].dt.year < 2023) 
 ```
 
 :::
-
 
 ## Sélectionner des lignes selon une condition externe
 
@@ -320,7 +316,6 @@ femmes = donnees_python[condition(donnees_python)]
 ```
 
 :::
-
 
 ## Sélection de lignes et de variables 
 ::: {.panel-tabset group="language"}
@@ -390,7 +385,3 @@ femmes = donnees_python[donnees_python["sexe"] == "2"][cols]
 ```
 
 :::
-
-
-
-
