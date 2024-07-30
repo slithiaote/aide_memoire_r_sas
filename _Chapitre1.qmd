@@ -172,6 +172,13 @@ Documentation Utilit'R pour `duckdb` : <https://book.utilitr.org/03_Fiches_thema
 
 ## Documentation pour `RStudio`
 
+::: {.panel-tabset group="language"}
+## SAS {.unnumbered .unlisted}
+
+Sans objet pour SAS.
+
+## R base {.unnumbered .unlisted}
+
 Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
 
 Plusieurs raccourcis clavier sont notamment très utiles :
@@ -190,3 +197,53 @@ Plusieurs raccourcis clavier sont notamment très utiles :
 | Ctrl et Shift et U                                        | Met en minuscule les caractères sélectionnés                                             |
 
 : Raccourcis `RStudio`
+
+## tidyverse {.unnumbered .unlisted}
+
+Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
+
+Plusieurs raccourcis clavier sont notamment très utiles :
+
+| Raccourci                                                 | Effet                                                                                    |
+|--------------------------|----------------------------------------------|
+| Alt et -                                                  | -\>                                                                                      |
+| Ctrl et Shift et m                                        | %\>%                                                                                     |
+| Ctrl et Entrée                                            | Exécuter le code sélectionné ou de la ligne où se trouve le curseur                      |
+| Alt et Entrée                                             | Exécuter le code jusqu'à la ligne où se trouve le curseur                                |
+| Ctrl et Shift et a                                        | Reformater automatiquement le code sélectionné pour qu'il soit plus lisible              |
+| Alt et flèche de droite ou de gauche                      | Aller directement à la fin (flèche de droite) ou au début (flèche de gauche) de la ligne |
+| Alt et flèche du haut ou du bas                           | Intervertir la ligne avec celle du dessus (flèche du haut) ou du dessous (flèche du bas) |
+| Ctrl et flèche de droite ou de gauche                     | Passer d'un mot à l'autre de la ligne                                                    |
+| Alt et déplacement du curseur de la souris en haut ou bas | Permet de modifier simultanément le même emplacement de plusieurs lignes successives     |
+| Ctrl et Shift et U                                        | Met en minuscule les caractères sélectionnés                                             |
+
+: Raccourcis `RStudio`
+
+## data.table {.unnumbered .unlisted}
+
+Si vous utilisez l'IDE `RStudio` : <https://rstudio.github.io/cheatsheets/rstudio-ide.pdf>
+
+Plusieurs raccourcis clavier sont notamment très utiles :
+
+| Raccourci                                                 | Effet                                                                                    |
+|--------------------------|----------------------------------------------|
+| Alt et -                                                  | -\>                                                                                      |
+| Ctrl et Shift et m                                        | %\>%                                                                                     |
+| Ctrl et Entrée                                            | Exécuter le code sélectionné ou de la ligne où se trouve le curseur                      |
+| Alt et Entrée                                             | Exécuter le code jusqu'à la ligne où se trouve le curseur                                |
+| Ctrl et Shift et a                                        | Reformater automatiquement le code sélectionné pour qu'il soit plus lisible              |
+| Alt et flèche de droite ou de gauche                      | Aller directement à la fin (flèche de droite) ou au début (flèche de gauche) de la ligne |
+| Alt et flèche du haut ou du bas                           | Intervertir la ligne avec celle du dessus (flèche du haut) ou du dessous (flèche du bas) |
+| Ctrl et flèche de droite ou de gauche                     | Passer d'un mot à l'autre de la ligne                                                    |
+| Alt et déplacement du curseur de la souris en haut ou bas | Permet de modifier simultanément le même emplacement de plusieurs lignes successives     |
+| Ctrl et Shift et U                                        | Met en minuscule les caractères sélectionnés                                             |
+
+: Raccourcis `RStudio`
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+## pandas {.unnumbered .unlisted}
+
+Sans objet pour pandas.
+
+:::
