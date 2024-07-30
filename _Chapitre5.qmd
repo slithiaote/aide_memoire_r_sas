@@ -1,6 +1,6 @@
 # Sélection de colonnes
 
-## Selectionner une colonne par sa position 
+## Sélectionner une colonne par sa position 
 ::::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -112,9 +112,7 @@ donnees_python.iloc[:, [pos]]
 
 :::::
 
-
-
-## Selectionner une colonne par son nom 
+## Sélectionner une colonne par son nom 
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -160,6 +158,7 @@ id <- donnees_datatable[, identifiant] ; class(id)
 
 # Résultat sous forme de data.table
 id <- donnees_datatable[, "identifiant"] ; class(id)
+id <- donnees_datatable[, .SD, .SDcols = "identifiant"] ; class(id)
 # Ne fonctionnent pas !
 #id <- donnees_datatable[, .("identifiant")] ; class(id)
 #id <- donnees_datatable[J("identifiant")] ; class(id)
