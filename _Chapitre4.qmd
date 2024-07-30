@@ -420,11 +420,13 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```
 
 ## data.table {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 colnames(donnees_datatable) <- tolower(colnames(donnees_datatable))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -441,6 +443,7 @@ donnees_python.columns = donnees_python.columns.str.lower()
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
+
 ``` sas
 proc sql;
   select count(*) as Nb_Lignes, count(distinct identifiant) as Nb_Identifiants_Uniques
@@ -449,6 +452,7 @@ quit;
 ```
 
 ## R base {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sprintf("La base de données contient %d lignes et %d identifiants uniques !",
         nrow(donnees_rbase),
@@ -456,6 +460,7 @@ sprintf("La base de données contient %d lignes et %d identifiants uniques !",
 ```
 
 ## tidyverse {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sprintf("La base de données contient %d lignes et %d identifiants uniques !",
         donnees_tidyverse %>% nrow(),
@@ -468,16 +473,14 @@ donnees_tidyverse %>% distinct(identifiant) %>% nrow()
 ```
 
 ## data.table {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sprintf("La base de données contient %d lignes et %d identifiants uniques !",
         nrow(donnees_datatable),
         donnees_datatable[, uniqueN(identifiant)])
-# Identifiants uniques
-donnees_datatable[, uniqueN(identifiant)]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-
 
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>% nrow()
@@ -497,6 +500,7 @@ Note : on a vu que `nrow` ne fonctionne pas en DuckDB.
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
+
 ``` sas
 %let var = date_entree;
 proc contents data = donnees_sas out = Var noprint;run;
@@ -506,6 +510,7 @@ run;
 ```
 
 ## R base {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "date_entree"
 pos <- match(variable, names(donnees_rbase))
@@ -513,6 +518,7 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 ## tidyverse {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "date_entree"
 pos <- match(variable, donnees_tidyverse %>% colnames())
@@ -520,6 +526,7 @@ sprintf("La variable %s se trouve en colonne n°%s !", variable, pos)
 ```
 
 ## data.table {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 variable <- "date_entree"
 pos <- match(variable, names(donnees_datatable))
