@@ -2,7 +2,8 @@
 
 Pour en savoir plus sur le fonctionnement des dates en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_temporelles.html>.
 
-## Créer des dates
+
+## Créer une date à partir d'une chaîne de caractères
 
 Créer le 31 décembre de l'année sous forme de date.
 
@@ -52,8 +53,13 @@ lubridate::mdy(paste0("12.31.", annee))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r}
+requete_duckdb %>% 
+  mutate(exemple1 = as.Date("2024/07/14"),
+         exemple2 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
+  # mutate(date_r = lubridate::dmy("01/01/2000")) %>% # no known SQL translation
+  select(contains("exemple"))
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -72,7 +78,9 @@ datetime.strptime(f"{annee}-12-31", "%Y-%m-%d")
 
 :::
 
-## Manipuler des dates
+## Calculer sur des dates
+
+Attention, calculer sur des dates est un peu compliqué à cause de cas particuliers. Par exemple, le 29 février, les années bisextiles, le calcul des mois, des semaines, les fuseaux horaires, etc. Calculer en nombre de jours ou secondes ne pose pas de problème en général.
 
 ### Écart entre deux dates
 
@@ -136,22 +144,14 @@ donnees_datatable[, age_jours_2 := date_entree - date_naissance]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-# Création de la colonne age 
+```{r}
+# Durée entre deux dates
 requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  select(age)
+  mutate(duree_annees = year(age(date_entree,date_naissance)),
+         duree_mois = month(age(date_entree,date_naissance)),
+         ) %>% 
+  select(contains("duree"))
 
-# Âge formaté
-requete_duckdb %>%
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  mutate(agef = case_when(
-    age < 26 ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
-    age >= 50 ~ "3. 50 ans ou plus")) %>% 
-  select(age, agef)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -222,26 +222,15 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 # Date 6 mois après la sortie
 donnees_datatable[, date_6mois   := date_sortie %m+% months(6)]
 donnees_datatable[, date_6mois   := lubridate::add_with_rollback(date_sortie, months(6))]
-donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(365.25/2)]
+donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(round(365.25/2))]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-# Création de la colonne age 
+```{r}
 requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  select(age)
-
-# Âge formaté
-requete_duckdb %>%
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  mutate(agef = case_when(
-    age < 26 ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
-    age >= 50 ~ "3. 50 ans ou plus")) %>% 
-  select(age, agef)
+  mutate(date_sortie = date_entree + duree,
+         date_6mois = date_sortie + to_months(6L)) %>% # préciser le type de 6
+  select(date_sortie, date_6mois)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -254,3 +243,155 @@ donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(
 ```
 
 :::
+
+## Formater les dates 
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+/* On utilise ici %sysevalf et non %eval pour des calculs avec des macro-variables non entières */
+%let sixmois = %sysevalf(365.25/2);
+%put sixmois : &sixmois.;
+data donnees_sas;
+  set donnees_sas;
+  /* Âge à l'entrée dans le dispositif */
+  Age = intck('year', date_naissance, date_entree);
+  /* Âge formaté */
+  Agef = put(Age, agef.);
+  /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
+  format date_sortie ddmmyy10.;
+  date_sortie = intnx('day', date_entree, duree);  
+  /* La durée du contrat est-elle inférieure à 6 mois ? */
+  Duree_Inf_6_mois = (Duree < &sixmois. & Duree ne .);
+  /* Deux manières de créer une date */
+  format Decembre_31_&an._a Decembre_31_&an._b ddmmyy10.;
+  Decembre_31_&an._a = "31dec&an."d;
+  /* mdy pour month, day, year (pas d'autre alternative, ymd par exemple n'existe pas) */
+  Decembre_31_&an._b = mdy(12, 31, &an.); 
+  /* Date 6 mois après la sortie */
+  format Date_6mois ddmmyy10.;
+  Date_6mois = intnx('month', date_sortie, 6);
+run;
+/* Ventilation pondérée (cf. infra) */
+proc freq data = donnees_sas;tables apres_31_decembre;weight poids_sondage;run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge à l'entrée dans le dispositif
+donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
+# Âge formaté
+donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
+# 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
+donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
+donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
+# Autre solution
+# L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
+agef <- cut(donnees_rbase$age, 
+            breaks = c(0, 25, 49, Inf),
+            right = TRUE,
+            labels = c("1. De 15 à 25 ans", "2. De 26 à 49 ans", "3. 50 ans ou plus"), 
+            ordered_result = TRUE)
+
+# Manipuler les dates
+sixmois <- 365.25/2
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_rbase$duree_inf_6_mois <- ifelse(donnees_rbase$duree < sixmois, 1, 0)
+# Date de sortie du dispositif
+donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
+
+# Date 6 mois après la sortie
+donnees_rbase$date_6mois <- donnees_rbase$date_sortie + lubridate::month(6)
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge à l'entrée dans le dispositif
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
+# Âge formaté
+donnees_tidyverse <- donnees_tidyverse %>%
+  mutate(agef = case_when(
+    age < 26             ~ "1. De 15 à 25 ans",
+    age >= 26 & age < 50 ~ "2. De 26 à 49 ans",
+    age >= 50            ~ "3. 50 ans ou plus")
+    )
+
+# Manipuler les dates
+sixmois <- 365.25/2
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(duree_inf_6_mois = case_when(duree <  sixmois ~ 1,
+                                      duree >= sixmois ~ 0))
+donnees_tidyverse %>% pull(duree_inf_6_mois) %>% table()
+
+# Date de sortie du dispositif
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(date_sortie = date_entree + lubridate::days(duree))
+
+# Date 6 mois après la sortie
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(date_6mois = date_sortie + lubridate::month(6))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Âge à l'entrée dans le dispositif
+donnees_datatable[, age := floor(lubridate::time_length(difftime(donnees_datatable$date_entree, donnees_datatable$date_naissance), "years"))]
+
+# Âge formaté
+donnees_datatable[, agef := fcase(age < 26,             "1. De 15 à 25 ans",
+                                  26 <= age & age < 50, "2. De 26 à 49 ans",
+                                  age >= 50,            "3. 50 ans ou plus")]
+
+# Manipuler les dates
+sixmois <- 365.25/2
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_datatable[, duree_inf_6_mois := ifelse(duree >= sixmois, 1, 0)]
+donnees_datatable[, duree_inf_6_mois := fifelse(duree >= sixmois, 1, 0)]
+donnees_datatable[, duree_inf_6_mois := fcase(duree >= sixmois, 1,
+                                              duree <  sixmois, 0)]
+# Date de sortie du dispositif
+donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
+
+# Date 6 mois après la sortie
+donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# Création de la colonne age 
+requete_duckdb %>% 
+  mutate(age = year(age(date_entree,date_naissance))) %>% 
+  select(age)
+
+# Âge formaté
+requete_duckdb %>%
+  mutate(age = year(age(date_entree,date_naissance))) %>% 
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Calculer la durée en jours pour six mois
+sixmois = 365.25 / 2
+
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_python['duree_inf_6_mois'] = np.where(donnees_python['duree'] < sixmois, 1, 0)
+
+# Calculer la date de sortie du dispositif
+donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
+
+# Créer une date spécifique (31 décembre de l'année en cours)
+donnees_python['date_specifique'] = pd.to_datetime(donnees_python['date_entree'].dt.year.fillna(0).astype(int).astype(str) + "-12-31", format='%Y-%m-%d', errors='coerce')
+
+# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
+donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
+
+```
+:::
+
