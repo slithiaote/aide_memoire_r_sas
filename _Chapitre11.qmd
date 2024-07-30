@@ -417,7 +417,7 @@ requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, No
 requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
 ```
 
-### pandas {.unnumbered .unlisted}
+## pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant
 donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'])
@@ -463,7 +463,7 @@ tri_toutes_variables <- setorderv(donnees_datatable, na.last = FALSE)
 
 ```
 
-### pandas {.unnumbered .unlisted}
+## pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
 donnees_python = donnees_python.sort_values(by=list(donnees_python.columns), na_position='first')
 ```
