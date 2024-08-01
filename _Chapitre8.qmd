@@ -237,7 +237,7 @@ requete_duckdb %>%
   mutate(age = year(age(Date_entree,Date_naissance))) %>% 
   mutate(agef = case_when(
     age < 26             ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 26 | age < 50 ~ "2. De 26 à 49 ans",
     age >= 50            ~ "3. 50 ans ou plus")) %>% 
   select(age, agef)
 ```
@@ -264,20 +264,26 @@ donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(
 %put sixmois : &sixmois.;
 data donnees_sas;
   set donnees_sas;
+  
   /* Âge à l'entrée dans le dispositif */
   Age = intck('year', date_naissance, date_entree);
+  
   /* Âge formaté */
   Agef = put(Age, agef.);
+  
   /* Date de sortie du dispositif : ajout de la durée à la date d'entrée */
   format date_sortie ddmmyy10.;
-  date_sortie = intnx('day', date_entree, duree);  
+  date_sortie = intnx('day', date_entree, duree);
   /* La durée du contrat est-elle inférieure à 6 mois ? */
   Duree_Inf_6_mois = (Duree < &sixmois. & Duree ne .);
+  
   /* Deux manières de créer une date */
   format Decembre_31_&an._a Decembre_31_&an._b ddmmyy10.;
   Decembre_31_&an._a = "31dec&an."d;
+  
   /* mdy pour month, day, year (pas d'autre alternative, ymd par exemple n'existe pas) */
   Decembre_31_&an._b = mdy(12, 31, &an.); 
+  
   /* Date 6 mois après la sortie */
   format Date_6mois ddmmyy10.;
   Date_6mois = intnx('month', date_sortie, 6);
@@ -290,11 +296,13 @@ proc freq data = donnees_sas;tables apres_31_decembre;weight poids_sondage;run;
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Âge à l'entrée dans le dispositif
 donnees_rbase$age <- floor(lubridate::time_length(difftime(donnees_rbase$date_entree, donnees_rbase$date_naissance), "years"))
+
 # Âge formaté
 donnees_rbase$agef[donnees_rbase$age < 26]                           <- "1. De 15 à 25 ans"
 # 26 <= donnees_rbase$age < 50 ne fonctionne pas, il faut passer en 2 étapes
 donnees_rbase$agef[26 <= donnees_rbase$age & donnees_rbase$age < 50] <- "2. De 26 à 49 ans"
 donnees_rbase$agef[donnees_rbase$age >= 50]                          <- "3. 50 ans ou plus"
+
 # Autre solution
 # L'option right = TRUE implique que les bornes sont ]0; 25] / ]25; 49] / ]49; Infini[
 agef <- cut(donnees_rbase$age, 
@@ -305,8 +313,10 @@ agef <- cut(donnees_rbase$age,
 
 # Manipuler les dates
 sixmois <- 365.25/2
+
 # La durée du contrat est-elle inférieure à 6 mois ?
 donnees_rbase$duree_inf_6_mois <- ifelse(donnees_rbase$duree < sixmois, 1, 0)
+
 # Date de sortie du dispositif
 donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
 
@@ -319,6 +329,7 @@ donnees_rbase$date_6mois <- donnees_rbase$date_sortie + lubridate::month(6)
 # Âge à l'entrée dans le dispositif
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(age = as.period(interval(start = date_naissance, end = date_entree))$year)
+
 # Âge formaté
 donnees_tidyverse <- donnees_tidyverse %>%
   mutate(agef = case_when(
@@ -380,33 +391,12 @@ requete_duckdb %>%
          duree_mois = month(age(date_entree,date_naissance)),
          ) %>% 
   select(contains("duree"))
-  
-# Création de la colonne age 
-requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  mutate(age = year(age(date_entree,date_naissance))) %>% 
-  select(age)
-
-# Âge formaté
-requete_duckdb %>%
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  mutate(agef = case_when(
-    age < 26             ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
-    age >= 50            ~ "3. 50 ans ou plus")) %>% 
-  select(age, agef)
 
 requete_duckdb %>% 
   mutate(date_sortie = date_entree + duree,
          date_6mois = date_sortie + to_months(6L)) %>% # préciser le type de 6
   select(date_sortie, date_6mois)
 
-En DuckDB, plusieurs syntaxes sont possibles pour transformer une chaîne de caractères en date si la chaîne de caractères est au format `YYYY-MM-DD`. Dans le cas contraire, passer par la fonction `strptime` de DuckDB pour indiquer le format de la date.
-
-```{r, warning=FALSE, message=FALSE}
-# Transformer une date d'un format caractère à un format Date
 requete_duckdb %>%  
   mutate(date_0 = as.Date("2000-01-01")) %>% 
   mutate(date_1 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
