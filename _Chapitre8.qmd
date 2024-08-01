@@ -254,3 +254,88 @@ donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(
 ```
 
 :::
+
+
+
+## Mettre un 0 devant un nombre
+
+Mettre le numéro du mois d'entrée sur 2 positions (avec un 0 devant si le mois <= 9).
+
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+data Zero_devant;
+  set donnees_sas (keep = date_entree);
+  /* Obtenir le mois et la date */
+  Mois = month(date_entree);
+  Annee = year(date_entree);
+  /* Mettre le mois sur 2 positions (avec un 0 devant si le mois <= 9) : format prédéfini z2. */
+  Mois_a = put(Mois, z2.);
+  drop Mois;
+  rename Mois_a = Mois;
+run;
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase$mois <- sprintf("%02d", lubridate::month(donnees_rbase$date_entree))
+```
+
+## tidyverse {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(mois = sprintf("%02d", lubridate::month(date_entree)))
+
+# Autre solution
+donnees_tidyverse <- donnees_tidyverse %>% 
+  mutate(mois = lubridate::month(date_entree),
+         mois = ifelse(str_length(mois) < 2, paste0("0", mois), mois))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# Une fonction month() est déjà implémentée en data.table, l'usage de lubridate est inutile
+donnees_datatable[, mois := sprintf("%02d", data.table::month(date_entree))]
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+# À FAIRE : pas exactement au bon endroit
+#requete_duckdb %>% 
+#  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
+#  mutate(mois=lubridate::month(Date_entree),
+#         mois=ifelse(str_length(mois)<2, paste0("0", mois), mois)) %>% 
+#  select(mois, Date_entree)
+```
+
+En DuckDB, plusieurs syntaxes sont possibles pour transformer une chaîne de caractères en date si la chaîne de caractères est au format `YYYY-MM-DD`. Dans le cas contraire, passer par la fonction `strptime` de DuckDB pour indiquer le format de la date.
+
+```{r, warning=FALSE, message=FALSE}
+# Transformer une date d'un format caractère à un format Date
+requete_duckdb %>%  
+  mutate(date_0 = as.Date("2000-01-01")) %>% 
+  mutate(date_1 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
+  # mutate(date_r = lubridate::dmy("01/01/2000")) %>% # no known SQL translation
+  select(starts_with("date"))
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Calculer la durée en jours pour six mois
+sixmois = 365.25 / 2
+
+# La durée du contrat est-elle inférieure à 6 mois ?
+donnees_python['duree_inf_6_mois'] = np.where(donnees_python['duree'] < sixmois, 1, 0)
+
+# Calculer la date de sortie du dispositif
+donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
+
+# Créer une date spécifique (31 décembre de l'année en cours)
+donnees_python['date_specifique'] = pd.to_datetime(donnees_python['date_entree'].dt.year.fillna(0).astype(int).astype(str) + "-12-31", format='%Y-%m-%d', errors='coerce')
+
+# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
+donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
+
+```
+:::
