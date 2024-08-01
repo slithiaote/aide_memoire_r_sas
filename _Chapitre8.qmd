@@ -188,13 +188,12 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Date de sortie du dispositif
-donnees_rbase$date_sortie <- donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
+donnees_rbase$date_sortie <- donnees_datatable$date_entree + lubridate::days(donnees_rbase$duree)
 
 # Date 6 mois après la sortie
-donnees_datatable[, date_6mois   := date_sortie %m+% months(6)]
-donnees_datatable[, date_6mois   := lubridate::add_with_rollback(date_sortie, months(6))]
-donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(365.25/2)]
-donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(round(365.25/2))]
+donnees_rbase$date_6mois <- donnees_datatable$date_sortie %m+% months(6)
+donnees_rbase$date_6mois <- lubridate::add_with_rollback(donnees_datatable$date_sortie, months(6))
+donnees_rbase$date_6mois_2 <- donnees_datatable$date_sortie + lubridate::days(round(365.25/2))
 ```
 
 ### tidyverse {.unnumbered .unlisted}
