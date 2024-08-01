@@ -56,6 +56,13 @@ doublons <- donnees_datatable[duplicated(donnees_datatable), ]
 
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On extrait seulement les doublons, pas la première occurrence
+doublons = donnees_python[donnees_python.duplicated()]
+```
+
 :::
 
 ## Doublons pour une ou plusieurs colonnes
@@ -105,6 +112,14 @@ doublons <- donnees_datatable[duplicated(donnees_datatable[, ..variable]), ]
 
 ```
 
+## pandas {.unnumbered .unlisted}
+
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On extrait seulement les doublons, pas la première occurrence
+variable = "identifiant"
+doublons = donnees_python[donnees_python[variable].duplicated()]
+```
+
 :::
 
 ## Récupérer toutes les lignes pour les identifiants en doublon
@@ -148,6 +163,17 @@ enDouble <- donnees_datatable[donnees_datatable[[variable]] %chin%
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+variable = 'identifiant'
+
+# Identifier les valeurs dupliquées
+doublons_values = donnees_python[variable][donnees_python[variable].duplicated()]
+
+# Filtrer les lignes qui contiennent ces valeurs dupliquées
+enDouble = donnees_python[donnees_python[variable].isin(doublons_values)]
 ```
 
 :::
@@ -194,6 +220,17 @@ sansDouble <- donnees_datatable[donnees_datatable[[variable]] %notin%
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+variable = 'identifiant'
+
+# Identifier les valeurs dupliquées
+doublons_values = donnees_python[variable][donnees_python[variable].duplicated()]
+
+# Filtrer les lignes qui contiennent ces valeurs dupliquées
+sansDouble = donnees_python[~donnees_python[variable].isin(doublons_values)]
 ```
 
 :::
@@ -260,6 +297,11 @@ donnees_datatable_sansdoublon <- donnees_datatable[! duplicated(donnees_datatabl
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python_sansdoublon = donnees_python.drop_duplicates()
+```
+
 :::
 
 ## Suppression des doublons pour une seule variable
@@ -302,6 +344,15 @@ sansDouble <- donnees_datatable[! duplicated(donnees_datatable[, c("identifiant"
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Trier le DataFrame par toutes les colonnes avec les valeurs NaN en premier
+donnees_python_sorted = donnees_python.sort_values(by=donnees_python.columns.tolist(), na_position='first')
+
+# Supprimer les doublons en gardant la première occurrence pour chaque identifiant
+sansDouble = donnees_python_sorted.drop_duplicates(subset=['identifiant'], keep='first')
 ```
 
 :::
@@ -356,6 +407,16 @@ unique(donnees_datatable[["identifiant"]])
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sous forme de liste (vecteur) :
+list(pd.unique(donnees_python['identifiant']))
+
+# Dataframe
+# Convertir les valeurs uniques en DataFrame
+donnees_python[['identifiant']].drop_duplicates().reset_index(drop=True)
+```
+
 :::
 
 ## Nombre de lignes uniques, sans doublon
@@ -392,6 +453,11 @@ uniqueN(donnees_datatable)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python.drop_duplicates().shape[0]
 ```
 
 :::

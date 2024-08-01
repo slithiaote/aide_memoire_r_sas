@@ -58,6 +58,14 @@ donnees_datatable[, num_observation := seq_len(.N)]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Python commence le compte à 0 (penser à ajouter 1 pour coïncider avec la numérotation de R)
+donnees_python['num_observation'] = range(1, len(donnees_python) + 1)
+
+donnees_python['num_observation'] = donnees_python.index + 1
+```
+
 :::
 
 ### Numéroter les contrats de l'individu
@@ -123,6 +131,15 @@ donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# 1. Trier les données par 'identifiant' et 'date_entree'
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'])
+
+# 2. Créer le numéro de contrat
+donnees_python['numero_contrat'] = donnees_python.groupby('identifiant').cumcount() + 1
 ```
 
 :::
@@ -203,6 +220,11 @@ donnees_datatable[, .SD[1], keyby = identifiant]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python.drop_duplicates(subset='identifiant', keep='first')
+```
+
 :::
 
 ### Dernière ligne par identifiant
@@ -267,6 +289,11 @@ donnees_datatable[, .SD[.N], by = identifiant]
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python.drop_duplicates(subset='identifiant', keep='last')
 ```
 
 :::
@@ -338,6 +365,21 @@ donnees_datatable[, ni_prem_ni_der  := fifelse(! c(! duplicated(identifiant, fro
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# 1. Trier les données par 'identifiant' et 'date_entree'
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'])
+
+# Premier contrat
+donnees_python['premier_contrat'] = 1 - donnees_python.duplicated(subset='identifiant', keep='first').astype(int)
+
+# Dernier contrat
+donnees_python['dernier_contrat'] = 1 - donnees_python.duplicated(subset='identifiant', keep='last').astype(int)
+
+# Ni premier ni dernier contrat
+donnees_python['ni_prem_ni_der'] = (~donnees_python['premier_contrat'].astype(bool) & ~donnees_python['dernier_contrat'].astype(bool)).astype(int)
 ```
 
 :::
