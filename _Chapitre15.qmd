@@ -59,6 +59,12 @@ note_moins_10 <- donnees_datatable[donnees_datatable[, Reduce(`|`, lapply(.SD, `
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNotes = ["note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel"]
+donnees_python[donnees_python[varNotes].apply(lambda x: (x < 10).any(), axis=1)]
+```
+
 :::
 
 ## Sélectionner les lignes avec toutes les notes supérieures à 10
@@ -122,6 +128,12 @@ note_sup_10 <- donnees_datatable[donnees_datatable[, Reduce(`&`, lapply(.SD, `>=
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNotes = ["note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel"]
+donnees_python[donnees_python[varNotes].apply(lambda x: (x >= 10).all() and x.notna().all(), axis=1)]
 ```
 
 :::
@@ -198,6 +210,11 @@ donnees_datatable[, note_moyenne := rowMeans(.SD, na.rm = TRUE), .SDcols = varNo
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+varNotes = ["note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel"]
+donnees_python['note_moyenne'] = donnees_python[varNotes].mean(axis=1, skipna=True)
+```
 :::
 
 ### Moyenne des moyennes par ligne
@@ -240,6 +257,11 @@ donnees_datatable[, weighted.mean(note_moyenne, poids_sondage, na.rm = TRUE)]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['note_moyenne'].mean()
+(donnees_python['note_moyenne'] * donnees_python['poids_sondage']).sum(skipna=True) / donnees_python['poids_sondage'].sum(skipna=True)
+```
 :::
 
 ### La moyenne par ligne est-elle supérieure à la moyenne ?
@@ -281,6 +303,14 @@ table(donnees_datatable$note_superieure_moyenne, useNA = "always")
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+moyenne = donnees_python['note_moyenne'].mean()
+donnees_python['note_superieure_moyenne'] = (donnees_python['note_moyenne'] > moyenne).astype(int)
+
+donnees_python['note_superieure_moyenne'].value_counts(dropna=False)
 ```
 
 :::
@@ -375,6 +405,25 @@ donnees_datatable[, note_moyenne_pond := rowSums(mapply(FUN = `*`, .SD, ponderat
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On souhaite affecter les pondérations suivantes aux notes :
+# note_contenu : 30%, note_formateur : 20%, note_moyens : 25%, note_accompagnement : 15%, note_materiel : 10%
+notes = ["note_contenu", "note_formateur", "note_moyens", "note_accompagnement", "note_materiel"]
+ponderation_dict = {"note_contenu" : 0.3, "note_formateur" : 0.2, "note_moyens" : 0.25, "note_accompagnement" : 0.15, "note_materiel" : 0.1}
+# On vérifie que la somme des poids vaut 1
+sum(ponderation_dict.values())
+
+# Extraire les pondérations dans le meme ordre que le vecteur de notes :
+ponderation = np.array([ponderation_dict[note] for note in varNotes])
+
+# Moyenne pondérée
+donnees_python['note_moyenne'] = donnees_python[varNotes].apply(
+    lambda row: np.average(row, weights=ponderation[:len(row.dropna())]) if len(row.dropna()) > 0 else np.nan,
+    axis=1
+)
 ```
 
 :::
