@@ -452,6 +452,16 @@ deux_premieres_lignes <- donnees_datatable[, .SD[1:2], by = identifiant]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+deux_premieres_lignes = (donnees_python
+            .sort_values(by=['identifiant', 'date_entree'], ascending=[True, True], na_position='last')
+            .groupby('identifiant')
+            .head(2)
+            .reset_index(drop=True)
+)
+```
+
 :::
 
 ### Les 2 dernières lignes de chaque identifiant
@@ -512,6 +522,16 @@ deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+deux_dernieres_lignes = (donnees_python
+            .sort_values(by=['identifiant', 'date_entree'], ascending=[True, True], na_position='last')
+            .groupby('identifiant')
+            .tail(2)
+            .reset_index(drop=True)
+)
 ```
 
 :::
@@ -575,6 +595,17 @@ deuxieme_ligne <- donnees_datatable[, .SD[2], by = identifiant]
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+deuxieme_ligne_par_groupe = (
+    donnees_python
+    .sort_values(by=['identifiant', 'date_entree'], ascending=[True, True], na_position='last')
+    .groupby('identifiant')
+    .nth(1)  # 1 correspond à la deuxieme ligne
+    .reset_index()
+)
+```
+
 :::
 
 ### L'avant-dernière ligne de l'individu (et rien si l'individu a 1 seul contrat)
@@ -611,6 +642,17 @@ donnees_datatable[, .SD[.N-1], by = identifiant]
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+deuxieme_ligne_par_groupe = (
+    donnees_python
+    .sort_values(by=['identifiant', 'date_entree'], ascending=[True, True], na_position='last')
+    .groupby('identifiant')
+    .nth(1)  # 1 correspond à la deuxieme ligne
+    .reset_index()
+)
 ```
 
 :::
@@ -673,6 +715,15 @@ auMoins2022 <- donnees_datatable[, if (sum(data.table::year(date_entree) == 2022
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+auMoins2022 = (
+    donnees_python
+    .groupby('identifiant')
+    .filter(lambda x: (x['date_entree'].dt.year == 2022).any())
+)
 ```
 
 :::
@@ -740,6 +791,15 @@ donnees_datatable[, `:=` (qualif = sum(niveau == "Qualifié", na.rm = TRUE), non
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+qualif_non_qualif = (
+    donnees_python
+    .groupby('identifiant')
+    .filter(lambda x: (x['niveau'] == 'Qualifié').any() and (x['niveau'] == 'Non qualifié').any())
+)
+```
+
 :::
 
 ### Personnes qui ont suivi deux contrats, et seulement deux, dont l'un au moins a débuté en 2022
@@ -797,6 +857,15 @@ donnees_datatable[, if (.N == 2 & sum(data.table::year(date_entree) == 2022, na.
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+deux_contrats = (
+    donnees_python
+    .groupby('identifiant')
+    .filter(lambda x: len(x) == 2 and (x['date_entree'].dt.year == 2022).any())
+)
+```
+
 :::
 
 ## Ajouter le nombre d'observations par CSP
@@ -842,6 +911,10 @@ donnees_datatable[, n := length(identifiant), by = cspf]
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['n'] = donnees_python.groupby('cspf')['cspf'].transform('count')
+```
 :::
 
 ## Ajouter deux colonnes désignant la note moyenne et la somme de Note_Contenu, par individu
@@ -916,6 +989,12 @@ donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDc
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['note_contenu_moyenne'] = donnees_python.groupby('identifiant')['note_contenu'].transform('mean')
+donnees_python['note_contenu_somme'] = donnees_python.groupby('identifiant')['note_contenu'].transform('sum')
+```
+
 :::
 
 ## Ajouter une variable d'entrée initiale par individu
@@ -976,6 +1055,11 @@ donnees_datatable[, premiere_entree := head(date_entree, 1), by = identifiant]
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python['premiere_entree'] = donnees_python.groupby('identifiant')['date_entree'].transform('min')
 ```
 
 :::
@@ -1057,6 +1141,17 @@ ligne_max_note_contenu <- donnees_datatable[, .SD[which.max(note_contenu)], by =
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
+ligne_max_note_contenu = (
+    donnees_python
+    .groupby('identifiant')
+    .apply(lambda x: x[x['note_contenu'] == x['note_contenu'].max()], include_groups=False).reset_index()
+)
 
 ```
 
@@ -1142,6 +1237,32 @@ financement_datatable[, etat := rleid(financement_datatable), by = identifiant]
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+financement_python = pd.DataFrame({
+    'identifiant': ['173']*6 + ['211'],
+    'date': ['02/01/2022', '18/07/2022', '15/09/2022', '28/12/2022', '02/04/2023', '06/06/2024', '02/07/2024'],
+    'financement': ['Public', 'Public', 'Privé', 'Public', 'Privé', 'Privé', 'Privé']
+})
+
+# Création de la fonction pour identifier les groupes consécutifs
+def consecutive_id(series):
+    return (series != series.shift()).cumsum()
+  
+  # Transformation des dates en format datetime
+financement_python['date'] = pd.to_datetime(financement_python['date'], format='%d/%m/%Y')
+
+# Tri des données par identifiant et date
+financement_python = financement_python.sort_values(by=['identifiant', 'date'])
+
+# Application de la fonction pour identifier les groupes consécutifs
+financement_python['etat'] = (
+    financement_python.groupby('identifiant')['financement']
+    .transform(consecutive_id)
+)
 
 ```
 
