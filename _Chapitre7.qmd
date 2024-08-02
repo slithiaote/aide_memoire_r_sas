@@ -116,7 +116,7 @@ donnees_rbase$civilite <- ifelse(donnees_rbase$sexe == "2", "Mme",
                                         "Inconnu"))
 
 # Autre solution (rapide)
-donnees_rbase$civilite <- "Inconnu"
+donnees_rbase$civilite                            <- "Inconnu"
 donnees_rbase$civilite[donnees_rbase$sexe == "1"] <- "M"
 donnees_rbase$civilite[donnees_rbase$sexe == "2"] <- "Mme"
 ```
@@ -198,19 +198,19 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexef <- c("1" = "Homme", "2" = "Femme")
-cspf <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
+cspf  <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
 ### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexef_format <- c("1" = "Homme", "2" = "Femme")
-cspf_format <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
+cspf_format  <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
 ### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 sexeform <- c("1" = "Homme", "2" = "Femme")
-cspform <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
+cspform  <- c("1" = "Cadre", "2" = "Profession intermédiaire", "3" = "Employé", "4" = "Ouvrier", "5" = "Retraité")
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
@@ -688,111 +688,6 @@ donnees_python = donnees_python.assign(
                                     note_formateur2 = donnees_python['note_formateur'] / 20 * 5
                                     )
 
-# Suppression des variables nouvellement crées
-donnees_python.drop(columns=['note_contenu2', 'note_formateur2'], axis = 1, inplace = True)
-```
-
-:::
-
-## Créer et supprimer plusieurs variables
-
-::: {.panel-tabset group="language"}
-
-### SAS {.unnumbered .unlisted}
-``` sas
-/* Création et suppressions de plusieurs variables */
-
-/* Manipulation de colonnes par référence */
-data Creation;
-  set donnees_sas;
-  note_contenu2 = note_contenu / 20 * 5;
-  note_formateur2 = note_formateur / 20 * 5;
-  /* Suppression des variables créées */
-  drop note_contenu2 note_formateur2;
-run;
-
-/* Par nom ou par variable */
-%let var = identifiant Sexe note_contenu;
-data Femmes;
-  /* Sélection de colonnes */
-  set donnees_sas (keep = &var.);
-  /* Sélection de lignes respectant une certaine condition */
-  if Sexe = "2";
-  /* Création de colonne */
-  note2 = note_contenu / 20 * 5;
-  /* Suppression de colonnes */
-  drop note2;
-  /* Selection de colonnes */
-  keep identifiant Sexe note_contenu;
-run;
-```
-
-### R base {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_rbase$note2 <- donnees_rbase$note_contenu / 20 * 5
-# Le with permet de s'affranchir des expressions "donnees_rbase$"
-with(donnees_rbase, note2 <- note_contenu / 20 * 5)
-
-# On ne peut pas utiliser transform pour des variables récemment créées
-#donnees_rbase <- transform(donnees_rbase, note3 = note_contenu ** 2, note3 = log(note3))
-donnees_rbase <- transform(donnees_rbase, note2 = note_contenu / 20 * 5)
-
-# Suppression de variables
-donnees_rbase$note2 <- NULL
-
-# Création et suppressions de plusieurs variables
-donnees_rbase <- transform(donnees_rbase, note_contenu2 = note_contenu / 20 * 5, note_formateur2 = note_formateur / 20 * 5)
-# Suppression des variables créées
-variable <- c("note_contenu2", "note_formateur2")
-donnees_rbase[, variable] <- NULL
-```
-
-### tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-donnees_tidyverse <- donnees_tidyverse %>% 
-  mutate(note2 = note_contenu / 20 * 5)
-
-# Suppression de variables
-donnees_tidyverse <- donnees_tidyverse %>% 
-  select(-note2)
-```
-
-### data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
-# Création de variables
-donnees_datatable[, note2 := note_contenu / 20 * 5]
-
-# Suppression de variables
-donnees_datatable[, note2 := NULL]
-```
-
-### arrow/duckdb {.unnumbered .unlisted}
-
-Note : l'opération n'est pas persistante, i.e. l'objet `requete_duckdb` n'est pas modifié
-
-```{r}
-# Création de la colonne note2
-requete_duckdb %>% 
-  mutate(note2 = as.integer(note_contenu) / 20 * 5) %>% 
-  select(note2)
-
-# Suppression de colonnes
-requete_duckdb %>% select(-contains("date"), -starts_with("note"))
-```
-
-### pandas {.unnumbered .unlisted}
-```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
-# Création de la colonne note2
-donnees_python['note2'] = donnees_python['note_contenu'] / 20 * 5
-
-# Suppression de variables :
-donnees_python.drop(['note2'], axis = 1, inplace = True)
-
-# Création des colonnes note_contenu2 et note_formateur2
-donnees_python = donnees_python.assign(
-                                    note_contenu2 = donnees_python['note_contenu'] / 20 * 5,
-                                    note_formateur2 = donnees_python['note_formateur'] / 20 * 5
-                                    )
 # Suppression des variables nouvellement crées
 donnees_python.drop(columns=['note_contenu2', 'note_formateur2'], axis = 1, inplace = True)
 ```
