@@ -97,6 +97,7 @@ donnees_rbase$un <- NULL
 
 # Autre solution
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
+# Utiliser seq_along ne nécessite pas un tri préalable À REVOIR
 donnees_rbase$numero_contrat <- as.numeric(ave(donnees_rbase$identifiant, donnees_rbase$identifiant, FUN = seq_along))
 
 # Autre solution : order pour éviter le as.numeric
