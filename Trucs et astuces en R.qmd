@@ -141,9 +141,8 @@ for(i in seq(along=x)) print(i)
 seq(from = 1, to = 10, by = 2)
 seq(1, 10, 2)
 
-# seq_len : créé une séquence d'éléments de 1 jusqu'au paramètre de la fonction
+# seq_len : créé une séquence d'éléments de 1 jusqu'au paramètre de la fonction (supposé positif)
 seq_len(10)
-seq_len(-10)
 
 # seq_along : créé une séquence d'éléments de 1 jusqu'au nombre d'éléments du vecteur
 seq_along(c(7,9,1,0))
