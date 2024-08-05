@@ -1008,19 +1008,25 @@ setNames(donnees_datatable[, lapply(methodes,
 
 :::
 
-## Centrer et réduire les variables À FAIRE
+## Centrer et réduire les variables
+
+On souhaite centrer (moyenne nulle) et réduire (écart-type égal à 1) les notes.
 
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
-
+%let notes = Note_Contenu Note_Formateur Note_Moyens Note_Accompagnement Note_Materiel;
+data centrer_reduire;set donnees_sas (keep = &notes.);run;
+proc stdize data = centrer_reduire out = centrer_reduire method = std;
+   var &notes.;
+run;
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-centrer_reduire <- scale(donnees_rbase[, notes])
+centrer_reduire <- scale(donnees_rbase[, notes], na.rm = TRUE)
 
 # Essayer apply et sweep
 ```
@@ -1028,11 +1034,15 @@ centrer_reduire <- scale(donnees_rbase[, notes])
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+centrer_reduire <- donnees_tidyverse %>% 
+  select(all_of(notes)) %>% 
+  mutate(across(notes, ~ (.x - mean(.x, na.rm = TRUE)) / sd(.x, na.rm = TRUE) ))
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
+centrer_reduire <- donnees_datatable[, lapply(.SD, function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)), .SDcols = notes]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
