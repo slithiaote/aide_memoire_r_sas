@@ -147,7 +147,7 @@ seq_len(10)
 # seq_along : créé une séquence d'éléments de 1 jusqu'au nombre d'éléments du vecteur
 seq_along(c(7,9,1,0))
 
-# seq se comporte comme seq_along sauf si le vecteur ne comprend qu'un élement, et comme seq_len s'il en comprend plusieurs
+# seq se comporte comme seq_along si le vecteur comprend plusieurs éléments, et comme seq_len s'il comprend un seul élément
 
 # Plusieurs éléments
 vecteur <- c(10, 20, 30)
