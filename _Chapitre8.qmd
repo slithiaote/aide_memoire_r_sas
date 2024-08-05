@@ -10,6 +10,7 @@ Créer le 31 décembre de l'année sous forme de date.
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
+/* Pour créer une date avec l'année courante */
 %let an = %sysfunc(year(%sysfunc(today())));
 data donnees_sas;
   set donnees_sas;
@@ -23,7 +24,7 @@ run;
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour créer une date
+# Pour créer une date avec l'année courante
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee, "-12-31"), origin = "1970-01-01")
 lubridate::ymd(paste0(annee, "-12-31"))
@@ -33,7 +34,7 @@ lubridate::mdy(paste0("12.31.", annee))
 
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour créer une date
+# Pour créer une date avec l'année courante
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee, "-12-31"))
 lubridate::ymd(paste0(annee, "-12-31"))
@@ -43,7 +44,7 @@ lubridate::mdy(paste0("12.31.", annee))
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# Pour créer une date
+# Pour créer une date avec l'année courante
 annee <- format(Sys.Date(), "%Y")
 as.Date(paste0(annee, "-12-31"))
 lubridate::ymd(paste0(annee, "-12-31"))
@@ -54,6 +55,7 @@ lubridate::mdy(paste0("12.31.", annee))
 ## arrow/duckdb {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE}
+# Pour créer une date avec l'année courante
 requete_duckdb %>% 
   mutate(exemple1 = as.Date("2024/07/14"),
          exemple2 = as.Date(strptime("01/01/2000", "%d/%m/%Y"))) %>% 
