@@ -135,6 +135,35 @@ for(i in seq(along=x)) print(i)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
+# Différences seq, seq_len et seq_along
+
+# seq : créé une séquence d'éléments successifs, espacés éventuellement d'un pas
+seq(from = 1, to = 10, by = 2)
+seq(1, 10, 2)
+
+# seq_len : créé une séquence d'éléments de 1 jusqu'au paramètre de la fonction
+seq_len(10)
+seq_len(-10)
+
+# seq_along : créé une séquence d'éléments de 1 jusqu'au nombre d'éléments du vecteur
+seq_along(c(7,9,1,0))
+
+# seq se comporte comme seq_along sauf si le vecteur ne comprend qu'un élement, et comme seq_len s'il en comprend plusieurs
+
+# Plusieurs éléments
+vecteur <- c(10, 20, 30)
+seq_along(vecteur)
+seq_len(vecteur)
+seq(vecteur)
+
+# Un seul élement
+vecteur <- 10
+seq_along(vecteur)
+seq_len(vecteur)
+seq(vecteur)
+```
+
+```{r, warning=FALSE, message=FALSE}
 # Equivalent des list-comprehensions de type Python en R
 # Somme des entiers de 1 à 1 000 multiples de 3 ou 5, en une ligne !
 # 4 manières de faire
