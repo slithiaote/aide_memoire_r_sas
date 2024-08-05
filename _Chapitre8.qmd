@@ -248,6 +248,9 @@ from dateutil.relativedelta import relativedelta
 
 # Date de sortie du dispositif
 donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
+
+# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
+donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
 ```
 
 :::
@@ -411,20 +414,11 @@ from dateutil.relativedelta import relativedelta
 # Calculer la durée en jours pour six mois
 sixmois = 365.25 / 2
 
-# Calculer la date de sortie du dispositif
-donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
-
 # La durée du contrat est-elle inférieure à 6 mois ?
 donnees_python['duree_inf_6_mois'] = np.where(donnees_python['duree'] < sixmois, 1, 0)
 
 # Créer une date spécifique (31 décembre de l'année en cours)
 donnees_python['date_specifique'] = pd.to_datetime(donnees_python['date_entree'].dt.year.fillna(0).astype(int).astype(str) + "-12-31", format='%Y-%m-%d', errors='coerce')
-
-# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
-donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
-
-# Ajouter une colonne date_6mois qui est la date six mois après date_sortie
-donnees_python['date_6mois'] = donnees_python['date_sortie'] + pd.DateOffset(months=6)
 ```
 
 :::
