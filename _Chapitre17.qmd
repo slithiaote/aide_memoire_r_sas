@@ -99,6 +99,25 @@ jointure_datatable <- donnees_datatable[, c("identifiant", "sexe", "date_entree"
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# On suppose que l'on dispose d'une base supplémentaire avec les diplômes des personnes
+diplome_python = pd.DataFrame({
+    'identifiant': ["173", "168", "112", "087", "689", "765", "113", "999", "554"],
+    'diplome': ["Bac", "Bep-Cap", "Bep-Cap", "Bac+2", "Bac+2", "Pas de diplôme", "Bac", "Bac", "Bep-Cap"]
+})
+
+# On suppose que l'on dispose d'une base supplémentaire indiquant la date d'une entrevue avec un conseiller
+entrevue_python = pd.DataFrame({
+    'identifiant': ["173", "168", "087", "689", "099", "765"],
+    'date_entrevue': ["06/08/2021", "17/10/2019", "12/06/2021", "28/03/2018", "01/09/2022", "01/10/2020"]
+})
+entrevue_python['date_entrevue'] = pd.to_datetime(entrevue_python['date_entrevue'], format='%d/%m/%Y') # Conversion des dates en datetime
+
+# On récupère un extrait de la base initiale
+jointure_python = donnees_python[['identifiant', 'sexe', 'date_entree', 'date_sortie']]
+```
+
 
 :::
 
@@ -164,6 +183,16 @@ dim(innerJoin)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sont appariés les identifiants communs aux deux bases
+inner_join = jointure_python.merge(diplome_python, 
+                                  left_on='identifiant', 
+                                  right_on = 'identifiant',
+                                  how='inner')
+inner_join.shape
 ```
 
 :::
@@ -232,6 +261,16 @@ dim(leftJoin)
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sont appariés tous les identifiants de la base de gauche, et les correspondants éventuels de la base de droite
+left_join = jointure_python.merge(diplome_python, 
+                                  left_on='identifiant', 
+                                  right_on = 'identifiant',
+                                  how='left')
+left_join.shape
+```
+
 :::
 
 ## Right join : les identifiants de la base de droite
@@ -296,6 +335,16 @@ dim(rightJoin)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
+right_join = jointure_python.merge(diplome_python, 
+                                  left_on='identifiant', 
+                                  right_on = 'identifiant',
+                                  how='right')
+right_join.shape
 ```
 
 :::
@@ -363,6 +412,16 @@ dim(fullJoin)
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Sont appariés tous les identifiants de la base de droite et les correspondants éventuels de la base de gauche
+full_join = jointure_python.merge(diplome_python, 
+                                  left_on='identifiant', 
+                                  right_on = 'identifiant',
+                                  how='outer')
+full_join.shape
+```
+
 :::
 
 ## Jointure de 3 bases ou plus en une seule opération (exemple avec inner join)
@@ -425,6 +484,30 @@ dim(innerJoin2)
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+from functools import reduce
+# Liste des DataFrames à joindre
+dataframes = [jointure_python, diplome_python, entrevue_python]
+
+## Methode 1 : avec la fonction reduce
+# Fonction de jointure interne
+def inner_join(x, y):
+    return pd.merge(x, y, on='identifiant', how='inner')
+# Application successive de la fonction de jointure à tous les éléments de la liste
+inner_join2 = reduce(inner_join, dataframes)
+
+## Méthode 2 : Sans la fonction reduce
+# Initialisation du DataFrame résultant avec le premier DataFrame de la liste
+inner_join2 = dataframes[0]
+
+# Jointure successive des autres DataFrames
+for df in dataframes[1:]:
+    inner_join2 = pd.merge(inner_join2, df, on='identifiant', how='inner')
+
+inner_join2.shape
+```
+
 :::
 
 ## Jointure sur inégalités
@@ -482,6 +565,18 @@ dim(innerJoinInegalite)
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# En procédant en deux temps :
+# Jointure interne sur la colonne 'identifiant'
+intermediate_join = pd.merge(jointure_python, entrevue_python, on='identifiant', how='inner')
+
+# Filtrage selon les conditions d'inégalité
+#inner_join_inegalite = intermediate_join.query('date_entree <= date_entrevue <= date_sortie')
+
+inner_join_inegalite.shape
 ```
 
 :::
@@ -547,6 +642,11 @@ dim(crossJoin)
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
+
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
 
 ```
 
