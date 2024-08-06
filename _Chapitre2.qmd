@@ -294,7 +294,7 @@ enDate = ['date_naissance', 'date_entree']
 donnees_python[enDate] = donnees_python[enDate].apply(pd.to_datetime, format='%d/%m/%Y', errors='coerce')
 
 # Date de sortie du dispositif
-# A FAIRE
+donnees_python['date_sortie'] = donnees_python['date_entree'] + pd.to_timedelta(donnees_python['duree'], unit='D')
 
 # Âge à l'entrée dans le dispositif
 donnees_python['age'] = np.floor((donnees_python['date_entree'] - donnees_python['date_naissance']).dt.days / 365.25).astype('Int64')
