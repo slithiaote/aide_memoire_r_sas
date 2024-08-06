@@ -67,6 +67,12 @@ donnees_datatable[, .(date_sortie, date_sortie_1)]
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], ascending=[True, True])
+donnees_python['date_sortie_1'] = donnees_python['date_sortie'].shift(1)
+```
+
 :::
 
 ## Variable avancée (*lead*)
@@ -109,6 +115,12 @@ donnees_datatable[, .(date_sortie, date_sortie__1)]
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+donnees_python = donnees_python.sort_values(by=['identifiant', 'date_entree'], ascending=[True, True])
+donnees_python['date_sortie_1'] = donnees_python['date_sortie'].shift(-1)
 ```
 
 :::
