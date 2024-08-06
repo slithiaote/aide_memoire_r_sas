@@ -262,7 +262,7 @@ N.B. Duckdb est envisagé pour des traitements sans charger des données en mém
 ```{python, warning=FALSE, message=FALSE, python.reticulate = FALSE}
 donnees_python = pd.DataFrame({
     "Identifiant": ["173", "173", "173", "173", "174", "175", "198", "198", "198", "168", "211", "278", "347", "112", "112", "112", "087", "087", "099", "099", "099", "187", "187", "689", "765", "765", "765"],
-    "Sexe_red": ["2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "1", "1", "1", "1"],
+    "Sexe": ["2", "2", "2", "2", "1", "1", "2", "2", "2", "1", "2", "1", "2", "1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "1", "1", "1", "1"],
     "CSP": ["1", "1", "1", "1", "1", "1", "4", "4", "4", "2", "3", "5", "5", "3", "3", "3", "3", "3", "3", "3", "3", "2", "2", "1", "4", "4", "4"],
     "Niveau": ["Qualifié", "Qualifié", "Qualifié", "Non qualifié", "Qualifié", "Qualifié", "Non qualifié", "Qualifié", "Qualifié", "Qualifié", "Non qualifié", "Qualifié", "Qualifié", "Non qualifié", 
              "Non qualifié", "Qualifié", "Non qualifié", "Non qualifié", "Qualifié", "Qualifié", "Qualifié", "Qualifié", "Qualifié", None, "Non qualifié", "Non qualifié", "Non qualifié"],
