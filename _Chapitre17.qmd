@@ -647,7 +647,12 @@ dim(crossJoin)
 
 ## pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
-
+# Toutes les combinaisons possibles de CSP, sexe et diplome
+crossJoin = pd.MultiIndex.from_product([pd.unique(donnees_python['cspf']), 
+                                           pd.unique(donnees_python['sexef']), 
+                                           pd.unique(diplome_python['diplome'])], 
+                                          names=['cspf', 'sexef', 'diplome']).to_frame(index=False)
+crossJoin.shape
 ```
 
 :::
@@ -702,6 +707,13 @@ dim(semiJoin)
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Toutes les combinaisons possibles de CSP, sexe et diplome
+semiJoin = donnees_python[donnees_python['identifiant'].isin(diplome_python['identifiant'])]
+semiJoin.shape
+```
+
 :::
 
 ## Anti join
@@ -753,6 +765,13 @@ dim(antiJoin)
 
 ```
 
+## pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Toutes les combinaisons possibles de CSP, sexe et diplome
+antiJoin = donnees_python[~donnees_python['identifiant'].isin(diplome_python['identifiant'])]
+antiJoin.shape
+```
+
 :::
 
 ## Autres fonctions utiles
@@ -797,6 +816,13 @@ sort(c(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Toutes les combinaisons possibles de CSP, sexe et diplome
+# Concaténer les identifiants avec doublons
+pd.concat([donnees_python['identifiant'], diplome_python['identifiant']]).sort_values()
 ```
 
 :::
@@ -850,6 +876,15 @@ sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Toutes les combinaisons possibles de CSP, sexe et diplome
+# Concaténer les identifiants avec doublons
+identifiants = pd.concat([donnees_python['identifiant'], diplome_python['identifiant']]).sort_values()
+
+pd.Series(identifiants.unique())
+```
+
 :::
 
 ### Identifiants communs des 2 bases
@@ -893,6 +928,12 @@ fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[or
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Identifiants communs des 2 bases
+sorted(set(donnees_python['identifiant']).intersection(set(diplome_python['identifiant'])))
 ```
 
 :::
@@ -944,6 +985,12 @@ fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[orde
 
 ```
 
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Identifiants communs des 2 bases
+sorted(set(donnees_python['identifiant']) - set(diplome_python['identifiant']))
+```
+
 :::
 
 ### Identifiants dans Diplome mais pas Jointure
@@ -990,6 +1037,12 @@ fsetdiff(diplome_datatable[, ..variable], jointure_datatable[, ..variable])[orde
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 
+```
+
+### pandas {.unnumbered .unlisted}
+```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
+# Identifiants communs des 2 bases
+sorted(set(diplome_python['identifiant']) - set(donnees_python['identifiant']))
 ```
 
 :::
