@@ -76,7 +76,7 @@ entrevue_tidyverse <- entrevue_tidyverse %>%
 # On récupère un extrait de la base initiale
 variable <- c("identifiant", "sexe", "date_entree", "date_sortie")
 jointure_tidyverse <- donnees_tidyverse %>%
-  select(variable)
+  select(all_of(variable))
 ```
 
 ## data.table {.unnumbered .unlisted}
@@ -117,7 +117,6 @@ entrevue_python['date_entrevue'] = pd.to_datetime(entrevue_python['date_entrevue
 # On récupère un extrait de la base initiale
 jointure_python = donnees_python[['identifiant', 'sexe', 'date_entree', 'date_sortie']]
 ```
-
 
 :::
 
@@ -583,8 +582,6 @@ inner_join_inegalite.shape
 
 ## Cross join : toutes les combinaisons possibles de CSP, sexe et diplôme
 
-<https://stackoverflow.com/questions/10600060/how-to-do-cross-join-in-r>
-
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -621,14 +618,17 @@ crossJoin <- donnees_tidyverse %>%
   distinct()
 dim(crossJoin)
 
-# Autre solution
+# Autres solutions
 crossJoin <- cross_join(donnees_tidyverse %>% select(cspf, sexef), diplome_tidyverse %>% select(diplome)) %>% 
   distinct()
 dim(crossJoin)
 
-# Autre solution
 crossJoin <- donnees_tidyverse %>% 
   tidyr::expand(cspf, sexef, diplome_tidyverse$diplome) %>%
+  distinct()
+dim(crossJoin)
+
+crossJoin <- tidyr::crossing(donnees_tidyverse %>% select(cspf, sexef), diplome_tidyverse %>% select(diplome)) %>%
   distinct()
 dim(crossJoin)
 ```
@@ -756,6 +756,9 @@ dim(antiJoin)
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Identifiants de la base de gauche qui n'ont pas de correspondant dans la base de droite
+donnees_datatable[! diplome_datatable, on = "identifiant", j = ! "diplome"]
+
+# Autre solution
 antiJoin <- donnees_datatable[! identifiant %in% diplome_datatable[, identifiant], ]
 dim(antiJoin)
 ```
@@ -867,8 +870,9 @@ dplyr::union(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>%
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
 # Identifiants uniques des 2 bases
+variable <- "identifiant"
 sort(unique(c(jointure_datatable[[variable]], diplome_datatable[[variable]])))
-sort(union(jointure_datatable[[variable]], diplome_datatable[[variable]]))
+funion(jointure_datatable[, ..variable], diplome_datatable[, ..variable])
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
@@ -922,6 +926,7 @@ dplyr::intersect(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) 
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
 # Identifiants communs des 2 bases
+variable <- "identifiant"
 fintersect(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
 ```
 
@@ -977,6 +982,7 @@ dplyr::setdiff(jointure_tidyverse$identifiant, diplome_tidyverse$identifiant) %>
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
 # Identifiants dans Jointure mais pas Diplome
+variable <- "identifiant"
 fsetdiff(jointure_datatable[, ..variable], diplome_datatable[, ..variable])[order(identifiant)]
 ```
 
@@ -1031,6 +1037,7 @@ dplyr::setdiff(diplome_tidyverse$identifiant, jointure_tidyverse$identifiant) %>
 # Les fonctions spécifiques à data.table fonctionnent avec des formats data.table, d'où la syntaxe un peu différente de R base
 
 # Identifiants dans Diplome mais pas Jointure
+variable <- "identifiant"
 fsetdiff(diplome_datatable[, ..variable], jointure_datatable[, ..variable])[order(identifiant)]
 ```
 

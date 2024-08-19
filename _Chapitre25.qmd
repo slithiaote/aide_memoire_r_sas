@@ -1,9 +1,35 @@
 # Créer ses propres fonctions (À FAIRE)
 
+## Documentation
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+
+## R base {.unnumbered .unlisted}
+
+## tidyverse {.unnumbered .unlisted}
+
 Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
+
+<https://dplyr.tidyverse.org/articles/programming.html>
+
 <https://brad-cannell.github.io/r_notes/tidy-evaluation.html>.
 
+
+## data.table {.unnumbered .unlisted}
+
+Pour en savoir plus sur l'écriture de fonctions en `data.table` :
+
+<https://cran.r-project.org/web/packages/data.table/vignettes/datatable-programming.html>
+
+## arrow/duckdb {.unnumbered .unlisted}
+
+:::
+
 ## Sélection de données
+
+On sélectionne des données (dans cet exemple, les femmes) dans une nouvelle base (dans cet exemple, extrait), *via* une fonction (une macro en `SAS`).
+
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -13,23 +39,86 @@ Pour en savoir plus sur l'écriture de fonctions en `tidyverse` :
     set &BaseInitiale. (&condition.);
   run;
 %mend Selection;
-%Selection();
+%Selection(BaseInitiale = donnees_sas, BaseFinale = extrait);
+%Selection(BaseInitiale = donnees_sas, BaseFinale = extrait, condition = where = (sexe = 2));
 ```
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+Selection <- function(baseInitiale = donnees_rbase, condition) {
+  return(eval(substitute(subset(baseInitiale, condition))))
+}
+extrait <- Selection(baseInitiale = donnees_rbase)
+extrait <- Selection(baseInitiale = donnees_rbase, condition = sexe == "2")
 ```
 
 ## tidyverse {.unnumbered .unlisted}
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+Selection <- function(baseInitiale = donnees_tidyverse, condition = TRUE) {
+  baseInitiale %>% 
+    filter({{ condition }}) %>% 
+    return()
+}
+extrait <- Selection(baseInitiale = donnees_tidyverse)
+extrait <- Selection(baseInitiale = donnees_tidyverse, condition = sexe == "2")
 ```
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 
+```
+
+## arrow/duckdb {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+:::
+
+## Moyenne d'un certain nombre de variables
+
+::: {.panel-tabset group="language"}
+
+## SAS {.unnumbered .unlisted}
+``` sas
+%macro Moyenne (BaseInitiale, variables);
+  proc means data = &BaseInitiale. mean;
+    var &variables;
+  run;
+%mend Moyenne;
+%Moyenne(BaseInitiale = donnees_sas, variables = note_contenu note_formateur);
+```
+
+## R base {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+Moyenne <- function(baseInitiale = donnees_rbase, variables) {
+  moyennes <- unlist(lapply(baseInitiale[, variables], mean, na.rm = TRUE))
+  names(moyennes) <- paste("moyenne", names(moyennes), sep = "_")
+  return(moyennes)
+}
+Moyenne(baseInitiale = donnees_rbase, variables = c("note_contenu", "note_formateur"))
+```
+
+## tidyverse {.unnumbered .unlisted}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+Moyenne <- function(baseInitiale = donnees_tidyverse, variables) {
+  baseInitiale %>% 
+    summarise(across({{ variables }}, function(x) mean(x,, na.rm = TRUE), .names = "Moyenne_{.col}")) %>% 
+    return()
+}
+Moyenne(baseInitiale = donnees_tidyverse, variables = c("note_contenu", "note_formateur"))
+```
+
+## data.table {.unnumbered .unlisted}
+```{r, warning=FALSE, message=FALSE, results='hide'}
+Moyenne <- function(baseInitiale = donnees_datatable, variables) {
+  moyennes <- baseInitiale[, lapply(.SD, mean, na.rm = TRUE), .SDcols = variables]
+  setnames(moyennes, paste("Moyenne", variables, sep = "_"))
+  return(moyennes)
+}
+Moyenne(baseInitiale = donnees_datatable, variables = c("note_contenu", "note_formateur"))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}

@@ -96,16 +96,12 @@ donnees_rbase$numero_contrat <- ave(donnees_rbase$un, donnees_rbase$identifiant,
 donnees_rbase$un <- NULL
 
 # Autre solution
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
-# Utiliser seq_along ne nécessite pas un tri préalable À REVOIR
+# Utiliser seq_along ne nécessite pas un tri préalable !
 donnees_rbase$numero_contrat <- as.numeric(ave(donnees_rbase$identifiant, donnees_rbase$identifiant, FUN = seq_along))
 
 # Autre solution : order pour éviter le as.numeric
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase$numero_contrat <- ave(order(donnees_rbase$date_entree), donnees_rbase$identifiant, FUN = seq_along)
-
-#https://stackoverflow.com/questions/11996135/create-a-sequential-number-counter-for-rows-within-each-group-of-a-dataframe
-#https://stackoverflow.com/questions/13732062/what-are-examples-of-when-seq-along-works-but-seq-produces-unintended-results
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -127,6 +123,9 @@ donnees_tidyverse <- donnees_tidyverse %>%
 setorder(donnees_datatable, "identifiant", "date_entree", na.last = FALSE)
 donnees_datatable[, numero_contrat := rowid(identifiant)]
 donnees_datatable[, numero_contrat := seq_len(.N), by = identifiant]
+
+# Les seuls numéros de colonnes
+rowidv(donnees_datatable, identifiant)
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
@@ -173,6 +172,7 @@ run;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase[! duplicated(donnees_rbase$identifiant), , drop = FALSE]
 ```
 
@@ -254,6 +254,7 @@ run;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 donnees_rbase[! duplicated(donnees_rbase$identifiant, fromLast = TRUE), , drop = FALSE]
 ```
 
@@ -493,17 +494,13 @@ deux_dernieres_lignes <- donnees_rbase[unlist(tapply(seq_len(nrow(donnees_rbase)
                                                      donnees_rbase$identifiant, 
                                                      function(x) tail(x, 2))), ]
 
-# REVOIR
-# MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
-#donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) seq_along(z) == 2L)]
-#ind <- donnees_rbase[ave(rep(TRUE, nrow(donnees_rbase)), donnees_rbase$identifiant, FUN = function(z) length(z) == 1L | seq_along(z) == 2L)]
-
 # Version en R Base
 #https://stackoverflow.com/questions/14800161/select-the-top-n-values-by-group
 ```
 
 ### tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# À FAIRE : ne fait pas la même-chose !
 deux_dernieres_lignes <- donnees_tidyverse %>% 
   # Pour trier les données de la même façon que SAS
   arrange(identifiant, !is.na(date_entree), date_entree) %>% 
@@ -515,9 +512,6 @@ deux_dernieres_lignes <- donnees_tidyverse %>%
 ### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 deux_dernieres_lignes <- donnees_datatable[, tail(.SD, 2), by = identifiant]
-
-# À REVOIR : ne fait pas exactement pareil
-# Par ailleurs, utiliser rowid ???
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
