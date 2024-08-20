@@ -1090,15 +1090,15 @@ run;
 
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et l'identifiant est conservé en SAS, pas en R
-# PAS AVEC LA STRATEGIE DU GROUP ET FIRST. !!! DISTINGUER LES DEUX CAS !!!
+# On note un comportement un peu différent de R : la note de l'identifiant 087 est inconnue, et la ligne est conservée en SAS, pas en R.
+# Ceci est dû au fait que la fonction max ignore les NA.
 
 # Renvoie toutes les lignes où note_contenu est maximale, s'il y a plusieurs ex-aequo
 ligne_max_note_contenu <- merge(aggregate(note_contenu ~ identifiant, max, data = donnees_rbase), donnees_rbase)
 
 # Autre solution
 # MISE EN GARDE : en utilisant la fonction ave, toujours précéder la fonction de FUN = !
-donnees_rbase[with(donnees_rbase, note_contenu == ave(note_contenu, identifiant, FUN = max)), ]
+ligne_max_note_contenu <- donnees_rbase[with(donnees_rbase, which(note_contenu == ave(note_contenu, identifiant, FUN = max))), ]
 
 # Renvoie seulement la première ligne en cas d'ex-aequo
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, -donnees_rbase$note_contenu), ]

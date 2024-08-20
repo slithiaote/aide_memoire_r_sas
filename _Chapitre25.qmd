@@ -37,6 +37,7 @@ On sélectionne des données (dans cet exemple, les femmes) dans une nouvelle ba
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
+
 ``` sas
 %macro Selection (BaseInitiale, BaseFinale, condition);
   data &BaseFinale.;
@@ -48,6 +49,7 @@ On sélectionne des données (dans cet exemple, les femmes) dans une nouvelle ba
 ```
 
 ## R base {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 Selection <- function(baseInitiale = donnees_rbase, condition) {
   return(eval(substitute(subset(baseInitiale, condition))))
@@ -89,6 +91,7 @@ extrait <- Selection(baseInitiale = donnees_datatable, condition = quote(sexe ==
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
+
 ``` sas
 %macro Moyenne (BaseInitiale, variables);
   proc means data = &BaseInitiale. mean;
@@ -99,6 +102,7 @@ extrait <- Selection(baseInitiale = donnees_datatable, condition = quote(sexe ==
 ```
 
 ## R base {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 Moyenne <- function(baseInitiale = donnees_rbase, variables) {
   moyennes <- unlist(lapply(baseInitiale[, variables], mean, na.rm = TRUE))
@@ -120,6 +124,7 @@ Moyenne(baseInitiale = donnees_tidyverse, variables = c("note_contenu", "note_fo
 ```
 
 ## data.table {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 Moyenne <- function(baseInitiale = donnees_datatable, variables) {
   moyennes <- baseInitiale[, lapply(.SD, mean, na.rm = TRUE), .SDcols = variables]
@@ -130,6 +135,7 @@ Moyenne(baseInitiale = donnees_datatable, variables = c("note_contenu", "note_fo
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 
 ```
@@ -137,11 +143,13 @@ Moyenne(baseInitiale = donnees_datatable, variables = c("note_contenu", "note_fo
 :::
 
 ## Fonction calculant un indicateur statistique
-::: {.panel-tabset group="language"}
 
 Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes, et des arguments supplémentaires (notamment na.rm = TRUE) via le paramètre ...
 
+::: {.panel-tabset group="language"}
+
 ## SAS {.unnumbered .unlisted}
+
 ``` sas
 %macro CalculMoyenne (baseDonnees, variables, statistique, condition);
   proc means data = &baseDonnees. &statistique.;
@@ -155,6 +163,7 @@ Cet exemple de fonction propose de calculer un indicateur statistique au choix (
 ```
 
 ## R base {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 CalculMoyenne <- function(baseDonnees, variable, statistique = "mean", ..., selection = TRUE) {
   baseDonnees <- eval(substitute(subset(baseDonnees, selection)))
@@ -187,6 +196,7 @@ CalculMoyenne(donnees_rbase, c("note_formateur", "note_contenu"), "quantile", na
 ```
 
 ## data.table {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 CalculMoyenne <- function(baseDonnees, variable, statistique = "mean", ..., selection = TRUE) {
   moyenne <- baseDonnees[selection, lapply(.SD, statistique, ...), .SDcols = variable, env = list(statistique = statistique, selection = selection)]
@@ -201,6 +211,7 @@ CalculMoyenne(donnees_datatable, c("note_formateur", "note_contenu"), "quantile"
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 
 ```
