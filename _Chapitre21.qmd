@@ -567,7 +567,6 @@ run;
 
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ne fonctionne pas
 library(survey)
 tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_rbase)
 survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
@@ -583,7 +582,6 @@ survey::svytable(poids_sondage ~ sexef + cspf, design = tab)
 
 ### data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : ne fonctionne pas
 library(survey)
 tab <- survey::svydesign(id = ~1, weights = ~poids_sondage, data = donnees_datatable)
 survey::svytable(poids_sondage ~ sexef + cspf, design = tab)

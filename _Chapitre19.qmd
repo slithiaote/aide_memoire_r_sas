@@ -1026,9 +1026,16 @@ run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
-centrer_reduire <- scale(donnees_rbase[, notes], na.rm = TRUE)
+centrer_reduire <- scale(donnees_rbase[, notes])
 
-# Essayer apply et sweep
+# Autre solution avec les fonctions apply et sweep
+# Centrer la base
+centrer <- sweep(donnees_rbase[, notes], 2, colMeans(donnees_rbase[, notes], na.rm = TRUE), FUN = "-")
+# Réduire la base
+# On calcule déjà l'écart-type par colonne
+ecart_type <- t(apply(centrer, 2, sd, na.rm = TRUE))
+# Et on réduit
+centrer_reduire < sweep(centrer, 2, ecart_type, "/")
 ```
 
 ## tidyverse {.unnumbered .unlisted}
