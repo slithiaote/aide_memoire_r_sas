@@ -1,4 +1,4 @@
-# Créer ses propres fonctions (À FAIRE)
+# Créer ses propres fonctions
 
 ## Documentation
 ::: {.panel-tabset group="language"}
@@ -6,6 +6,10 @@
 ## SAS {.unnumbered .unlisted}
 
 ## R base {.unnumbered .unlisted}
+
+Pour en savoir plus sur l'écriture de fonctions en `R` :
+
+<https://adv-r.hadley.nz/functions.html>
 
 ## tidyverse {.unnumbered .unlisted}
 
@@ -66,7 +70,11 @@ extrait <- Selection(baseInitiale = donnees_tidyverse, condition = sexe == "2")
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-
+Selection <- function(baseInitiale = donnees_datatable, condition) {
+  baseInitiale[condition, , env = list(condition = condition)]
+}
+extrait <- Selection(baseInitiale = donnees_datatable)
+extrait <- Selection(baseInitiale = donnees_datatable, condition = quote(sexe == "2"))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
@@ -131,7 +139,7 @@ Moyenne(baseInitiale = donnees_datatable, variables = c("note_contenu", "note_fo
 ## Fonction calculant un indicateur statistique
 ::: {.panel-tabset group="language"}
 
-Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes.
+Cet exemple de fonction propose de calculer un indicateur statistique au choix (par exemple, moyenne, médiane, maximum, etc.) sur un certain nombre de variables numériques (au choix) d'une certaine base de données (au choix) avec éventuellement une sélection de lignes, et des arguments supplémentaires (notamment na.rm = TRUE) via le paramètre ...
 
 ## SAS {.unnumbered .unlisted}
 ``` sas
@@ -180,7 +188,16 @@ CalculMoyenne(donnees_rbase, c("note_formateur", "note_contenu"), "quantile", na
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+CalculMoyenne <- function(baseDonnees, variable, statistique = "mean", ..., selection = TRUE) {
+  moyenne <- baseDonnees[selection, lapply(.SD, statistique, ...), .SDcols = variable, env = list(statistique = statistique, selection = selection)]
+  setnames(moyenne, paste(names(moyenne), statistique, sep = "_"))
+  return(moyenne)
+}
 
+CalculMoyenne(donnees_datatable, c("note_formateur", "note_contenu"))
+CalculMoyenne(donnees_datatable, c("note_formateur", "note_contenu"), statistique = "median", na.rm = TRUE)
+CalculMoyenne(donnees_datatable, c("note_formateur", "note_contenu"), "mean", na.rm = TRUE, selection = quote(sexef == "Femme"))
+CalculMoyenne(donnees_datatable, c("note_formateur", "note_contenu"), "quantile", na.rm = TRUE, probs = seq(0, 1, 0.1), selection = quote(sexef == "Femme"))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}

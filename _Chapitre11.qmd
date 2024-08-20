@@ -368,9 +368,9 @@ donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$da
 donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree, na.last = FALSE), ]
 
 # Pour mimer le tri par ordre décroissant en SAS :
-donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, donnees_rbase$date_entree,
+donnees_rbase <- donnees_rbase[order(donnees_rbase$identifiant, is.na(donnees_rbase$date_entree), donnees_rbase$date_entree,
                                      na.last = FALSE,
-                                     decreasing = c(FALSE, TRUE),
+                                     decreasing = c(FALSE, FALSE, TRUE),
                                      method = "radix"), ]
 ```
 
@@ -404,17 +404,29 @@ donnees_datatable <- donnees_datatable[order(identifiant, date_entree)]
 setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, 1L), na.last = FALSE)
 
 # Pour mimer le tri par ordre décroissant en SAS :
-setorderv(donnees_datatable, cols = c("identifiant", "date_entree"), order = c(1L, -1L), na.last = FALSE)
+donnees_datatable[, date_entree_na := is.na(date_entree)]
+setorderv(donnees_datatable, cols = c("identifiant", "date_entree_na", "date_entree"), order = c(1L, 1L, -1L), na.last = FALSE)
+donnees_datatable[, date_entree_na := NULL]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
 # Les valeurs manquantes sont situées en dernier dans un tri par ordre croissant ou décroissant (car par défaut l'option na.last = TRUE) ...
-requete_duckdb %>% arrange(Identifiant, Note_Contenu) %>% select(Identifiant, Note_Contenu)
+requete_duckdb %>% 
+  arrange(Identifiant, Note_Contenu) %>% 
+  select(Identifiant, Note_Contenu)
   
-# Pour mimer le tri SAS, il faut écrire :
+# Pour mimer le tri par ordre croissant en SAS :
 # Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
-requete_duckdb %>% select(Identifiant, Note_Contenu) %>% arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
+requete_duckdb %>% 
+  select(Identifiant, Note_Contenu) %>% 
+  arrange(Identifiant, ! is.na(Note_Contenu), Note_Contenu)
+
+# Pour mimer le tri par ordre décroissant en SAS :
+# Note : il faut faire select d'abord, sinon il y a une erreur quand "! is.na()" est dans la liste des colonnes
+requete_duckdb %>% 
+  select(Identifiant, Note_Contenu) %>% 
+  arrange(Identifiant, is.na(Note_Contenu), Note_Contenu)
 ```
 
 ## pandas {.unnumbered .unlisted}

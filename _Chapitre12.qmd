@@ -446,7 +446,6 @@ donnees_tidyverse %>%
 
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-# À FAIRE : pas sûr de moi
 uniqueN(donnees_datatable)
 ```
 
