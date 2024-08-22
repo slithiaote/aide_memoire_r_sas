@@ -974,6 +974,7 @@ donnees_tidyverse <- donnees_tidyverse %>%
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 donnees_datatable[, `:=` (note_contenu_moyenne = mean(note_contenu, na.rm = TRUE),
                           note_contenu_somme = sum(note_contenu, na.rm = TRUE)), by = identifiant]
+
 # Moyenne de chaque note par individu
 notes <- tolower(c("Note_Contenu", "Note_Formateur", "Note_Moyens", "Note_Accompagnement", "Note_Materiel"))
 donnees_datatable[, paste0(notes, "_m") := lapply(.SD, mean, na.rm = TRUE), .SDcols = notes, keyby = identifiant]
