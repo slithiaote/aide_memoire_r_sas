@@ -2,7 +2,7 @@
 
 Pour en savoir plus sur le fonctionnement des dates en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_temporelles.html>.
 
-## Créer des dates
+## Créer une date à partir d'une chaîne de caractères
 
 Créer le 31 décembre de l'année sous forme de date.
 
@@ -54,7 +54,7 @@ lubridate::mdy(paste0("12.31.", annee))
 
 ## arrow/duckdb {.unnumbered .unlisted}
 
-```{r, warning=FALSE, message=FALSE}
+```{r}
 # Pour créer une date avec l'année courante
 requete_duckdb %>% 
   mutate(exemple1 = as.Date("2024/07/14"),
@@ -79,7 +79,7 @@ datetime.strptime(f"{annee}-12-31", "%Y-%m-%d")
 
 :::
 
-## Manipuler des dates
+## Calculer sur des dates
 
 Attention, calculer sur des dates est un peu compliqué à cause de cas particuliers. Par exemple, le 29 février, les années bisextiles, le calcul des mois, des semaines, les fuseaux horaires, etc. Calculer en nombre de jours ou secondes ne pose pas de problème en général.
 
@@ -145,12 +145,14 @@ donnees_datatable[, age_jours_2 := date_entree - date_naissance]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-# Création de la colonne age 
+```{r}
+# Durée entre deux dates
 requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  select(age)
+  mutate(duree_annees = year(age(date_entree,date_naissance)),
+         duree_mois = month(age(date_entree,date_naissance)),
+         ) %>% 
+  select(contains("duree_"))
+
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -190,12 +192,12 @@ run;
 ### R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Date de sortie du dispositif
-donnees_rbase$date_sortie <- donnees_datatable$date_entree + lubridate::days(donnees_rbase$duree)
+donnees_rbase$date_sortie <- donnees_rbase$date_entree + lubridate::days(donnees_rbase$duree)
 
 # Date 6 mois après la sortie
-donnees_rbase$date_6mois <- donnees_datatable$date_sortie %m+% months(6)
-donnees_rbase$date_6mois <- lubridate::add_with_rollback(donnees_datatable$date_sortie, months(6))
-donnees_rbase$date_6mois_2 <- donnees_datatable$date_sortie + lubridate::days(round(365.25/2))
+donnees_rbase$date_6mois   <- donnees_rbase$date_sortie %m+% months(6)
+donnees_rbase$date_6mois   <- lubridate::add_with_rollback(donnees_rbase$date_sortie, months(6))
+donnees_rbase$date_6mois_2 <- donnees_rbase$date_sortie + lubridate::days(round(365.25/2))
 ```
 
 ### tidyverse {.unnumbered .unlisted}
@@ -221,26 +223,15 @@ donnees_datatable[, date_sortie := date_entree + lubridate::days(duree)]
 # Date 6 mois après la sortie
 donnees_datatable[, date_6mois   := date_sortie %m+% months(6)]
 donnees_datatable[, date_6mois   := lubridate::add_with_rollback(date_sortie, months(6))]
-donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(365.25/2)]
+donnees_datatable[, date_6mois_2 := date_sortie + lubridate::days(round(365.25/2))]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-# Création de la colonne age 
+```{r}
 requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  select(age)
-
-# Âge formaté
-requete_duckdb %>%
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
-  mutate(agef = case_when(
-    age < 26             ~ "1. De 15 à 25 ans",
-    age >= 26 | age < 50 ~ "2. De 26 à 49 ans",
-    age >= 50            ~ "3. 50 ans ou plus")) %>% 
-  select(age, agef)
+  mutate(date_sortie = date_entree + duree,
+         date_6mois = date_sortie + to_months(6L)) %>% # préciser le type de 6
+  select(date_sortie, date_6mois)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -385,27 +376,19 @@ donnees_datatable[, date_6mois := date_sortie + lubridate::month(6)]
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
-# Durée entre deux dates
+# Création de la colonne age 
 requete_duckdb %>% 
-  mutate_at(enDate, ~ as.Date(strptime(.,'%d/%m/%Y'))) %>% # strptime est une fonction duckdb
-  mutate(age = year(age(Date_entree,Date_naissance))) %>% 
+  mutate(age = year(age(date_entree,date_naissance))) %>% 
   select(age)
-  mutate(duree_annees = year(age(date_entree,date_naissance)),
-         duree_mois = month(age(date_entree,date_naissance)),
-         ) %>% 
-  select(contains("duree"))
 
-requete_duckdb %>% 
-  mutate(date_sortie = date_entree + duree,
-         date_6mois = date_sortie + to_months(6L)) %>% # préciser le type de 6
-  select(date_sortie, date_6mois)
-
-requete_duckdb %>%  
-  mutate(date_0 = as.Date("2000-01-01")) %>% 
-  mutate(date_1 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
-  # mutate(date_r = lubridate::dmy("01/01/2000")) %>% # no known SQL translation
-  select(starts_with("date"))
+# Âge formaté
+requete_duckdb %>%
+  mutate(age = year(age(date_entree,date_naissance))) %>% 
+  mutate(agef = case_when(
+    age < 26 ~ "1. De 15 à 25 ans",
+    age >= 26 | age < 50 ~  "2. De 26 à 49 ans",
+    age >= 50 ~ "3. 50 ans ou plus")) %>% 
+  select(age, agef)
 ```
 
 ## pandas {.unnumbered .unlisted}
