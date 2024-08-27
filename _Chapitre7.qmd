@@ -56,9 +56,6 @@ En dplyr/arrow/duckdb, le renommage n'est pas persistant, i.e. la variable `requ
 ```{r, warning=FALSE, message=FALSE}
 # On renomme la variable sexe en sexe_red
 requete_duckdb %>% rename(sexe_red = sexe)
-
-# On la renomme en sexe
-requete_duckdb %>% rename(sexe = sexe_red)
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -147,9 +144,9 @@ Note : l'opération n'est pas persistante, i.e. l'objet `requete_duckdb` n'est p
 
 ```{r}
 requete_duckdb %>%
-  mutate(civilite = case_when(sexe     == "2" ~ "Mme",
-                              sexe     == "1" ~ "M",
-                              .default  = "Inconnu"))
+  mutate(civilite = case_when(sexe == "2" ~ "Mme",
+                              sexe == "1" ~ "M",
+                              .default = "Inconnu"))
 
 requete_duckdb %>%
   mutate(civilite = if_else(sexe == "2", "Mme",
@@ -420,7 +417,8 @@ donnees_python['agef'] = pd.cut(donnees_python['age'],
 
 :::
 
-## Transformer le format d'une variable
+
+## Changer le type d'une variable
 ::: {.panel-tabset group="language"}
 
 ## SAS {.unnumbered .unlisted}
@@ -482,6 +480,7 @@ donnees_datatable[, date_r := lubridate::dmy("01/01/2000")]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 requete_duckdb %>%  
   mutate(sexe_numerique = as.numeric(sexe)) %>% # Transformer la variable sexe en numérique
@@ -489,9 +488,7 @@ requete_duckdb %>%
   select(starts_with("sexe")) %>% print(n=5)
 ```
 
-Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
-
-En DuckDB, plusieurs syntaxes sont possibles pour transformer une chaîne de caractères en date. Sauf lorsque la chaîne de caractères n'est pas au format `YYYY-MM-DD`. On conseille de passer par la fonction `strptime` de DuckDB pour indiquer le format de la date.
+En DuckDB, plusieurs syntaxes sont possibles pour transformer une chaîne de caractères en date si la chaîne de caractères est au format `YYYY-MM-DD`. Dans le cas contraire, passer par la fonction `strptime` de DuckDB pour indiquer le format de la date.
 
 ```{r, warning=FALSE, message=FALSE}
 # Transformer une date d'un format caractère à un format Date
@@ -499,8 +496,10 @@ requete_duckdb %>%
   mutate(date_0 = as.Date("2000-01-01")) %>% 
   mutate(date_1 = as.Date(strptime("01/01/2000","%d/%m/%Y"))) %>% 
   # mutate(date_r = lubridate::dmy("01/01/2000")) %>% # no known SQL translation
-  select(starts_with("date")) %>% print(n=5)
+  select(starts_with("date"))
 ```
+
+Note : `duckdb` fait des conversions de type implicitement, mais seulement les conversions incontestables. Il faudra souvent préciser le type des variables.
 
 ## pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
@@ -615,6 +614,7 @@ donnees_python.drop(['note2'], axis = 1, inplace = True)
 ::: {.panel-tabset group="language"}
 
 ### SAS {.unnumbered .unlisted}
+
 ``` sas
 /* Création et suppressions de plusieurs variables */
 data donnees_sas;
@@ -640,6 +640,7 @@ donnees_rbase[, variable] <- NULL
 ```
 
 ### tidyverse {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Création et suppressions de plusieurs variables
 donnees_tidyverse <- donnees_tidyverse %>% 
@@ -668,6 +669,7 @@ donnees_datatable[, (variable) := NULL]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
+
 ```{r, warning=FALSE, message=FALSE}
 # À FAIRE : à compléter !
 # Création de la colonne note2
@@ -852,6 +854,7 @@ donnees_python['annee'] = donnees_python['date_entree'].dt.year
 # Mettre le numéro du mois sur 2 positions (avec un 0 devant si le mois <= 9)
 donnees_python['mois'] = donnees_python['mois'].fillna(0).astype(int).apply(lambda x: f"{x:02d}")
 ```
+
 :::
 
 ## Arrondir une valeur numérique
@@ -948,7 +951,6 @@ donnees_python['poids_inf'] = np.floor(donnees_python['poids_sondage'])
 # Arrondi à l'entier supérieur
 donnees_python['poids_sup'] = np.ceil(donnees_python['poids_sondage'])
 ```
-
 :::
 
 ## Corriger une valeur de la base
@@ -1019,3 +1021,5 @@ donnees_python_cor.loc[donnees_python_cor['identifiant'] == '168', 'note_contenu
 ```
 
 :::
+
+
