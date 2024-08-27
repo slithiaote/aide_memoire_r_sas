@@ -16,24 +16,24 @@ run;
 ```
 
 ### R base {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 donnees_rbase$csp_maj <- toupper(donnees_rbase$cspf)
 ```
 
 ### tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(csp_maj = toupper(cspf))
 ```
 
 ### data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 donnees_datatable[, csp_maj := toupper(cspf)]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(csp_maj = toupper(cspf)) %>% select(csp_maj)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -55,25 +55,25 @@ run;
 ```
 
 ### R base {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 donnees_rbase$csp_min <- tolower(donnees_rbase$cspf)
 ```
 
 ### tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 donnees_tidyverse <- donnees_tidyverse %>% 
   mutate(csp_maj = tolower(cspf))
 ```
 
 ### data.table {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 # En minuscule
 donnees_datatable[, csp_min := tolower(cspf)]
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(csp_maj = tolower(cspf)) %>% select(csp_maj)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -118,7 +118,13 @@ donnees_datatable[, niveau := paste0(toupper(substr(niveau, 1, 1)), tolower(subs
 
 ### arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% 
+  # mutate(csp_maj = str_to_title(cspf)) %>% # fonction non traduite
+  mutate(
+    l_niveau = as.integer(length(niveau)-1),
+    niveau = paste0(toupper(substr(niveau, 1, 1)), tolower(right(niveau, l_niveau)))) %>% 
+  # note : on utilise la fonction duckdb right car substr semble ne pas accepter un paramètre variable
+  select(l_niveau, niveau)
 ```
 
 ### pandas {.unnumbered .unlisted}
@@ -159,8 +165,8 @@ donnees_datatable[, taille_id := nchar(identifiant)]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(taille_id = nchar(identifiant)) %>% select(taille_id) %>% print()
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -226,7 +232,7 @@ gsub("[Q-q]ualifie", "Qualifié", tolower(aCorriger))
 
 ## arrow/duckdb {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE}
-
+requete_duckdb %>% mutate(niveau = stringr::str_replace_all(niveau, "[Q-q]ualifie", "Qualifié")) %>% select(niveau)
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -321,7 +327,7 @@ proc print data = Exemple_texte;run;
 ## R base {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
-texte  <- "              Ce   Texte   mériterait   d être   corrigé   
+texte  <- "              Ce   Texte   mériterait   d être   corrigé   "
 
 # "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
 # Le gsub remplace 1 ou plusieurs espaces successifs par un seul espace
@@ -332,7 +338,7 @@ texte <- gsub("\\s+", " ", trimws(texte))
 ## tidyverse {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
-texte  <- "              Ce   Texte   mériterait   d être   corrigé  
+texte  <- "              Ce   Texte   mériterait   d être   corrigé  "
 
 # str_squish() supprime les espaces blancs au début et à la fin, et remplace tous les espaces blancs internes par un seul espace
 texte <- str_squish(texte)
@@ -341,7 +347,7 @@ texte <- str_squish(texte)
 ## data.table {.unnumbered .unlisted}
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 # Enlever les blancs au début et à la fin de la chaîne de caractère
-texte  <- "              Ce   Texte   mériterait   d être   corrigé  
+texte  <- "              Ce   Texte   mériterait   d être   corrigé  "
 
 # "\\s+" est une expression régulière indiquant 1 ou plusieurs espaces successifs
 # Le gsub remplace 1 ou plusieurs espaces successifs par un seul espace
