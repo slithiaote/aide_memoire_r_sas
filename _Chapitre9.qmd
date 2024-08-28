@@ -1,5 +1,9 @@
 # Manipulation de chaînes de caractères
 
+En `R`, la manipulation des chaînes de caractères passe par deux librairies principales, R base et `stringr`. Ces librairies sont transversales à `dplyr` / `data.table` / `duckdb`, on peut mélanger sans difficulté, et la séparation en onglets est un peu artificielle dans ce chapitre. Il reste préférable de s'accorder sur un style de programmation homogène. En `duckdb`, certaines fonctions ne sont pas disponibles, et nous proposons des alternatives.
+
+Les fonctions de R base sont souvent mieux connues (notamment dans les tutoriels et cours de programmation). La librairie `stringr` est intéressante car les noms des fonctions sont plus simples et plus homogènes. Cette librairie est efficace, car implémentée au-dessus de `stringi`, librairie qui pourra être utile pour certains traitements complexes (l'inversion d'une chaîne, l'encodage des caractères, les accents par exemple).
+
 Pour en savoir plus sur le fonctionnement des chaînes de caractères en `R` : <https://book.utilitr.org/03_Fiches_thematiques/Fiche_donnees_textuelles.html>.
 
 ## Majuscule, minuscule
@@ -288,8 +292,8 @@ extrait <- substr("extrait", 2, 5)
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(niveau = stringr::str_sub(niveau, 2, 5)) %>% select(niveau)
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -356,8 +360,8 @@ texte <- gsub("\\s+", " ", trimws(texte))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(niveau = stringr::str_squish(niveau)) %>% select(niveau)
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -441,8 +445,8 @@ paste(texte4, texte3, sep = "-")
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(niveau = paste0(niveau,niveau)) %>% select(niveau)
 ```
 
 ## pandas {.unnumbered .unlisted}
@@ -501,8 +505,9 @@ chartr("éèêëàâçîô", "eeeeaacio", texte)
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(niveau = strip_accents(niveau)) %>% select(niveau) # strip_accents est une fonction duckdb
+# chartr n'est pas traduite en duckdb
 ```
 
 
@@ -563,9 +568,14 @@ unlist(strsplit(texte, split = " "))
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+```{r}
+requete_duckdb %>% mutate(niveau = string_split(niveau, " ")) %>% select(niveau) # string_split est une fonction duckdb
+# `str_split()` is not available in this SQL variant
+# strsplit n'est pas disponible non plus
 ```
+
+N.B. On obtient une seule colonne contenant des listes (de chaînes de caractères). DuckDB sait gérer des types complexes dans des cases, tout comme `dplyr`, mais c'est plus difficile à manipuler.
 
 ## pandas {.unnumbered .unlisted}
 ```{python, warning=FALSE, message=FALSE, results='hide', python.reticulate = FALSE}
@@ -617,8 +627,9 @@ inverserTexte(texte)
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% mutate(niveau = reverse(niveau)) %>% select(niveau) # reverse est une fonction duckdb
+# stri_reverse : No known SQL translation
 ```
 
 ## pandas {.unnumbered .unlisted}
