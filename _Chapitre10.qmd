@@ -49,8 +49,8 @@ donnees_datatable[, manquant := fifelse(is.na(age) | is.na(niveau), 1, 0)]
 ```
 
 ## arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
-
+```{r}
+requete_duckdb %>% filter(is.na(age) | is.na(niveau))
 ```
 
 :::
@@ -97,17 +97,17 @@ apply(is.na(donnees_rbase), 2, mean) * 100
 ```
 
 ### tidyverse {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r}
 # Nombre et proportion de valeurs manquantes
-donnees_tidyverse %>%
-  reframe(across(everything(), ~c( sum(is.na(.x)), mean(is.na(.x) * 100)) ))
-
-# Proportion de valeurs manquantes
 donnees_tidyverse %>%
   reframe(across(everything(), ~c( sum(is.na(.x)), mean(is.na(.x) * 100)) ))
 
 # Autres solutions
 donnees_tidyverse %>% map(~c( sum(is.na(.x)), mean(is.na(.x) * 100)))
+
+donnees_tidyverse %>%
+  summarise(across(everything(), .fns = list(nb = \(x) sum(is.na(x)), prop = \(x) mean(is.na(x)) * 100), .names = c("{.col}_{.fn}")))
+
 # Obsolète
 donnees_tidyverse %>% summarise_each(funs(mean(is.na(.)) * 100))
 ```
@@ -119,7 +119,9 @@ donnees_datatable[, lapply(.SD, function(x) c(sum(is.na(x)), mean(is.na(x)) * 10
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
+```{r}
+requete_duckdb %>%
+  summarise(across(everything(), .fns = list(nb = \(x) sum(as.integer(is.na(x))), prop = \(x) mean(as.integer(is.na(x))) * 100), .names = c("{.col}_{.fn}")))
 
 ```
 
@@ -169,8 +171,11 @@ donnees_datatable[, lapply(.SD, function(x) mean(is.na(x)) * 100),
 ```
 
 ### arrow/duckdb {.unnumbered .unlisted}
-```{r, warning=FALSE, message=FALSE}
 
+En duckdb, on ne peut pas écrire `where(is.numeric)`, mais on peut passer par `starts_with` ou `contains`.
+
+```{r}
+# ! This tidyselect interface doesn't support predicates.
 ```
 
 :::
